@@ -1,5 +1,7 @@
 /**
  * @file src/app/api/admin/annotations/approve/route.ts
+ * 
+ * @fileoverview route handler for admin annotation approval
  */
 
 import { approveAnnotations } from "@/functions/server/queries";

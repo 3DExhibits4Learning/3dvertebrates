@@ -1,9 +1,18 @@
+/**
+ * @file src/functions/client/reducers/AnnotationEntryData.ts
+ * 
+ * @fileoverview reducer for the state of the annotation entry component
+ * 
+ */
+
+// Typical imports
 import { annotationEntry, annotationsAndPositions } from "@/interface/interface";
 import { photo_annotation, video_annotation, model_annotation } from "@prisma/client";
 import { annotationEntryAction, setImageSource, setImageVisibility, loadAnnotation, setStringValue, setFile } from "@/interface/actions";
 import { getInitialAnnotationEntryData } from "@/interface/initializers";
 
-export default function AnnotationEntryReducer(data: annotationEntry, action: annotationEntryAction): annotationEntry {
+// Main JSX
+export default function annotationEntryReducer(data: annotationEntry, action: annotationEntryAction): annotationEntry {
 
     var apData: annotationsAndPositions
 

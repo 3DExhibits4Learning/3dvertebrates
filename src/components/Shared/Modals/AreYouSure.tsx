@@ -1,9 +1,17 @@
+/**
+ * @file src/components/Shared/Modals/AreYouSure.tsx
+ * 
+ * @fileoverview "Are you sure?" modal for marking a 3D model as annotated
+ */
+
 'use client'
 
+// Typical imports
 import { Modal, ModalContent, ModalBody, Button } from "@nextui-org/react"
 import { SetStateAction, useState, Dispatch } from "react";
 import { Spinner } from "@nextui-org/react";
 
+// Main JSX
 export default function AreYouSure(props: { uid: string, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
 
     //Variable initialization
@@ -25,8 +33,7 @@ export default function AreYouSure(props: { uid: string, open: boolean, setOpen:
                 setMarkedAsAnnotated(true)
             }
         
-    return (
-        <>
+    return <>
             <Modal isOpen={props.open}>
                 <ModalContent>
                     {(onClose) => (
@@ -65,5 +72,4 @@ export default function AreYouSure(props: { uid: string, open: boolean, setOpen:
                 </ModalContent>
             </Modal>
         </>
-    );
 }

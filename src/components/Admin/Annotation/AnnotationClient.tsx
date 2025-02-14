@@ -77,8 +77,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     // Set relevant model data onPress of the Accordion or when an annotation record has been changed in the database
     useEffect(() => { newAnnotationEnabled.current = false; modelOrAnnotationChangeHandler(specimenData, annotationsAndPositionsDispatch) }, [specimenData.uid, annotationsAndPositions.annotationSavedOrDeleted])
 
-    return (
-        <AnnotationClientData.Provider value={annotationClientContext} >
+    return <AnnotationClientData.Provider value={annotationClientContext} >
             <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />
 
             <div className="flex w-full h-full">
@@ -251,5 +250,4 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
                 </div>
             </div>
         </AnnotationClientData.Provider>
-    )
 }

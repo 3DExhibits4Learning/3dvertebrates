@@ -73,8 +73,7 @@ export default function ManagerClient(props: ManagerClientProps) {
         </>
     }
 
-    return (
-        <>
+    return <>
             {/* Data transfer (fetch or query) modal */}
             <DataTransferModal open={openModal} setOpen={setOpenModal} transferring={transferring} loadingLabel={loadingLabel as string} result={result} href='/admin/management' />
 
@@ -162,5 +161,4 @@ export default function ManagerClient(props: ManagerClientProps) {
                 </Accordion>
             </DataTransferContext.Provider>
         </>
-    )
 }

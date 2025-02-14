@@ -4,7 +4,7 @@
  * @fileoverview logic (function) file primarily for components of AnnotationEntry.tsx
  * 
  * @todo extract "index" argument from firstAnnotationFormData, it should always be "1"
- * @todo complete commentation
+ * @todo complete commentary
  */
 
 'use client'
