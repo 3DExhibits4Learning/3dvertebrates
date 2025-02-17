@@ -20,10 +20,29 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
 
         case 'newAnnotation':
 
-        const newAnnotationAction = action as loadAnnotation
-        if (!newAnnotationAction.apData) throw Error('Missing annotations and positions')
+            const newAnnotationAction = action as loadAnnotation
+            if (!newAnnotationAction.apData) throw Error('Missing annotations and positions')
 
-        return getInitialAnnotationEntryData(newAnnotationAction.apData, true)
+            return {
+                photoChecked: undefined,
+                videoChecked: undefined,
+                modelChecked: undefined,
+                annotationType: '',
+                mediaType: undefined,
+                imageVisible: undefined,
+                annotationTitle: undefined,
+                url: '',
+                file: undefined,
+                author: '',
+                license: '',
+                photoTitle: '',
+                website: '',
+                annotation: '',
+                length: '',
+                imageSource: undefined,
+                videoSource: '',
+                modelAnnotationUid: 'select'
+            }
 
         case 'setImageSource':
 
@@ -85,6 +104,7 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
                 videoChecked: true,
                 photoChecked: false,
                 modelChecked: false,
+                url: ''
             }
 
         case 'loadModelAnnotation':
@@ -104,6 +124,7 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
                 videoChecked: false,
                 photoChecked: false,
                 modelChecked: true,
+                url: ''
             }
 
         case 'photoRadioButton':
