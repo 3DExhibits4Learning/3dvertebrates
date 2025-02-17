@@ -46,13 +46,13 @@ export async function POST(request: Request) {
         await mkdir(filePath, { recursive: true }).catch(e => routeHandlerErrorHandler(e.message, path, 'mkdir()', "Couldn't make directory"))
 
         // Write file to path
-        filePath = join(path, file.name)
+        filePath = join(filePath, file.name)
 
         //@ts-ignore - typescript thinks writeFile doesn't take a buffer
         await writeFile(filePath, buffer).catch(e => routeHandlerErrorHandler(e.message, path, 'writeFile()', "Couldn't write file"))
 
         // Update the thumbnail column for the model in the database
-        const update = await prisma.model.update({ where: { uid: uid }, data: { thumbnail: path.slice(7) } }).catch(e => routeHandlerErrorHandler(e.message, path, 'prisma.model.update()', "Couldn't update thumbnail in database"))
+        const update = await prisma.model.update({ where: { uid: uid }, data: { thumbnail: filePath.slice(7) } }).catch(e => routeHandlerErrorHandler(e.message, path, 'prisma.model.update()', "Couldn't update thumbnail in database"))
 
         // Delete old thumbnail
         await unlink('public/' + oldThumbnailObject?.thumbnail).catch(e => console.log(routeHandlerError(path, e.message, 'unlink', 'POST', true)))
@@ -60,5 +60,6 @@ export async function POST(request: Request) {
         //Return Successful
         return routeHandlerTypicalResponse('Thumbnail Updated', update)
     }
+    // Typical catch
     catch (e: any) {routeHandlerTypicalCatch(e.message)}
 }
