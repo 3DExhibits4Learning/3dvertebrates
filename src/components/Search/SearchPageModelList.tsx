@@ -27,8 +27,6 @@ const SearchPageModelList = (props: SearchPageModelListProps) => {
     (selectionCheck(props.selectedAnnotator) || model.annotator === selectedAnnotator)
   )
 
-  console.log('X:' + filteredModels[1].thumbnail?.replace(/\\/g, "/").slice(4))
-
   return <>
     {
       filteredModels && filteredModels.length === 0 &&
