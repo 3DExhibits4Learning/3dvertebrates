@@ -1,9 +1,18 @@
+/**
+ * @file src/functions/client/reducers/AnnotationEntryData.ts
+ * 
+ * @fileoverview reducer for the state of the annotation entry component
+ * 
+ */
+
+// Typical imports
 import { annotationEntry, annotationsAndPositions } from "@/interface/interface";
 import { photo_annotation, video_annotation, model_annotation } from "@prisma/client";
 import { annotationEntryAction, setImageSource, setImageVisibility, loadAnnotation, setStringValue, setFile } from "@/interface/actions";
 import { getNewAnnotationEntryData } from "@/interface/initializers";
 
-export default function AnnotationEntryReducer(data: annotationEntry, action: annotationEntryAction): annotationEntry {
+// Main JSX
+export default function annotationEntryReducer(data: annotationEntry, action: annotationEntryAction): annotationEntry {
 
     var apData: annotationsAndPositions
 
@@ -11,10 +20,29 @@ export default function AnnotationEntryReducer(data: annotationEntry, action: an
 
         case 'newAnnotation':
 
-        const newAnnotationAction = action as loadAnnotation
-        if (!newAnnotationAction.apData) throw Error('Missing annotations and positions')
+            const newAnnotationAction = action as loadAnnotation
+            if (!newAnnotationAction.apData) throw Error('Missing annotations and positions')
 
-        return getNewAnnotationEntryData()
+            return {
+                photoChecked: undefined,
+                videoChecked: undefined,
+                modelChecked: undefined,
+                annotationType: '',
+                mediaType: undefined,
+                imageVisible: undefined,
+                annotationTitle: undefined,
+                url: '',
+                file: undefined,
+                author: '',
+                license: '',
+                photoTitle: '',
+                website: '',
+                annotation: '',
+                length: '',
+                imageSource: undefined,
+                videoSource: '',
+                modelAnnotationUid: 'select'
+            }
 
         case 'setImageSource':
 
@@ -76,6 +104,7 @@ export default function AnnotationEntryReducer(data: annotationEntry, action: an
                 videoChecked: true,
                 photoChecked: false,
                 modelChecked: false,
+                url: ''
             }
 
         case 'loadModelAnnotation':
@@ -95,6 +124,7 @@ export default function AnnotationEntryReducer(data: annotationEntry, action: an
                 videoChecked: false,
                 photoChecked: false,
                 modelChecked: true,
+                url: ''
             }
 
         case 'photoRadioButton':

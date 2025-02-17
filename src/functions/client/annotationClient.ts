@@ -61,7 +61,7 @@ export const findStudentEmail = (students: studentsAssignmentsAndModels[], speci
  * @param email email of student who to be assigned the currently selected model for annotation
  * @returns arguments for assignAnnotation()
  */
-export const getAssignmentArgs = (specimenData: annotationClientSpecimen, students?: studentsAssignmentsAndModels[], email?: string | null) => specimenData.annotator ?
+export const getAssignmentArgs = (specimenData: annotationClientSpecimen, name: string | null | undefined, students?: studentsAssignmentsAndModels[], email?: string | null) => specimenData.annotator ?
     [specimenData.uid, null, findStudentEmail(students as studentsAssignmentsAndModels[], specimenData)] :
     [specimenData.uid, (students as studentsAssignmentsAndModels[]).find(student => student.email === email)?.name, email]
 

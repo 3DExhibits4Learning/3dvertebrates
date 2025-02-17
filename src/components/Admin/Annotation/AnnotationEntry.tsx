@@ -76,31 +76,28 @@ export default function AnnotationEntry(props: AnnotationEntryProps) {
     useEffect(() => aeFn.setImageVisibility(props.index, annotationEntryData, props.new, annotationEntryDataDispatch), imageVisibilityDependencies)
     useEffect(() => aeFn.populateFormFields(apData, annotationEntryDataDispatch), [apData.activeAnnotation, apData.activeAnnotationIndex]) // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => aeFn.enableSaveOrUpdateButton(apData, annotationEntryData, enableFirstAnnotation, props.index, props.new, setCreateDisabled, setSaveDisabled, isNewPosition), enableDependencies) // eslint-disable-line react-hooks/exhaustive-deps
-    
-    // Return JSX for first annotation
-    if (props.index === 1) return (
-        <>
-            <AnnotationEntryData.Provider value={annotationEntryContext}>
-                <AnnotationEntryTransferModal />
-                <FirstAnnotationEntry new={props.new} updateAnnotation={updateAnnotation} createAnnotation={createAnnotation} saveDisabled={saveDisabled} createDisabled={createDisabled} />
-            </AnnotationEntryData.Provider>
-        </>
-    )
 
-    // JSX for all other annotations
-    return (
+    console.log(annotationEntryData)    
+
+    // Return JSX for first annotation
+    if (props.index === 1) return <>
         <AnnotationEntryData.Provider value={annotationEntryContext}>
             <AnnotationEntryTransferModal />
-            <AnnotationEntryWrapper
-                new={props.new}
-                index={props.index}
-                createAnnotation={createAnnotation}
-                updateAnnotation={updateAnnotation}
-                deleteAnnotation={deleteAnnotation}
-                saveDisabled={saveDisabled}
-                createDisabled={createDisabled}
-                annotationModels={props.annotationModels}
-            />
+            <FirstAnnotationEntry new={props.new} updateAnnotation={updateAnnotation} createAnnotation={createAnnotation} saveDisabled={saveDisabled} createDisabled={createDisabled} />
         </AnnotationEntryData.Provider>
-    )
+    </>
+
+    // JSX for all other annotations
+    return <AnnotationEntryData.Provider value={annotationEntryContext}>
+        <AnnotationEntryTransferModal />
+        <AnnotationEntryWrapper
+            new={props.new}
+            index={props.index}
+            createAnnotation={createAnnotation}
+            updateAnnotation={updateAnnotation}
+            deleteAnnotation={deleteAnnotation}
+            saveDisabled={saveDisabled}
+            createDisabled={createDisabled}
+            annotationModels={props.annotationModels} />
+    </AnnotationEntryData.Provider>
 }

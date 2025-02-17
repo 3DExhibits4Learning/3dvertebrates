@@ -2,32 +2,11 @@
  * @file src/app/api/annotations/route.tsx
  * 
  * @fileoverview route for annotation creation, update and delete operations; also gets first annotation position
- * @function GET
- * @function POST
- * @function PATCH
- * @function DELETE
  * 
  */
 
-// Importing lots of queries
-import {
-    insertFirstAnnotationPosition,
-    getFirstAnnotationPostion,
-    createAnnotation,
-    createPhotoAnnotation,
-    createVideoAnnotation,
-    deleteAnnotation,
-    updateAnnotation,
-    updatePhotoAnnotation,
-    updateVideoAnnotation,
-    deletePhotoAnnotation,
-    deleteVideoAnnotation,
-    createModelAnnotation,
-    updateModelAnnotation,
-    deleteModelAnnotation
-} from "@/functions/server/queries"
-
 // Typical imports
+import { insertFirstAnnotationPosition, getFirstAnnotationPostion, deleteAnnotation } from "@/functions/server/queries"
 import { mkdir, writeFile, unlink } from "fs/promises"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
@@ -35,6 +14,13 @@ import { getAuthorizedUsers } from "@/functions/server/queries"
 import { authorized } from "@prisma/client"
 import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/server/error"
 
+// PATH
+const path = 'src/app/api/annotations/route.tsx'
+
+// SINGLETON
+import prisma from "@/functions/utils/prisma"
+
+// DYNAMIC ROUTE
 export const dynamic = 'force-dynamic'
 
 // Default imports
@@ -77,123 +63,101 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
 
-    // Get session (mainly just for name, quick auth check while we're here)
-    const session = await getServerSession(authOptions).catch((e) => routeHandlerErrorHandler(route, e.message, 'POST getServerSession', "Couldn't get session"))
+    try {
+        // Get session (mainly just for name, quick auth check while we're here)
+        const session = await getServerSession(authOptions).catch((e) => routeHandlerErrorHandler(route, e.message, 'POST getServerSession', "Couldn't get session"))
 
-    // Get authorized users
-    const authorizedUsers = await getAuthorizedUsers().catch((e) => routeHandlerErrorHandler(route, e.message, 'POST getAuthorizedUsers', "Couldn't get authorized users")) as authorized[]
+        // Get authorized users
+        const authorizedUsers = await getAuthorizedUsers().catch((e) => routeHandlerErrorHandler(route, e.message, 'POST getAuthorizedUsers', "Couldn't get authorized users")) as authorized[]
 
-    // Authorized user redirect
-    const email = session?.user?.email as string
-    if (!authorizedUsers.find(user => user.email === email)) return <h1>NOT AUTHORIZED</h1>
+        // Authorized user redirect
+        const email = session?.user?.email as string
+        if (!authorizedUsers.find(user => user.email === email)) return <h1>NOT AUTHORIZED</h1>
 
-    // Get formData
-    const data = await request.formData()
+        // Get formData
+        const data = await request.formData()
 
-    // First annotation handler
-    if (data.get('index') === '1') {
+        // First annotation handler
+        if (data.get('index') === '1') {
 
-        try {
+            try {
 
-            // Update model record with first annotation position
-            const update = await insertFirstAnnotationPosition(data.get('uid') as string, data.get('position') as string)
-                .catch((e) => routeHandlerErrorHandler(route, e.message, 'POST insertFirstAnnotationPosition()', "Couldn't insert first annotation position"))
+                // Update model record with first annotation position
+                const update = await insertFirstAnnotationPosition(data.get('uid') as string, data.get('position') as string).catch((e) => routeHandlerErrorHandler(route, e.message, 'POST insertFirstAnnotationPosition()', "Couldn't insert first annotation position"))
 
-            // Typical response
-            return routeHandlerTypicalResponse('Annotation Created', update)
+                // Typical response
+                return routeHandlerTypicalResponse('Annotation Created', update)
+            }
+
+            // Typical catch
+            catch (e: any) { return routeHandlerTypicalCatch(e.message) }
         }
 
-        // Typical catch
-        catch (e: any) { return routeHandlerTypicalCatch(e.message) }
-    }
+        // Else the annotation must be photo, video or 3d model
+        else {
 
-    // Else the annotation must be photo, video or 3d model
-    else {
+            // Data for new base annotations
+            const newAnnotationData = {
+                uid: data.get('uid') as string,
+                position: data.get('position') as string,
+                url: data.get('url') as string,
+                annotation_no: parseInt(data.get('annotation_no') as string),
+                annotation_id: data.get('annotation_id') as string,
+                annotation_type: data.get('annotation_type') as string,
+                title: data.get('title') as string
+            }
 
-        // Conditional based on annotationType
-        switch (data.get('annotation_type')) {
+            // Conditional based on annotationType
+            switch (data.get('annotation_type')) {
 
-            // annotationType = 'video' handler
-            case 'video':
-                try {
+                case 'video':
 
-                    // Annotation creation
-                    const newAnnotation = await createAnnotation(
-                        data.get('uid') as string,
-                        data.get('position') as string,
-                        data.get('url') as string,
-                        parseInt(data.get('annotation_no') as string),
-                        data.get('annotation_type') as string,
-                        data.get('annotation_id') as string,
-                        data.get('title') as string)
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'POST createAnnotation()', "Couldn't create annotation"))
-
-                    // Video annotation creation
-                    const newVideoAnnotation = await createVideoAnnotation(
-                        data.get('url') as string,
-                        data.get('length') as string,
-                        data.get('annotation_id') as string)
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'POST createVideoAnnotation()', "Couldn't create video annotation"))
+                    // Annotation creation, transaction
+                    const newVideoBaseAnnotation = prisma.annotations.create({ data: newAnnotationData })
+                    const newVideoAnnotation = prisma.video_annotation.create({ data: { url: data.get('url') as string, length: data.get('length') as string, annotation_id: data.get('annotation_id') as string } })
+                    const newVideoAnnotations = await prisma.$transaction([newVideoBaseAnnotation, newVideoAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, ' prisma.$transaction([newAnnotation, newVideoAnnotation]', "Couldn't create video annotation"))
 
                     // Typical response
-                    return routeHandlerTypicalResponse('Annotation created', { newAnnotation, newVideoAnnotation })
-                }
-                // Typical catch
-                catch (e: any) { return routeHandlerTypicalCatch(e.message) }
+                    return routeHandlerTypicalResponse('Annotation created', newVideoAnnotations)
 
-            // annotationType = 'video' handler
-            case 'model':
-                try {
+                case 'model':
 
                     // Annotation creation
-                    const newAnnotation = await createAnnotation(
-                        data.get('uid') as string,
-                        data.get('position') as string,
-                        data.get('url') as string,
-                        parseInt(data.get('annotation_no') as string),
-                        data.get('annotation_type') as string,
-                        data.get('annotation_id') as string,
-                        data.get('title') as string)
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'POST createAnnotation()', "Couldn't create annotation"))
+                    const newModelBaseAnnotation = prisma.annotations.create({ data: newAnnotationData })
+                    const newModelAnnotation = prisma.model_annotation.create({
+                        data: {
+                            uid: data.get('modelAnnotationUid') as string,
+                            annotation: data.get('annotation') as string,
+                            annotation_id: data.get('annotation_id') as string,
+                            annotator: session.user.name ?? 'Student',
+                            modeler: session.user.name ?? 'Student'
+                        }
+                    })
 
-                    // Model annotation creation
-                    const newModelAnnotation = await createModelAnnotation(
-                        data.get('modelAnnotationUid') as string,
-                        data.get('annotation') as string,
-                        data.get('annotation_id') as string,
-                        session.user.name ?? 'Student',
-                        session.user.name ?? 'Student'
-                    )
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'POST createModelAnnotation()', "Couldn't create model annotation"))
+                    // Await transaction
+                    const newModelAnnotations = await prisma.$transaction([newModelBaseAnnotation, newModelAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, ' prisma.$transaction([newAnnotation, newModelAnnotation]', "Couldn't create model annotation"))
 
                     // Typical response
-                    return routeHandlerTypicalResponse('Annotation created', { newAnnotation, newModelAnnotation })
-                }
+                    return routeHandlerTypicalResponse('Annotation created', newModelAnnotations)
 
-                // Typical catch
-                catch (e: any) { return routeHandlerTypicalCatch(e.message) }
 
-            // Default case (annotationType == 'photo')
-            default:
-                try {
+                // Default case (annotationType == 'photo')
+                default:
 
                     // Get file
                     const file = data.get('file') as File
 
                     // Convert to arrayBuffer
-                    const bytes = await file.arrayBuffer()
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'file.arrayBuffer()', "Couldn't get array buffer")) as ArrayBuffer
+                    const bytes = await file.arrayBuffer().catch((e) => routeHandlerErrorHandler(route, e.message, 'file.arrayBuffer()', "Couldn't get array buffer")) as ArrayBuffer
 
                     // Convert to buffer
                     const buffer = Buffer.from(bytes)
 
                     // Make the directory
-                    await mkdir(data.get('dir') as string, { recursive: true })
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'POST mkdir()', "Couldn't make directory"))
+                    await mkdir(data.get('dir') as string, { recursive: true }).catch((e) => routeHandlerErrorHandler(route, e.message, 'POST mkdir()', "Couldn't make directory"))
 
                     //@ts-ignore - ts incorrectly thinks that writeFile() can't write buffers
-                    await writeFile(data.get('path') as string, buffer)
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'POST writeFile()', "Couldn't write file"))
+                    await writeFile(data.get('path') as string, buffer).catch((e) => routeHandlerErrorHandler(route, e.message, 'POST writeFile()', "Couldn't write file"))
 
 
                     // Optional photo_annotation data initializtion
@@ -201,36 +165,31 @@ export async function POST(request: Request) {
                     const title = data.get('photoTitle') ? data.get('title') : undefined
 
                     // Create annotation record
-                    const newAnnotation = await createAnnotation(
-                        data.get('uid') as string,
-                        data.get('position') as string,
-                        data.get('url') as string,
-                        parseInt(data.get('annotation_no') as string),
-                        data.get('annotation_type') as string,
-                        data.get('annotation_id') as string,
-                        data.get('title') as string)
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'POST createAnnotation()', "Couldn't create annotation"))
+                    const newBasePhotoAnnotation = prisma.annotations.create({ data: newAnnotationData })
 
                     // Create photo annotation record
-                    const newPhotoAnnotation = await createPhotoAnnotation(
-                        data.get('url') as string,
-                        data.get('author') as string,
-                        data.get('license') as string,
-                        session.user.name ? session.user.name : 'student',
-                        data.get('annotation') as string,
-                        data.get('annotation_id') as string,
-                        website as string | undefined,
-                        title as string | undefined)
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'POST createPhotoAnnotation()', "Couldn't create photo annotation"))
+                    const newPhotoAnnotation = prisma.photo_annotation.create({
+                        data: {
+                            url: data.get('url') as string,
+                            author: data.get('author') as string,
+                            license: data.get('license') as string,
+                            annotator: session.user.name ? session.user.name : 'student',
+                            annotation_id: data.get('annotation_id') as string,
+                            annotation: data.get('annotation') as string,
+                            website: website ? website as string : '',
+                            title: title ? title as string : '',
+                        }
+                    })
+
+                    // Await transaction
+                    const newPhotoAnnotations = await prisma.$transaction([newBasePhotoAnnotation, newPhotoAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, ' prisma.$transaction([newAnnotation, newModelAnnotation]', "Couldn't create model annotation"))
 
                     // Typical response
-                    return routeHandlerTypicalResponse('Annotation created', { newAnnotation, newPhotoAnnotation })
-                }
-
-                // Typical catch
-                catch (e: any) { return routeHandlerTypicalCatch(e.message) }
+                    return routeHandlerTypicalResponse('Annotation created', newPhotoAnnotations)
+            }
         }
     }
+    catch (e: any) { return routeHandlerTypicalCatch(e.message) }
 }
 
 /**
@@ -261,11 +220,10 @@ export async function PATCH(request: Request) {
         try {
 
             // Update first annotation position
-            const update = await insertFirstAnnotationPosition(data.get('uid') as string, data.get('position') as string)
-                .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH insertFirstAnnotationPosition()', "Couldn't insert first annotation position"))
+            const update = await insertFirstAnnotationPosition(data.get('uid') as string, data.get('position') as string).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH insertFirstAnnotationPosition()', "Couldn't insert first annotation position"))
 
             // Typical response
-            return routeHandlerTypicalResponse('Annotation Updated', { update })
+            return routeHandlerTypicalResponse('Annotation Updated', update)
         }
 
         // Typical catch
@@ -291,53 +249,62 @@ export async function PATCH(request: Request) {
                         // Delete photo annotation (if it was a photo annotation)
                         if (data.get('previousMedia') === 'photo') {
 
-                            // Eliminate uploaded photo
-                            await unlink(`public${data.get('oldUrl')}`)
-                                .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH unlink()', "Couldn't delete old annotation"))
-
+                            // Eliminate previous annotation photo
+                            await unlink(`public${data.get('oldUrl')}`).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH unlink()', "Couldn't delete old annotation"))
                             // Delete photo annotation record
-                            deletion = await deletePhotoAnnotation(data.get('annotation_id') as string)
-                                .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH deletePhotoAnnotation()', "Couldn't delete photo annotation"))
+                            deletion = prisma.photo_annotation.delete({ where: { annotation_id: data.get('annotation_id') as string } })
                         }
 
                         // Else delete the model annotation
-                        else deletion = await deleteModelAnnotation(data.get('annotation_id') as string)
-                            .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH deleteModelAnnotation()', "Couldn't delete model annotation"))
+                        else deletion = prisma.model_annotation.delete({ where: { annotation_id: data.get('annotation_id') as string } })
 
-                        // Annotation update
-                        const updatedAnnotation = await updateAnnotation(
-                            data.get('uid') as string,
-                            data.get('position') as string,
-                            data.get('annotation_type') as string,
-                            data.get('annotation_id') as string,
-                            data.get('title') as string,
-                            data.get('url') as string)
-                            .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH updatedAnnotation()', "Couldn't update annotation"))
+                        // Base annotation update
+                        const updatedBaseAnnotation0 = prisma.annotations.update({
+                            where: { annotation_id: data.get('annotation_id') as string },
+                            data: {
+                                uid: data.get('uid') as string,
+                                position: data.get('position') as string,
+                                url: data.get('url') as string,
+                                annotation_type: data.get('annotation_type') as string,
+                                title: data.get('title') as string
+                            },
+                        })
 
                         // Video annotation creation
-                        const newVideoAnnotation = await createVideoAnnotation(
-                            data.get('url') as string,
-                            data.get('length') as string,
-                            data.get('annotation_id') as string)
-                            .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH newVideoAnnotation()', "Couldn't update video annotation"))
+                        const newVideoAnnotation = prisma.video_annotation.create({
+                            data: {
+                                url: data.get('url') as string,
+                                length: data.get('length') as string,
+                                annotation_id: data.get('annotation_id') as string
+                            }
+                        })
+
+                        // Await transaction
+                        const updatedVideoAnnotation = await prisma.$transaction([deletion as any, updatedBaseAnnotation0, newVideoAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, 'prisma.$transaction([updatedBaseAnnotation0, newVideoAnnotation])', "Couldn't update annotation"))
 
                         // Successful response returns message as the data value and response objects from prisma as the response values
-                        return Response.json({ data: 'Annotation updated', response: deletion, updatedAnnotation, newVideoAnnotation })
+                        return routeHandlerTypicalResponse('Annotation updated', updatedVideoAnnotation)
                     }
 
                     // Annotation update
-                    const updatedAnnotation = await updateAnnotation(data.get('uid') as string,
-                        data.get('position') as string, data.get('annotation_type') as string,
-                        data.get('annotation_id') as string, data.get('title') as string,
-                        data.get('url') as string)
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH updatedAnnotation()', "Couldn't update annotation"))
+                    const updatedAnnotation = prisma.annotations.update({
+                        where: { annotation_id: data.get('annotation_id') as string },
+                        data: {
+                            uid: data.get('uid') as string,
+                            position: data.get('position') as string,
+                            url: data.get('url') as string,
+                            annotation_type: data.get('annotation_type') as string,
+                            title: data.get('title') as string
+                        },
+                    })
 
                     // Video annotation update
-                    const updatedVideoAnnotation = await updateVideoAnnotation(
-                        data.get('url') as string,
-                        data.get('length') as string,
-                        data.get('annotation_id') as string)
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH updatedVideoAnnotation()', "Couldn't update video annotation"))
+                    const updatedVideoAnnotation = prisma.video_annotation.update({
+                        where: { annotation_id: data.get('annotation_id') as string },
+                        data: { url: data.get('url') as string, length: data.get('length') as string }
+                    })
+
+                    await prisma.$transaction([updatedAnnotation, updatedVideoAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, "prisma.transaction([updatedAnnotation, updatedVideoAnnotation])", "Couldn't update annotation"))
 
                     // Typical response
                     return routeHandlerTypicalResponse('Annotation updated', { updatedAnnotation, updatedVideoAnnotation })
@@ -358,60 +325,68 @@ export async function PATCH(request: Request) {
                         // Delete the photo annotation (if the previous media was a photo)
                         if (data.get('previousMedia') === 'photo') {
 
-                            // Eliminate uploaded photo
-                            await unlink(`public${data.get('oldUrl')}`)
-                                .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH unlink()', "Couldn't delete old annotation"))
-
+                            // Eliminate previous annotation photo
+                            await unlink(`public${data.get('oldUrl')}`).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH unlink()', "Couldn't delete old annotation"))
                             // Delete photo annotation record
-                            deletion = await deletePhotoAnnotation(data.get('annotation_id') as string)
-                                .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH deletePhotoAnnotation()', "Couldn't delete photo annotation"))
+                            deletion = prisma.photo_annotation.delete({ where: { annotation_id: data.get('annotation_id') as string } })
                         }
 
                         // Or else delete the video annotation
-                        else deletion = await deleteVideoAnnotation(data.get('annotation_id') as string)
-                            .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH deleteVideoAnnotation()', "Couldn't delete video annotation"))
+                        else deletion = prisma.video_annotation.delete({ where: { annotation_id: data.get('annotation_id') as string } })
 
-                        // Annotation update
-                        const updatedAnnotation = await updateAnnotation(
-                            data.get('uid') as string,
-                            data.get('position') as string,
-                            data.get('annotation_type') as string,
-                            data.get('annotation_id') as string,
-                            data.get('title') as string)
-                            .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH updatedAnnotation()', "Couldn't update annotation"))
+                        // Base annotation update
+                        const updatedBaseAnnotation = prisma.annotations.update({
+                            where: { annotation_id: data.get('annotation_id') as string },
+                            data: {
+                                uid: data.get('uid') as string,
+                                position: data.get('position') as string,
+                                annotation_type: data.get('annotation_type') as string,
+                                title: data.get('title') as string
+                            },
+                        })
 
                         // Create new model annotation
-                        const newModelAnnotation = await createModelAnnotation(
-                            data.get('modelAnnotationUid') as string,
-                            data.get('annotation') as string,
-                            data.get('annotation_id') as string,
-                            session.user.name ?? 'Student',
-                            session.user.name ?? 'Student'
-                        )
-                            .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH newModelAnnotation()', "Couldn't create new model annotation"))
+                        const newModelAnnotation = prisma.model_annotation.create({
+                            data: {
+                                uid: data.get('modelAnnotationUid') as string,
+                                annotation: data.get('annotation') as string,
+                                annotation_id: data.get('annotation_id') as string,
+                                annotator: session.user.name ?? 'Student',
+                                modeler: session.user.name ?? 'Student'
+                            }
+                        }).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH newModelAnnotation()', "Couldn't create new model annotation"))
+
+                        // Await transaction
+                        const updatedModelAnnotationTransaction = await prisma.$transaction([deletion as any, updatedBaseAnnotation, newModelAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, "prisma.transaction([updating model annotation])", "Couldn't update model annotation"))
 
                         // Typical response
-                        return routeHandlerTypicalResponse('Annotation updated', { deletion, updatedAnnotation, newModelAnnotation })
+                        return routeHandlerTypicalResponse('Annotation updated', updatedModelAnnotationTransaction)
                     }
 
                     // Annotation update
-                    const updatedAnnotation = await updateAnnotation(
-                        data.get('uid') as string,
-                        data.get('position') as string,
-                        data.get('annotation_type') as string,
-                        data.get('annotation_id') as string,
-                        data.get('title') as string)
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH updatedAnnotation()', "Couldn't update annotation"))
+                    const updatedAnnotation = prisma.annotations.update({
+                        where: { annotation_id: data.get('annotation_id') as string },
+                        data: {
+                            uid: data.get('uid') as string,
+                            position: data.get('position') as string,
+                            annotation_type: data.get('annotation_type') as string,
+                            title: data.get('title') as string
+                        },
+                    })
 
                     // Model annotation update
-                    const updatedModelAnnotation = await updateModelAnnotation(
-                        data.get('modelAnnotationUid') as string,
-                        data.get('annotation') as string,
-                        data.get('annotation_id') as string)
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH updatedModelAnnotation()', "Couldn't update model annotation"))
+                    const updatedModelAnnotation = prisma.model_annotation.update({
+                        where: { annotation_id: data.get('annotation_id') as string },
+                        data: {
+                            uid: data.get('modelAnnotationUid') as string,
+                            annotation: data.get('annotation') as string,
+                        }
+                    })
+
+                    const updatedModelAnnotationTransaction = await prisma.$transaction([updatedAnnotation, updatedModelAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, "prisma.transaction([updating model annotation])", "Couldn't update model annotation"))
 
                     // Typical response
-                    return routeHandlerTypicalResponse('Annotation updated', { updatedAnnotation, updatedModelAnnotation })
+                    return routeHandlerTypicalResponse('Annotation updated', updatedModelAnnotationTransaction)
                 }
                 // Typical catch
                 catch (e: any) { return routeHandlerTypicalCatch(e.message) }
@@ -428,22 +403,18 @@ export async function PATCH(request: Request) {
                         const file = data.get('file') as File
 
                         // Convert file => arrayBuffer => buffer
-                        const bytes = await file.arrayBuffer()
-                            .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH file.arrayBuffer()', "Couldn't get array buffer")) as ArrayBuffer
+                        const bytes = await file.arrayBuffer().catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH file.arrayBuffer()', "Couldn't get array buffer")) as ArrayBuffer
                         const photoBuffer = Buffer.from(bytes)
 
                         // Make directory
-                        await mkdir(data.get('dir') as string, { recursive: true })
-                            .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH mkdir()', "Couldn't make directory"))
+                        await mkdir(data.get('dir') as string, { recursive: true }).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH mkdir()', "Couldn't make directory"))
 
-                        //@ts-ignore - ts incorreclty thinks buffers can't be written with writeFile()
-                        await writeFile(data.get('path') as string, photoBuffer)
-                            .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH writeFile()', "Couldn't write file"))
+                        //@ts-ignore - ts incorreclty thinks buffers can't be written with writeFile() (needs update)
+                        await writeFile(data.get('path') as string, photoBuffer).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH writeFile()', "Couldn't write file"))
                     }
 
                     // Eliminate previous photo uploaded to data storage container if it exists
-                    if (data.get('oldUrl') && data.get('file')) await unlink(`public${data.get('oldUrl')}`)
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH unlink()', "Couldn't delete old annotation"))
+                    if (data.get('oldUrl') && data.get('file')) await unlink(`public${data.get('oldUrl')}`).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH unlink()', "Couldn't delete old annotation"))
 
                     // Remaining optional fields
                     const website = data.get('website') ? data.get('website') : undefined
@@ -455,63 +426,73 @@ export async function PATCH(request: Request) {
                         let deletion
 
                         // Delete video annotation (if it was a video)
-                        if (data.get('previousMedia') === 'video') deletion = await deleteVideoAnnotation(data.get('annotation_id') as string)
-                            .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH deleteVideoAnnotation()', "Couldn't delete previous video annotation"))
+                        if (data.get('previousMedia') === 'video') deletion = prisma.video_annotation.delete({ where: { annotation_id: data.get('annotation_id') as string } })
 
                         // Or else delete the model annotation
-                        else deletion = await deleteModelAnnotation(data.get('annotation_id') as string)
-                            .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH deleteModelAnnotation()', "Couldn't delete previous model annotation"))
+                        else deletion = prisma.model_annotation.delete({ where: { annotation_id: data.get('annotation_id') as string } })
 
                         // Update annotation
-                        const updatedAnnotation = await updateAnnotation(
-                            data.get('uid') as string,
-                            data.get('position') as string,
-                            data.get('annotation_type') as string,
-                            data.get('annotation_id') as string,
-                            data.get('title') as string,
-                            data.get('url') as string)
-                            .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH updatedAnnotation()', "Couldn't update annotation"))
+                        const updatedAnnotation = prisma.annotations.update({
+                            where: { annotation_id: data.get('annotation_id') as string },
+                            data: {
+                                uid: data.get('uid') as string,
+                                position: data.get('position') as string,
+                                url: data.get('url') as string,
+                                annotation_type: data.get('annotation_type') as string,
+                                title: data.get('title') as string
+                            },
+                        }).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH updatedAnnotation()', "Couldn't update annotation"))
 
                         // Create new photo annotation
-                        const newPhotoAnnotation = await createPhotoAnnotation(
-                            data.get('url') as string,
-                            data.get('author') as string,
-                            data.get('license') as string,
-                            session.user.name ? session.user.name : 'student',
-                            data.get('annotation') as string,
-                            data.get('annotation_id') as string,
-                            website as string | undefined,
-                            title as string | undefined)
-                            .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH createPhotoAnnotation()', "Couldn't create photo annotation"))
+                        const newPhotoAnnotation = prisma.photo_annotation.create({
+                            data: {
+                                url: data.get('url') as string,
+                                author: data.get('author') as string,
+                                license: data.get('license') as string,
+                                annotator: session.user.name ? session.user.name : 'student',
+                                annotation_id: data.get('annotation_id') as string,
+                                annotation: data.get('annotation') as string,
+                                website: website ? website as string : '',
+                                title: title ? title as string : '',
+                            }
+                        }).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH createPhotoAnnotation()', "Couldn't create photo annotation"))
+
+                        const updatedPhotoAnnotationTransaction = await prisma.$transaction([deletion as any, updatedAnnotation, newPhotoAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, "prisma.transaction([updating model annotation])", "Couldn't update model annotation"))
 
                         // Typical response
                         return routeHandlerTypicalResponse('Annotation updated', { deletion, updatedAnnotation, newPhotoAnnotation })
                     }
 
                     // Update annotation
-                    const updatedAnnotation = await updateAnnotation(
-                        data.get('uid') as string,
-                        data.get('position') as string,
-                        data.get('annotation_type') as string,
-                        data.get('annotation_id') as string,
-                        data.get('title') as string,
-                        data.get('url') as string)
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH updateAnnotation()', "Couldn't update annotation"))
+                    const updatedAnnotation = prisma.annotations.update({
+                        where: { annotation_id: data.get('annotation_id') as string },
+                        data: {
+                            uid: data.get('uid') as string,
+                            position: data.get('position') as string,
+                            url: data.get('url') as string,
+                            annotation_type: data.get('annotation_type') as string,
+                            title: data.get('title') as string
+                        },
+                    })
 
                     // Update photo annotation
-                    const updatedPhotoAnnotation = await updatePhotoAnnotation(
-                        data.get('url') as string,
-                        data.get('author') as string,
-                        data.get('license') as string,
-                        session.user.name ? session.user.name : 'student',
-                        data.get('annotation') as string,
-                        data.get('annotation_id') as string,
-                        website as string | undefined,
-                        title as string | undefined)
-                        .catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH updatePhotoAnnotation()', "Couldn't update photo annotation"))
+                    const updatedPhotoAnnotation = prisma.photo_annotation.update({
+                        where: { annotation_id: data.get('annotation_id') as string },
+                        data: {
+                            url: data.get('url') as string,
+                            author: data.get('author') as string,
+                            license: data.get('license') as string,
+                            annotator: session.user.name ? session.user.name : 'student',
+                            annotation: data.get('annotation') as string,
+                            website: website ? website as string : '',
+                            title: title ? title as string : '',
+                        }
+                    })
+
+                    const updatedPhotoAnnotationTransaction = await prisma.$transaction([updatedAnnotation, updatedPhotoAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, "prisma.transaction([updating photo annotation])", "Couldn't update photo annotation"))
 
                     // Typical response
-                    return routeHandlerTypicalResponse('Annotation updated', { updatedAnnotation, updatedPhotoAnnotation })
+                    return routeHandlerTypicalResponse('Annotation updated', updatedPhotoAnnotationTransaction)
                 }
 
                 // Typical catch

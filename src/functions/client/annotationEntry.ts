@@ -4,7 +4,7 @@
  * @fileoverview logic (function) file primarily for components of AnnotationEntry.tsx
  * 
  * @todo extract "index" argument from firstAnnotationFormData, it should always be "1"
- * @todo complete commentation
+ * @todo complete commentary
  */
 
 'use client'
@@ -77,7 +77,8 @@ export const enablePhotoAnnotatonUpdate = (apData: annotationsAndPositions, aeDa
     const optionalValues = [aeData.photoTitle, aeData.website]
 
     // If all required fields are populated and: they are different from the original, there is a new file, there is a new annotation position, or optional values have changed, enable "save changes"
-    if (currentValues.every(allTruthy) && (!allSame(originalValues, currentValues) || aeData.file || isNewPosition || !allSame(originalOptionalValues, optionalValues))) setSaveDisabled(false)
+    if (!aeData.url.startsWith('/data') && !aeData.file) setSaveDisabled(true)
+    else if (currentValues.every(value => value) && (!allSame(originalValues, currentValues) || aeData.file || isNewPosition || !allSame(originalOptionalValues, optionalValues))) setSaveDisabled(false)
     else setSaveDisabled(true)
 }
 
@@ -94,7 +95,7 @@ export const enableVideoAnnotationUpdate = (apData: annotationsAndPositions, aeD
     // Type assertion, required value arrays
     const caseAnnotation = apData.activeAnnotation as video_annotation
     const originalValues = [apData.activeAnnotationTitle, caseAnnotation.url, caseAnnotation.length]
-    const currentValues = [aeData.annotationTitle, aeData.videoSource, length]
+    const currentValues = [aeData.annotationTitle, aeData.videoSource, aeData.length]
 
     // If all required fields are populated and: they are different from the original, or there is a new position, then enable "save changes"
     if (currentValues.every(allTruthy) && (!allSame(originalValues, currentValues) || isNewPosition)) setSaveDisabled(false)
@@ -173,13 +174,23 @@ export const deleteAnnotation = (apData: annotationsAndPositions, uid: string, d
     dataTransferWrapper(insertAnnotation, [data, 'DELETE'], "Deleting annotation")
 }
 
+/**
+ * 
+ * @param index 
+ * @param aeData 
+ * @param isNew 
+ * @param dispatch 
+ */
 export const setImageVisibility = (index: number, aeData: annotationEntry, isNew: boolean, dispatch: Dispatch<annotationEntryAction>) => {
-    if (index !== 1 && aeData.annotationType === 'photo') {
-        if (!aeData.file && !isNew) dispatch({ type: 'setImageVisibility', isVisible: true })
-        else dispatch({ type: 'setImageVisibility', isVisible: false })
-    }
+    if (index !== 1 && aeData.annotationType === 'photo' && !isNew && aeData.url.startsWith('/data')) dispatch({ type: 'setImageVisibility', isVisible: true })
+    else dispatch({ type: 'setImageVisibility', isVisible: false })
 }
 
+/**
+ * 
+ * @param apData 
+ * @param dispatch 
+ */
 export const populateFormFields = (apData: annotationsAndPositions, dispatch: Dispatch<annotationEntryAction>) => {
 
     if (apData.activeAnnotationIndex === 'new') dispatch({ type: 'newAnnotation', apData: apData })
@@ -207,7 +218,7 @@ export const enableSaveOrUpdateButton = (
     setSaveDisabled: Dispatch<SetStateAction<boolean>>,
     isNewPosition: boolean
 ) => {
-    if (index == 1) apData.position3D ? enableFirstAnnotation(false) : enableFirstAnnotation(true)
+    if (index === 1) apData.position3D ? enableFirstAnnotation(false) : enableFirstAnnotation(true)
 
     else if (aeData.annotationType === 'photo') {
         switch (isNew) {

@@ -5,6 +5,7 @@
  * 
  * @todo Modify to take JSX as children with references to the window resizing context for scale
  */
+
 "use client"
 
 // Typical Imports

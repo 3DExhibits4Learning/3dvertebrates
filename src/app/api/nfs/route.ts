@@ -26,7 +26,7 @@ export async function GET(request: Request) {
         const fileBuffer = await readFile(searchParams.get('path') as string).catch((e) => routeHandlerErrorHandler(route, e.message, 'readFile()', "Can't read photo")) as Buffer
 
         // Return filebuffer
-        return new Response(fileBuffer, { status: 200 })
+        return new Response(fileBuffer)
     }
     
     // Typical catch
