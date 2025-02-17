@@ -17,6 +17,9 @@ import routeHandlerTypicalResponse from '@/functions/server/typicalSuccessRespon
 // SINGLETON
 import prisma from '@/functions/utils/prisma'
 
+// PATH
+const path = 'src/app/api/thumbnail/add/route.tsx'
+
 // Main JSX
 export async function POST(request: Request) {
 
@@ -34,17 +37,17 @@ export async function POST(request: Request) {
         // Convert photo to buffer and write to data storage
         const bytes = await file.arrayBuffer()
         const buffer = Buffer.from(bytes)
-        var path = `public/data/Vertebrates/Thumbnails/${uid}`
+        var filePath = process.env.LOCAL_ENV === 'development' ? `X:/Vertebrates/Thumbnails/${uid}` : `public/data/Vertebrates/Thumbnails/${uid}`
 
         // Make directory, update path
-        await mkdir(path, { recursive: true }).catch(e => routeHandlerErrorHandler(e.message, path, 'mkdir()', "Couldn't make directory"))
-        path = join(path, file.name)
+        await mkdir(filePath, { recursive: true }).catch(e => routeHandlerErrorHandler(e.message, filePath, 'mkdir()', "Couldn't make directory"))
+        filePath = join(filePath, file.name)
 
         //@ts-ignore - typescript thinks writeFile doesn't take a buffer
         await writeFile(path, buffer).catch(e => routeHandlerErrorHandler(e.message, path, 'writeFile()', "Couldn't write file"))
         
         // Update the thumbnail column for the model in the database (remove 'public' and follwing slash, then escape remaining forward slashes in path before DB entry)
-        const update = await prisma.model.update({ where: { uid: uid }, data: { thumbnail: path.slice(7).replace('/', '\/') } }).catch(e => routeHandlerErrorHandler(e.message, path, 'prisma.model.update()', "Couldn't update thumbnail in database"))
+        const update = await prisma.model.update({ where: { uid: uid }, data: { thumbnail: filePath.slice(7).replace('/', '\/') } }).catch(e => routeHandlerErrorHandler(e.message, path, 'prisma.model.update()', "Couldn't update thumbnail in database"))
 
         //Return Successful
         return routeHandlerTypicalResponse('Thumbnail Added', update)

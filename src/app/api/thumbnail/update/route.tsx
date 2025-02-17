@@ -40,16 +40,16 @@ export async function POST(request: Request) {
         // Convert photo to buffer and write to data storage
         const bytes = await file.arrayBuffer()
         const buffer = Buffer.from(bytes)
-        var path = `public/data/Vertebrates/Thumbnails/${uid}`
+        var filePath = process.env.LOCAL_ENV === 'development' ? `X:/Vertebrates/Thumbnails/${uid}` : `public/data/Vertebrates/Thumbnails/${uid}`
 
         // Since this is an update, this path should already exist; this is a low-cost redundency check
-        await mkdir(path, { recursive: true }).catch(e => routeHandlerErrorHandler(e.message, path, 'mkdir()', "Couldn't make directory"))
+        await mkdir(filePath, { recursive: true }).catch(e => routeHandlerErrorHandler(e.message, path, 'mkdir()', "Couldn't make directory"))
 
         // Write file to path
-        path = join(path, file.name)
+        filePath = join(path, file.name)
 
         //@ts-ignore - typescript thinks writeFile doesn't take a buffer
-        await writeFile(path, buffer).catch(e => routeHandlerErrorHandler(e.message, path, 'writeFile()', "Couldn't write file"))
+        await writeFile(filePath, buffer).catch(e => routeHandlerErrorHandler(e.message, path, 'writeFile()', "Couldn't write file"))
 
         // Update the thumbnail column for the model in the database
         const update = await prisma.model.update({ where: { uid: uid }, data: { thumbnail: path.slice(7) } }).catch(e => routeHandlerErrorHandler(e.message, path, 'prisma.model.update()', "Couldn't update thumbnail in database"))
