@@ -44,7 +44,7 @@ export async function POST(request: Request) {
         const tags: string[] = JSON.parse(data.get('tags') as string)
         const position: { lat: string, lng: string } = JSON.parse(data.get('position') as string)
         const speciesAcquisitionDate = data.get('speciesAcquisitionDate') as string
-        const modelFile = data.get('modelFile') as File
+        const modelFile = data.get('modelFile') as File | Blob
         const baseOrAnnotation = data.get('baseOrAnnotation') as string
         const commonName = data.get('commonName') ? data.get('commonName') as string : ''
 
@@ -62,18 +62,10 @@ export async function POST(request: Request) {
 
         // Upload model file to sketchfab and instantiate modelUid
         await fetch(orgModelUploadEnd, {
-            headers: requestHeader,
+            headers: { 'Authorization': process.env.SKETCHFAB_API_TOKEN as string },
             method: 'POST',
             body: formData
-        })
-            .then((res) => {
-                if (!res.ok) {
-                    console.error(res.statusText)
-                    throw Error('Bad SF request')
-                }
-                return res.json()
-            })
-            .then(json => modelUid = json.uid)
+        }).then((res) => {if (!res.ok) {console.log(res);console.error(res.statusText); throw Error('Bad SF request')}; return res.json()}).then(json => modelUid = json.uid)
             .catch((e) => {
                 console.error(e.message)
                 throw Error('Bad SF request')

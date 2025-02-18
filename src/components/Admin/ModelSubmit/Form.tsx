@@ -13,6 +13,7 @@ import { useState, useEffect } from 'react';
 import { Button } from "@nextui-org/react";
 import { Divider } from '@nextui-org/react';
 
+// Default imports
 import ArtistName from './ArtistNameField';
 import SpeciesName from './SpeciesNameField';
 import ProcessSelect from './ProcessSelectField';
@@ -61,12 +62,17 @@ export default function ModelSubmitForm() {
             // Stringify arrays and object
             const formSoftware = JSON.stringify(software.map(obj => obj.value))
             const formTags = JSON.stringify(software.map(obj => obj.value))
-            const formPosition = JSON.stringify({lat: lat, lng: lng})
+            const formPosition = JSON.stringify({ lat: lat, lng: lng })
 
             // Zip file if it isn't
             const zip = new JSZip()
             const model = file as File
-            const dataFile = model.name.includes('.zip') ? model : zip.file(`${species}.zip`, model).generateAsync({type: 'blob'})
+            var dataFile
+
+            if(!model.name.endsWith('.zip')){
+                zip.file(`${species}.zip`, model) 
+                dataFile = await zip.generateAsync({ type: 'blob' })
+            }
 
             // Set form data
             const data = new FormData()
@@ -77,7 +83,7 @@ export default function ModelSubmitForm() {
             data.set('tags', formTags)
             data.set('position', formPosition)
             data.set('speciesAcquisitionDate', speciesAcquisitionDate)
-            data.set('modelFile', dataFile as File | Blob)
+            data.set('modelFile', dataFile ? dataFile : model, `${species}.zip`)
             data.set('baseOrAnnotation', baseOrAnnotation)
             data.set('commonName', commonName)
 
@@ -85,20 +91,8 @@ export default function ModelSubmitForm() {
             await fetch('/api/modelSubmit', {
                 method: 'POST',
                 body: data
-            })
-                .then(res => {
-                    if (!res.ok) throw Error(res.statusText)
-                    return res.json()
-                })
-                .then(json => {
-                    setResult(json.data)
-                    setTransferring(false)
-                })
-                .catch(e => {
-                    setResult(e.message)
-                    setTransferring(false)
-                    setSuccess(true)
-                })
+            }).then(res => { if (!res.ok) throw Error(res.statusText); return res.json() }).then(json => { setResult(json.data); setTransferring(false) })
+                .catch(e => { setResult(e.message); setTransferring(false); setSuccess(false) })
         }
         // Typical catch
         catch (e: any) {
@@ -139,9 +133,9 @@ export default function ModelSubmitForm() {
                 <Divider className='mb-6' />
 
                 <SpeciesName value={species} setValue={setSpecies} />
-                <TextInput value={commonName} setValue={setCommonName} title='Common Name' leftMargin='ml-12' textSize='text-2xl'/> 
+                <TextInput value={commonName} setValue={setCommonName} title='Common Name' leftMargin='ml-12' textSize='text-2xl' />
                 <SpeciesAcquisitionDate value={speciesAcquisitionDate} setValue={setSpeciesAcquisitionDate} />
-                <LatLng lat={lat} lng={lng} setLat={setLat} setLng={setLng}/>
+                <LatLng lat={lat} lng={lng} setLat={setLat} setLng={setLng} />
                 <TagInput value={tags} setValue={setTags} />
 
                 <Divider className='mt-8' />
@@ -151,9 +145,9 @@ export default function ModelSubmitForm() {
                 <Divider />
 
                 <ArtistName value={artist} setValue={setArtist} />
-                <BaseOrAnnotation value={baseOrAnnotation} setValue={setBaseOrAnnotation}/>
+                <BaseOrAnnotation value={baseOrAnnotation} setValue={setBaseOrAnnotation} />
                 <ProcessSelect value={buildMethod} setValue={setBuildMethod} />
-                <TagInput value={software} setValue={setSoftware} marginTop='mt-12' title='Enter any software used in creation of the 3D model (must enter at least 1)' required/>
+                <TagInput value={software} setValue={setSoftware} marginTop='mt-12' title='Enter any software used in creation of the 3D model (must enter at least 1)' required />
                 <ModelInput setFile={setFile} />
 
                 <Button
