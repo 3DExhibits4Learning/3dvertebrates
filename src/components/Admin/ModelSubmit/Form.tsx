@@ -23,6 +23,7 @@ import ModelInput from './ModelInput';
 import LatLng from './LatLng';
 import BaseOrAnnotation from './BaseOrAnnotation';
 import TextInput from '@/components/Shared/Form Fields/TextInput';
+import JSZip from 'jszip'
 
 // Main component
 export default function ModelSubmitForm() {
@@ -62,6 +63,11 @@ export default function ModelSubmitForm() {
             const formTags = JSON.stringify(software.map(obj => obj.value))
             const formPosition = JSON.stringify({lat: lat, lng: lng})
 
+            // Zip file if it isn't
+            const zip = new JSZip()
+            const model = file as File
+            const dataFile = model.name.includes('.zip') ? model : zip.file(`${species}.zip`, model).generateAsync({type: 'blob'})
+
             // Set form data
             const data = new FormData()
             data.set('artist', artist)
@@ -71,7 +77,7 @@ export default function ModelSubmitForm() {
             data.set('tags', formTags)
             data.set('position', formPosition)
             data.set('speciesAcquisitionDate', speciesAcquisitionDate)
-            data.set('modelFile', file as File)
+            data.set('modelFile', dataFile as File | Blob)
             data.set('baseOrAnnotation', baseOrAnnotation)
             data.set('commonName', commonName)
 
