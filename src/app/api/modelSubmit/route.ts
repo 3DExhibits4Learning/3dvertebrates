@@ -1,16 +1,27 @@
 /**
  * @file src/app/api/modelSubmit/route.tsx
+ * 
  * @fileoverview These are the route handlers for uploading and editing 3D models
+ * 
+ * @todo throw error on failure of required data check
  */
 
+// Typical imports
 import { prismaClient } from "@/functions/server/queries";
 import { LatLngLiteral } from "leaflet";
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { redirect } from "next/navigation"
+import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/server/error";
 
-// import prisma client
+// Defualt imports
+import routeHandlerTypicalResponse from "@/functions/server/typicalSuccessResponse";
+
+// SINGLETON
 const prisma = prismaClient()
+
+// ROUTE
+const route = 'src/app/api/modelSubmit/route.tsx'
 
 // Typescript satisfied header (used in POST and PUT methods)
 const requestHeader: HeadersInit = new Headers()
@@ -26,15 +37,12 @@ export async function POST(request: Request) {
 
     try {
 
-        // Get request data and initialize variables
-        const data = await request.formData()
-        const formData = new FormData
+        // Get request data
+        const data = await request.formData().catch(e => routeHandlerErrorHandler(route, e.message, 'request.formData()', "Couldn't get form data")) as FormData
 
         // Get session data (or redirect if there is no session data)
         const session = await getServerSession(authOptions)
-        if (!session || !session.user) {
-            redirect('/api/auth/signin')
-        }
+        if (!session || !session.user) redirect('/api/auth/signin')
 
         // Data variables
         const artist = data.get('artist') as string
@@ -49,31 +57,32 @@ export async function POST(request: Request) {
         const commonName = data.get('commonName') ? data.get('commonName') as string : ''
 
         // Form and fetch Variables 
+        const formData = new FormData
         formData.set('orgProject', process.env.SKETCHFAB_PROJECT_3DVERTEBRATES as string)
         formData.set('modelFile', modelFile)
         formData.set('visibility', 'private')
         formData.set('options', JSON.stringify({ background: { color: "#000000" } }))
         const orgModelUploadEnd = `https://api.sketchfab.com/v3/orgs/${process.env.SKETCHFAB_ORGANIZATION}/models`
-        var modelUid: any
+        var modelUid = ''
 
         // Session variables
         const email = session.user?.email
         const user = session.user.name ?? ''
 
+        // Database transaction array
+        const transactions = []
+
         // Upload model file to sketchfab and instantiate modelUid
-        await fetch(orgModelUploadEnd, {
-            headers: { 'Authorization': process.env.SKETCHFAB_API_TOKEN as string },
-            method: 'POST',
-            body: formData
-        }).then((res) => {if (!res.ok) {console.log(res);console.error(res.statusText); throw Error('Bad SF request')}; return res.json()}).then(json => modelUid = json.uid)
-            .catch((e) => {
-                console.error(e.message)
-                throw Error('Bad SF request')
+        await fetch(orgModelUploadEnd, { headers: requestHeader, method: 'POST', body: formData })
+            .then((res) => {
+                if (!res.ok) routeHandlerErrorHandler(route, res.statusText, 'fetch(orgModelUploadEnd)', "Bad upload request")
+                return res.json()
             })
+            .then(json => modelUid = json.uid)
+            .catch(e => routeHandlerErrorHandler(route, e.message, 'fetch(orgModelUploadEnd)', "Bad upload request"))
 
-
-        // Insert data into database
-        const insert = await prisma.model.create({
+        // Push model query onto transactions
+        transactions.push(prisma.model.create({
             data: {
                 email: email,
                 modeled_by: artist,
@@ -88,46 +97,21 @@ export async function POST(request: Request) {
                 base_model: baseOrAnnotation === 'base' ? true : false,
                 pref_comm_name: commonName
             }
-        }).catch((e) => {
-            console.error(e.message)
-            throw Error("Couldn't Insert Metadata into Database")
-        })
+        }))
 
-        // Insert software into database
-        for (let i in software) {
-            await prisma.software.create({
-                data: {
-                    uid: modelUid,
-                    software: software[i]
-                }
-            }).catch((e) => {
-                console.error(e.message)
-                throw Error("Couldn't Insert Software into Database")
-            })
-        }
+        // Push software and tag queries
+        for (let i in software) { transactions.push(prisma.software.create({ data: { uid: modelUid, software: software[i] } })) }
+        for (let i in tags) { transactions.push(prisma.tags.create({ data: { uid: modelUid, tag: tags[i] } })) }
 
-        // Insert tags into database
-        for (let i in tags) {
-            await prisma.tags.create({
-                data: {
-                    uid: modelUid,
-                    tag: tags[i]
-                }
-            }).catch((e) => {
-                console.error(e.message)
-                throw Error("Couldn't Insert Tags into Database")
-            })
-        }
+        // Await transaction
+        const transaction = await prisma.$transaction(transactions).catch(e => routeHandlerErrorHandler(route, e.message, 'prisma.transaction(transactions)', "Couldn't enter model into database"))
 
         // Typical success return
-        return Response.json({ data: 'Model added successfully', response: insert })
+        return routeHandlerTypicalResponse('Model added successfully', transaction)
     }
 
     // Typical fail return 
-    catch (e: any) {
-        console.error(e.message)
-        return Response.json({ data: e.message, response: e.message }, { status: 400, statusText: e.message })
-    }
+    catch (e: any) { routeHandlerTypicalCatch(e.message) }
 }
 
 /**
@@ -141,7 +125,7 @@ export async function PUT(request: Request) {
     try {
 
         // Get form data and initialize variables
-        const data = await request.formData()
+        const data = await request.formData().catch(e => routeHandlerErrorHandler(route, e.message, 'request.formData()', "Couldn't get form data")) as FormData
         const modelFile = data.get('modelFile') as File
         const uid = data.get('uid') as string
         const reuploadData = new FormData()

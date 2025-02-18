@@ -9,21 +9,21 @@
 'use client'
 
 // Imports
-import { useState, useEffect } from 'react';
-import { Button } from "@nextui-org/react";
-import { Divider } from '@nextui-org/react';
+import { useState, useEffect } from 'react'
+import { Button } from "@nextui-org/react"
+import { Divider } from '@nextui-org/react'
 
 // Default imports
-import ArtistName from './ArtistNameField';
-import SpeciesName from './SpeciesNameField';
-import ProcessSelect from './ProcessSelectField';
-import TagInput from './Tags';
-import DataTransferModal from '../../Shared/Modals/DataTransferModal';
-import SpeciesAcquisitionDate from './AcquisitionDate';
-import ModelInput from './ModelInput';
-import LatLng from './LatLng';
-import BaseOrAnnotation from './BaseOrAnnotation';
-import TextInput from '@/components/Shared/Form Fields/TextInput';
+import ArtistName from './ArtistNameField'
+import SpeciesName from './SpeciesNameField'
+import ProcessSelect from './ProcessSelectField'
+import TagInput from './Tags'
+import DataTransferModal from '../../Shared/Modals/DataTransferModal'
+import SpeciesAcquisitionDate from './AcquisitionDate'
+import ModelInput from './ModelInput'
+import LatLng from './LatLng'
+import BaseOrAnnotation from './BaseOrAnnotation'
+import TextInput from '@/components/Shared/Form Fields/TextInput'
 import JSZip from 'jszip'
 
 // Main component
@@ -69,8 +69,8 @@ export default function ModelSubmitForm() {
             const model = file as File
             var dataFile
 
-            if(!model.name.endsWith('.zip')){
-                zip.file(`${species}.zip`, model) 
+            if (!model.name.endsWith('.zip')) {
+                zip.file(`${species}.zip`, model)
                 dataFile = await zip.generateAsync({ type: 'blob' })
             }
 

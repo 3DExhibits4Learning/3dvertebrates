@@ -1,24 +1,28 @@
 /**
  * @file src/components/ModelSubmit/UpdateModelForm.tsx
+ * 
  * @fileoverview The form for updating 3D models
  * 
- * @todo replace map component with individual (non required) lat and lng fields per request
  * @todo add red asterisks to mandatory fields
  */
 
 'use client'
 
-import { useState, useEffect } from 'react';
-import ProcessSelect from './ProcessSelectField';
-import { Button } from "@nextui-org/react";
-import { Divider } from '@nextui-org/react';
-import TagInput from './Tags';
-import DataTransferModal from '../../Shared/Modals/DataTransferModal';
-import { UpdateModelFormProps } from '@/interface/interface';
-import TextInput from '../../Shared/Form Fields/TextInput';
-import AutoCompleteWrapper from '../../Shared/Form Fields/AutoCompleteWrapper';
-import ModelInput from './ModelInput';
-import LatLng from './LatLng';
+// Typical imports
+import { useState, useEffect } from 'react'
+import { Button } from "@nextui-org/react"
+import { Divider } from '@nextui-org/react'
+import { UpdateModelFormProps } from '@/interface/interface'
+
+// Default imports
+import ProcessSelect from './ProcessSelectField'
+import TagInput from './Tags'
+import DataTransferModal from '../../Shared/Modals/DataTransferModal'
+import TextInput from '../../Shared/Form Fields/TextInput'
+import AutoCompleteWrapper from '../../Shared/Form Fields/AutoCompleteWrapper'
+import ModelInput from './ModelInput'
+import LatLng from './LatLng'
+import JSZip from 'jszip'
 
 // Main component
 export default function UpdateModelForm(props: UpdateModelFormProps) {
@@ -30,12 +34,9 @@ export default function UpdateModelForm(props: UpdateModelFormProps) {
     var tagString = ''
     var softwareString = ''
 
-    for (let i in tagArr) {
-        tagString += tagArr[i] + ','
-    }
-    for (let i in softwareArr) {
-        softwareString += softwareArr[i] + ','
-    }
+    // Creating tag and software strings
+    for (let i in tagArr) tagString += tagArr[i] + ','
+    for (let i in softwareArr) softwareString += softwareArr[i] + ','
 
     // Variable initialization - field states
     const [species, setSpecies] = useState<string>(model.spec_name)
@@ -72,9 +73,19 @@ export default function UpdateModelForm(props: UpdateModelFormProps) {
             // If there is a file, replace the original file in sketchfab
             if (file) {
 
+                // Zip file if it isn't
+                const zip = new JSZip()
+                const dataModel = file as File
+                var zippedDataModel
+
+                if (!dataModel.name.endsWith('.zip')) {
+                    zip.file(`${species}.zip`, dataModel)
+                    zippedDataModel = await zip.generateAsync({ type: 'blob' })
+                }
+
                 const modelReuploadData = new FormData()
                 modelReuploadData.set('uid', model.uid)
-                modelReuploadData.set('file', file as File)
+                modelReuploadData.set('file', zippedDataModel ? zippedDataModel : dataModel, `${species}.zip`)
 
                 await fetch('/api/modelSubmit', {
                     method: 'PUT',
@@ -165,7 +176,7 @@ export default function UpdateModelForm(props: UpdateModelFormProps) {
                 <Divider className='mb-6' />
 
                 <AutoCompleteWrapper value={species} setValue={setSpecies} />
-                <TextInput value={commonName} setValue={setCommonName} title='Common Name' leftMargin='ml-12' textSize='text-2xl'/> 
+                <TextInput value={commonName} setValue={setCommonName} title='Common Name' leftMargin='ml-12' textSize='text-2xl' />
                 <LatLng lat={lat} lng={lng} setLat={setLat} setLng={setLng} />
                 <TagInput key={reRenderKey} value={tags} setValue={setTags} defaultValues={tagString} />
 
