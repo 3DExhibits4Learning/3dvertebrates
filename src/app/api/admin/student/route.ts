@@ -1,13 +1,19 @@
 /**
  * @file src/app/api/admin/student/route.ts
+ * 
+ * @fileoverview handler for adding (POST) or removing (DELETE) students from the project
+ * 
+ * @todo import singleton and handle queries directly
  */
 
-// Imports
-import { removeStudent, addStudent } from "@/functions/server/queries"
-import { getAuthorizedUsers } from "@/functions/server/queries"
+// Typical imports
+import { removeStudent, addStudent, getAuthorizedUsers } from "@/functions/server/queries"
 import { authorized } from "@prisma/client"
-import { emailNewlyAddedStudent, informStudentOfAssignment } from "@/functions/server/email"
-import { routeHandlerErrorHandler, nonFatalError } from "@/functions/server/error"
+import { emailNewlyAddedStudent } from "@/functions/server/email"
+import { routeHandlerErrorHandler, nonFatalError, routeHandlerTypicalCatch } from "@/functions/server/error"
+
+// Default imports
+import routeHandlerTypicalResponse from "@/functions/server/typicalSuccessResponse"
 
 // Route path
 const route = 'src/app/api/admin/student/route.ts'
@@ -38,11 +44,10 @@ export async function POST(request: Request) {
         await emailNewlyAddedStudent(process.env.NODE_ENV === 'production' ? email : "ab632@humboldt.edu", 'beta.3dvertebrates.org').catch((e) => nonFatalError(route, e.message, 'emailNewlyAddedStudent()'))
 
         // Typical success response
-        return Response.json({ data: 'Student added', response: insertStudent })
+        return routeHandlerTypicalResponse('Student added', insertStudent)
     }
-
     // Typical fail response
-    catch (e: any) { Response.json({ data: e.message, response: e.message }, { status: 400, statusText: e.message }) }
+    catch (e: any) { routeHandlerTypicalCatch(e.message)}
 }
 
 
@@ -75,9 +80,8 @@ export async function DELETE(request: Request) {
         const deleteStudent = await removeStudent(email).catch((e) => routeHandlerErrorHandler(route, e.message, 'removeStudent()', "Couldn't remove student"))
 
         // Typical success response
-        return Response.json({ data: 'Student deleted', response: deleteStudent })
+        return routeHandlerTypicalResponse('Student added', deleteStudent)
     }
-    
-    // Typical fail response
-    catch (e: any) { Response.json({ data: e.message, response: e.message }, { status: 400, statusText: e.message }) }
+    // Typical catch
+    catch (e: any) { routeHandlerTypicalCatch(e.message) }
 }

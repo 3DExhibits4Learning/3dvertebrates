@@ -1,12 +1,25 @@
-import { getAccount } from "@/functions/server/queries";
-import { Account } from "@prisma/client";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+/**
+ * @file src/app/api/inat/observation/route.tsx
+ * 
+ * @fileoverview inat observation route handler
+ */
 
+// Typical imports
+import { getAccount } from "@/functions/server/queries"
+import { Account } from "@prisma/client"
+import { getServerSession } from "next-auth"
+import { authOptions } from "../../auth/[...nextauth]/route"
+import { routeHandlerTypicalCatch } from "@/functions/server/error"
+import routeHandlerTypicalResponse from "@/functions/server/typicalSuccessResponse"
+
+/**
+ * 
+ * @param request HTTP
+ * @returns 
+ */
 export async function POST(request: Request) {
 
     const session = await getServerSession(authOptions)
-    //@ts-ignore
     const account = await getAccount(session.user.id, 'inaturalist') as Account
     const iNatToken = account.access_token
     const requestData = await request.formData()
@@ -63,8 +76,9 @@ export async function POST(request: Request) {
             }
         }
 
-        return Response.json({ data: 'Observation Posted!', response: results })
+        return routeHandlerTypicalResponse('Observation Posted!', results)
 
     }
-    catch (e: any) { return Response.json({ data: 'error', response: e.message }, { status: 400, statusText: 'Error' }) }
+    // Typical catch
+    catch (e: any) { return routeHandlerTypicalCatch(e.message)}
 }

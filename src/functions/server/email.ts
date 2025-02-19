@@ -1,7 +1,13 @@
+/**
+ * @file src\functions\server\email.ts
+ * 
+ * @fileoverview email functions
+ */
+
+// Typical imports
 import { transporter } from './utils/transporter'
 
 export async function emailNewlyAddedStudent(email: string, domain: string) {
-
     await transporter.sendMail({
         from: process.env.EMAIL_FROM,
         to: email,
@@ -10,14 +16,10 @@ export async function emailNewlyAddedStudent(email: string, domain: string) {
         Remember that you must login with your humboldt.edu email address.
         <br><br>
         You can find the admin portal for login on the contributions page of ${domain}, or click <u><a href="${domain}" target='_blank'>here</a></u>`
-    }).catch((e: any) => {
-        console.error(e.message)
-        throw Error("Couldn't send email")
-    })
+    }).catch(e => {throw Error(e.message)})
 }
 
 export async function informStudentOfAssignment(email: string, domain: string) {
-
     await transporter.sendMail({
         from: process.env.EMAIL_FROM,
         to: email,
@@ -25,8 +27,5 @@ export async function informStudentOfAssignment(email: string, domain: string) {
         html: `You have a new assignment on ${domain}.
         <br><br>
         You can find your assignment at ${domain}/admin/student, remember that you must login with your humboldt.edu email address.`
-    }).catch((e: any) => {
-        console.error(e.message)
-        throw Error("Couldn't send email")
-    })
+    }).catch(e => {throw Error(e.message)})
 }

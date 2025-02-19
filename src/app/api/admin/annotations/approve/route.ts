@@ -4,14 +4,18 @@
  * @fileoverview route handler for admin annotation approval
  */
 
+// Typical imports
 import { approveAnnotations } from "@/functions/server/queries";
 import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/server/error";
+
+// Default imports
 import routeHandlerTypicalResponse from "@/functions/server/typicalSuccessResponse";
 
+// Main component
 export async function PATCH(request: Request) {
 
     try {
-
+        
         // Variable declarations
         const { searchParams } = new URL(request.url)
         const uid = searchParams.get('uid') as string

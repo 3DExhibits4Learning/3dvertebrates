@@ -1,3 +1,19 @@
+/**
+ * @file src/app/api/collections/inaturalist/route.tsx
+ * 
+ * @fileoverview inat route handler
+ * 
+ * @todo refactor
+ */
+
+import { routeHandlerTypicalCatch } from "@/functions/server/error"
+
+/**
+ * 
+ * @param request 
+ * @returns 
+ */
+
 export async function POST(request: Request) {
     const data = await request.json()
     
@@ -69,5 +85,5 @@ export async function POST(request: Request) {
             }
         }
     }
-    catch (e: any) { return Response.json({ data: e.message }, { status: 400, statusText: 'fetch error' }) }
+    catch (e: any) { return routeHandlerTypicalCatch(e.message)}
 }

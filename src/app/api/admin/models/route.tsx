@@ -1,17 +1,32 @@
-import { getFullModels } from "@/functions/server/queries"
+/**
+ * @file src/app/api/admin/models/route.tsx
+ * 
+ * @fileoverview handler to obtain full 3d models
+ */
 
+// Typical imports
+import { routeHandlerTypicalCatch } from "@/functions/server/error"
+
+// Default imports
+import routeHandlerTypicalResponse from "@/functions/server/typicalSuccessResponse"
+
+// SINGLETON
+import prisma from "@/functions/utils/prisma"
+
+// DYNAMIC ROUTE
 export const dynamic = 'force-dynamic'
 
+/**
+ * 
+ * @returns typical response with success message and full models (or error message)
+ */
 export async function GET() {
+
     try {
-            const models = await getFullModels().catch((e) => {
-                console.error(e.message)
-                throw Error("Couldn't get Models")
-            })
-            return Response.json({ data: 'Models Obtained', response: models })
-        }
-    catch (e: any) {
-        console.error(e.message)
-        return Response.json({ data: e.message, response: e.message }, { status: 400, statusText: e.message })
+        
+        // Obtain the models and return them
+        const models = await prisma.model.findMany({ include: { software: true, tags: true, assignment: true } })
+        return routeHandlerTypicalResponse('Models Obtained', models)
     }
+    catch (e: any) { return routeHandlerTypicalCatch(e.message) }
 }

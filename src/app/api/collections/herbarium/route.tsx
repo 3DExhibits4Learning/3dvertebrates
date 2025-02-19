@@ -1,27 +1,41 @@
-import { getSoftwares } from '@/functions/server/queries'
-import { fetchGbifProfile, fetchGbifVernacularNames, fetchWikiSummary, fetchHSCImages } from "@/functions/server/fetchFunctions";
+/**
+ * @file src\app\api\collections\herbarium\route.tsx
+ * 
+ * @fileoverview handler which instantiates the client side Hebarium class
+ */
 
+// Typical imports
+import { getSoftwares } from '@/functions/server/queries'
+import { fetchGbifProfile, fetchGbifVernacularNames, fetchWikiSummary } from "@/functions/server/fetchFunctions"
+import { routeHandlerTypicalCatch } from '@/functions/server/error'
+
+// Default imports
+import routeHandlerTypicalResponse from '@/functions/server/typicalSuccessResponse'
+
+/**
+ * 
+ * @param request HTTP
+ * @returns typical response with message and promise results
+ */
 export async function GET(request: Request) {
+
     try {
 
+        // Get params
         const { searchParams } = new URL(request.url)
 
+        // Variables from params
         const uid = searchParams.get('uid') as string
         const usageKey = parseInt(searchParams.get('usageKey') as string)
         const specimenName = searchParams.get('specimenName') as string
 
-        var results: any[] = []
+        // Await all promises
+        const promises = [fetchGbifVernacularNames(usageKey), getSoftwares(uid), fetchGbifProfile(usageKey), fetchWikiSummary(specimenName)]
+        const results = await Promise.all(promises)
 
-        const promises = [
-            fetchGbifVernacularNames(usageKey),
-            getSoftwares(uid),
-            fetchGbifProfile(usageKey),
-            fetchWikiSummary(specimenName),
-        ]
-
-        await Promise.all(promises).then(res => results.push(...res))
-
-        return Response.json({data:"Success", response: results})
+        // Typical return
+        routeHandlerTypicalResponse("Success", results)
     }
-    catch (e: any) { return Response.json({ data: 'Success', response: e.message }, {status:400, statusText:'Fetching error'}) }
+    // Typical catch
+    catch (e: any) { return routeHandlerTypicalCatch(e.message) }
 }

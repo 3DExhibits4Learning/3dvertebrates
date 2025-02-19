@@ -280,7 +280,7 @@ export async function getAnnotations(uid: string) {
   const annotations = await prisma.annotations.findMany({
     where: { uid: uid },
     orderBy: { annotation_no: 'asc' }
-  });
+  })
 
   return annotations;
 }

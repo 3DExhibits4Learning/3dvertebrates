@@ -4,12 +4,16 @@
  * @fileoverview route handler for admin assignment of a 3d model for annotation by a student
  */
 
+// Typical imports
 import { NextRequest } from "next/server"
 import { updateModelAnnotator, assignModelToStudent, unassignModelToStudent } from "@/functions/server/queries"
 import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/server/error"
-import routeHandlerTypicalResponse from "@/functions/server/typicalSuccessResponse"
 import { informStudentOfAssignment } from "@/functions/server/email"
 
+// Default imports
+import routeHandlerTypicalResponse from "@/functions/server/typicalSuccessResponse"
+
+// ROUTE
 const route = 'src/app/api/admin/annotations/assign/route.tsx'
 
 export async function POST(request: NextRequest) {

@@ -1,35 +1,52 @@
 /**
  * @file src/app/api/collections/models/route.tsx
+ * 
+ * @fileoverview handler to obtain site ready models
+ * 
+ * @todo import singleton and handle queries directly
  */
-export const dynamic = 'force-dynamic'
 
+// Typical imports
 import { getAllModels, getModelAnnotations } from "@/functions/server/queries"
 import { model } from "@prisma/client"
 import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/server/error"
 import { annotationWithModel } from "@/interface/interface"
 
+// Default imports
 import routeHandlerTypicalResponse from "@/functions/server/typicalSuccessResponse"
 
+// DYNAMIC ROUTE
+export const dynamic = 'force-dynamic'
+
+// GLOBAL ROUTE
 const route = 'src/app/api/collections/models/route.tsx'
 
-// Returns all SiteReadyModels
+/**
+ * 
+ * @param request HTTP
+ * @returns 
+ */
 export async function GET(request: Request) {
 
   try {
 
+    // Get models and annotations
     const models = await getAllModels().catch(e => routeHandlerErrorHandler(route, e.message, 'getAllModels()', "Coulnd't get models", 'GET')) as model[]
     const modelAnnotations = await getModelAnnotations().catch(e => routeHandlerErrorHandler(route, e.message, 'getModelAnnotations()', "Coulnd't get modelAnnotations", 'GET')) as annotationWithModel[]
 
+    // Boolean arrows
     const isSiteReadyModel = (model: model) => model.site_ready && model.annotationPosition && model.base_model && model.modelApproved && model.thumbnail
     const isUnannotatedSiteReadyModel = (model: model) => model.annotator === null && !model.annotated && !model.annotationsApproved
     const isAnnotatedSiteReadyModel = (model: model) => model.annotator && model.annotationsApproved && model.annotated
     const isAnnotationModel = (model: model) => model.site_ready && !model.base_model && model.modelApproved && model.thumbnail
     const isUsedAnnotationModel = (model: model) => modelAnnotations.some(annotationModel => annotationModel.model_annotation.uid === model.uid)
 
-    const siteReadyModels = models.filter(model => isAnnotationModel(model) && isUsedAnnotationModel(model) ||
-      isSiteReadyModel(model) && (isAnnotatedSiteReadyModel(model) || isUnannotatedSiteReadyModel(model)))
+    // Site ready models - used annotaion models, site ready annotated models or unannotated site ready models
+    const siteReadyModels = models.filter(model => isAnnotationModel(model) && isUsedAnnotationModel(model) || isSiteReadyModel(model) && (isAnnotatedSiteReadyModel(model) || isUnannotatedSiteReadyModel(model)))
 
+    // Typical return
     return routeHandlerTypicalResponse("Models obtained", siteReadyModels)
   }
+  // Typical catch
   catch (e: any) { return routeHandlerTypicalCatch(e.message) }
 }

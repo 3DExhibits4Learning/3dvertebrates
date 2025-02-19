@@ -1,11 +1,23 @@
 /**
  * @file src/app/api/admin/annotations/reject/route.ts
+ * 
+ * @fileoverview handler for an admin to reject annotations
+ * 
+ * @todo handle query directly with singleton import
  */
 
+// Typical imports
 import { rejectAnnotations } from "@/functions/server/queries";
 import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/server/error";
+
+// Default imports
 import routeHandlerTypicalResponse from "@/functions/server/typicalSuccessResponse";
 
+/**
+ * 
+ * @param request HTTP
+ * @returns typical response with status
+ */
 export async function PATCH(request: Request) {
 
     try {
