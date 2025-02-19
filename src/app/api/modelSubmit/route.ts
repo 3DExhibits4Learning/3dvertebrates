@@ -73,13 +73,10 @@ export async function POST(request: Request) {
         const transactions = []
 
         // Upload model file to sketchfab and instantiate modelUid
-        await fetch(orgModelUploadEnd, { headers: requestHeader, method: 'POST', body: formData })
-            .then((res) => {
-                if (!res.ok) routeHandlerErrorHandler(route, res.statusText, 'fetch(orgModelUploadEnd)', "Bad upload request")
-                return res.json()
-            })
-            .then(json => modelUid = json.uid)
-            .catch(e => routeHandlerErrorHandler(route, e.message, 'fetch(orgModelUploadEnd)', "Bad upload request"))
+        await fetch(orgModelUploadEnd, { headers: requestHeader, method: 'POST', body: formData }).then((res) => {
+            if (!res.ok) routeHandlerErrorHandler(route, res.statusText, 'fetch(orgModelUploadEnd)', "Bad upload request")
+            return res.json()
+        }).then(json => modelUid = json.uid).catch(e => routeHandlerErrorHandler(route, e.message, 'fetch(orgModelUploadEnd)', "Bad upload request"))
 
         // Push model query onto transactions
         transactions.push(prisma.model.create({
@@ -128,41 +125,26 @@ export async function PUT(request: Request) {
         const data = await request.formData().catch(e => routeHandlerErrorHandler(route, e.message, 'request.formData()', "Couldn't get form data")) as FormData
         const modelFile = data.get('modelFile') as File
         const uid = data.get('uid') as string
-        const reuploadData = new FormData()
+        const orgModelUploadEnd = `https://api.sketchfab.com/v3/orgs/${process.env.SKETCHFAB_ORGANIZATION}/models/${uid}`
 
+        // Set reupload form data
+        const reuploadData = new FormData()
         reuploadData.set('orgProject', process.env.SKETCHFAB_PROJECT_3DVERTEBRATES as string)
         reuploadData.set('modelFile', modelFile)
         reuploadData.set('visibility', 'private')
         reuploadData.set('options', JSON.stringify({ background: { color: "#000000" } }))
-        const orgModelUploadEnd = `https://api.sketchfab.com/v3/orgs/${process.env.SKETCHFAB_ORGANIZATION}/models/${uid}`
 
         // Upload model file to sketchfab and instantiate modelUid
-        const reupload = await fetch(orgModelUploadEnd, {
-            headers: requestHeader,
-            method: 'PUT',
-            body: reuploadData
-        })
-            .then((res) => {
-                if (!res.ok) {
-                    console.error(res.statusText)
-                    throw Error('Bad SF reupload request')
-                }
-            })
-            .then(json => json)
-            .catch((e) => {
-                console.error(e.message)
-                throw Error('Bad SF request')
-            })
+        const reupload = await fetch(orgModelUploadEnd, { headers: requestHeader, method: 'PUT', body: reuploadData }).then((res) => {
+            if (!res.ok) routeHandlerErrorHandler(route, res.statusText, 'fetch(orgModelUploadEnd)', "Bad upload request")
+            return res.json()
+        }).then(json => json).catch(e => routeHandlerErrorHandler(route, e.message, "fetch(orgModelUploadEnd", "Couldn't reupload model"))
 
-        // Typical success return
-        return Response.json({ data: 'Model added.', response: reupload })
+        // Typical response
+        return routeHandlerTypicalResponse('Model added.', reupload)
     }
-
-    // Typical fail return 
-    catch (e: any) {
-        console.error(e.message)
-        return Response.json({ data: e.message, response: e.message }, { status: 400, statusText: e.message })
-    }
+    // Typical catch
+    catch (e: any) { return routeHandlerTypicalCatch(e.message) }
 
 }
 
@@ -176,13 +158,11 @@ export async function PATCH(request: Request) {
     try {
 
         // Get request data
-        const data = await request.formData()
+        const data = await request.formData().catch(e => routeHandlerErrorHandler(route, e.message, 'request.formData()', "Couldn't get form data")) as FormData
 
         // Get session data (or redirect if there is no session data)
         const session = await getServerSession(authOptions)
-        if (!session || !session.user) {
-            redirect('/api/auth/signin')
-        }
+        if (!session || !session.user) redirect('/api/auth/signin')
 
         // Data variables
         const artist = data.get('artist') as string
@@ -199,8 +179,11 @@ export async function PATCH(request: Request) {
         const email = session.user?.email
         const user = session.user.name ?? ''
 
+        // Transaction array
+        const transaction = []
+
         // Insert data into database
-        const update = await prisma.model.update({
+        transaction.push(prisma.model.update({
             where: { uid: uid },
             data: {
                 modeled_by: artist,
@@ -213,64 +196,22 @@ export async function PATCH(request: Request) {
                 user: user,
                 pref_comm_name: commonName
             }
-        }).catch((e) => {
-            console.error(e.message)
-            throw Error("Couldn't Insert Metadata into Database")
-        })
-
-        // Delete all software and tags for the provided uid then insert new software and tags into the database
-        const deletionPromises = []
-        const softwareAndTagPromises = []
-
-        // Push sofware deletions
-        deletionPromises.push(prisma.software.deleteMany({
-            where: { uid: uid }
         }))
 
-        // Push tag deletions
-        deletionPromises.push(prisma.tags.deleteMany({
-            where: { uid: uid }
-        }))
+        // Push sofware + tag deletions
+        transaction.push(prisma.software.deleteMany({ where: { uid: uid } }))
+        transaction.push(prisma.tags.deleteMany({ where: { uid: uid } }))
 
-        // Await software and tag deletions
-        await Promise.all(deletionPromises).catch((e) => {
-            console.error(e.message)
-            throw Error("Coulnd't delete software or tags")
-        })
+        // Push software + tag updates
+        for (let i in software) transaction.push(prisma.software.create({ data: { uid: uid, software: software[i] } }))
+        for (let i in tags) transaction.push(prisma.tags.create({ data: { uid: uid, tag: tags[i] } }))
+        
+        // Await transaction
+        const update = await prisma.$transaction(transaction).catch(e => routeHandlerErrorHandler(route, e.message, "prisma.$transaction(transaction)", "Couldn't update model data"))
 
-        // Push software updates
-        for (let i in software) {
-            softwareAndTagPromises.push(prisma.software.create({
-                data: {
-                    uid: uid,
-                    software: software[i]
-                }
-            }))
-        }
-
-        // Push tag updates
-        for (let i in tags) {
-            softwareAndTagPromises.push(prisma.tags.create({
-                data: {
-                    uid: uid,
-                    tag: tags[i]
-                }
-            }))
-        }
-
-        // Await software and tag updates
-        await Promise.all(softwareAndTagPromises).catch((e) => {
-            console.error(e.message)
-            throw Error('Error entering software or tags into database')
-        })
-
-        // Typical success response
-        return Response.json({ data: 'Model added.', response: update })
+        // Typical response
+        return routeHandlerTypicalResponse('Model added.', update)
     }
-
-    // Typical fail response
-    catch (e: any) {
-        console.error(e.message)
-        return Response.json({ data: e.message, response: e.message }, { status: 400, statusText: e.message })
-    }
+    // Typical catch
+    catch (e: any) {return routeHandlerTypicalCatch(e.message)}
 }

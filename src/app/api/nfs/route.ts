@@ -1,7 +1,7 @@
 /**
  * @file src/app/api/nfs/route.ts
  * 
- * @fileoverview get method returns files that can be served via http
+ * @fileoverview handler to serve files via HTTP
  */
 
 // Imports
@@ -16,6 +16,7 @@ import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/
 export async function GET(request: Request) {
 
     try {
+
         // Current route
         const route = 'src/app/api/nfs/route.ts'
         
@@ -28,7 +29,6 @@ export async function GET(request: Request) {
         // Return filebuffer
         return new Response(fileBuffer)
     }
-    
     // Typical catch
     catch (e: any) {return routeHandlerTypicalCatch(e.message)}
 }

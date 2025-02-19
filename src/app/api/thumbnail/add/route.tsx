@@ -1,7 +1,7 @@
 /**
  * @file src/app/api/thumbnail/add/route.tsx
  * 
- * @fileoverview
+ * @fileoverview handler for adding model thumbnails
  * 
  * @todo move to /api/thumbnail/route with /api/thumbnail/update/route as patch
  */
@@ -20,7 +20,11 @@ import prisma from '@/functions/utils/prisma'
 // PATH
 const path = 'src/app/api/thumbnail/add/route.tsx'
 
-// Main JSX
+/**
+ * 
+ * @param request HTTP
+ * @returns typical response with message and update object (or typical catch onCatch)
+ */
 export async function POST(request: Request) {
 
     try {
@@ -45,7 +49,7 @@ export async function POST(request: Request) {
         await mkdir(filePath, { recursive: true }).catch(e => routeHandlerErrorHandler(e.message, filePath, 'mkdir()', "Couldn't make directory"))
         filePath = join(filePath, file.name)
 
-        //@ts-ignore - typescript thinks writeFile doesn't take a buffer
+        // @ts-ignore - typescript thinks writeFile doesn't take a buffer
         await writeFile(path, buffer).catch(e => routeHandlerErrorHandler(e.message, path, 'writeFile()', "Couldn't write file"))
         
         // Update the thumbnail column for the model in the database (remove 'public' and follwing slash, then escape remaining forward slashes in path before DB entry)
@@ -54,5 +58,6 @@ export async function POST(request: Request) {
         //Return Successful
         return routeHandlerTypicalResponse('Thumbnail Added', update)
     }
+    // Typical catch
     catch (e: any) {return routeHandlerTypicalCatch(e.message)}
 }

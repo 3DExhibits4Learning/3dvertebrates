@@ -6,7 +6,6 @@
  * @todo make patch method along with post method from /api/thumbmail/add
  */
 
-
 // Typical imports
 import { writeFile, mkdir, unlink } from 'fs/promises'
 import { join } from 'path'
