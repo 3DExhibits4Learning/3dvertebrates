@@ -62,8 +62,7 @@ export default async function Page({ params }: { params: { specimenName: string 
   }
 
 
-  return (
-    <>
+  return <>
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"></meta>
       <title>3D Herbarium Collections</title>
 
@@ -81,7 +80,6 @@ export default async function Page({ params }: { params: { specimenName: string 
         noModelData={noModelData as { title: string, images: GbifImageResponse[] }}
       />
     </>
-  )
 }
 
 

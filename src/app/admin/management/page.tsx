@@ -8,19 +8,19 @@
 // Typical imports
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
-import { fullModel, studentsAndAssignments } from "@/interface/interface";
-import { getFullModels, getStudentsAndAssignments, getModelAnnotations, getAuthorizedUsers } from "@/functions/server/queries";
-import { authorized } from "@prisma/client";
-import { serverErrorHandler } from "@/functions/server/error";
-import { annotationWithModel } from "@/interface/interface";
-import { isAnnotationModel, isUsedAnnotationModel } from "@/functions/server/utils/filters";
+import { fullModel, studentsAndAssignments } from "@/interface/interface"
+import { getFullModels, getStudentsAndAssignments, getModelAnnotations, getAuthorizedUsers } from "@/functions/server/queries"
+import { authorized } from "@prisma/client"
+import { serverErrorHandler } from "@/functions/server/error"
+import { annotationWithModel } from "@/interface/interface"
+import { isAnnotationModel, isUsedAnnotationModel } from "@/functions/server/utils/filters"
 
 // Default imports
-import ManagerClient from "@/components/Admin/Administrator/ManagerClient";
-import createStudentsAssignmentsAndModels from "@/functions/client/managerClient/createStudentsAssignmentsAndModels";
-import Header from "@/components/Header/Header";
-import Foot from "@/components/Shared/Foot";
-import FullPageError from "@/components/Error/FullPageError";
+import ManagerClient from "@/components/Admin/Administrator/ManagerClient"
+import createStudentsAssignmentsAndModels from "@/functions/client/managerClient/createStudentsAssignmentsAndModels"
+import Header from "@/components/Header/Header"
+import Foot from "@/components/Shared/Foot"
+import FullPageError from "@/components/Error/FullPageError"
 
 // Path
 const path = '/src/app/admin/management/page.tsx'
@@ -58,22 +58,20 @@ export default async function Page() {
         const studentsAssignmentsAndModels = JSON.stringify(createStudentsAssignmentsAndModels(students, models))
 
         // Typical client return
-        return (
-            <>
-                <Header pageRoute="collections" headerTitle='Management' />
-                <main className="flex flex-col !min-h-[calc(100vh-177px)]">
-                    <ManagerClient
-                        models={modelsString}
-                        modelsNeedingThumbnails={modelsNeedingThumbnails}
-                        studentsAssignmentsAndModels={studentsAssignmentsAndModels}
-                        admin={true}
-                        modelAnnotations={unusedModelAnnotations}
-                    />
-                </main>
-                <Foot />
-            </>
-        )
+        return <>
+            <Header pageRoute="collections" headerTitle='Management' />
+            <main className="flex flex-col !min-h-[calc(100vh-177px)]">
+                <ManagerClient
+                    models={modelsString}
+                    modelsNeedingThumbnails={modelsNeedingThumbnails}
+                    studentsAssignmentsAndModels={studentsAssignmentsAndModels}
+                    admin={true}
+                    modelAnnotations={unusedModelAnnotations}
+                />
+            </main>
+            <Foot />
+        </>
     }
     // Typical catch
-    catch (e: any) {return <FullPageError clientErrorMessage={e.message}/>}
+    catch (e: any) { return <FullPageError clientErrorMessage={e.message} /> }
 }

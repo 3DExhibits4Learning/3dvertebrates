@@ -23,10 +23,9 @@ const route = 'src/app/api/collections/models/route.tsx'
 
 /**
  * 
- * @param request HTTP
- * @returns 
+ * @returns typical response with siteReadyModels (or error message onCatch)
  */
-export async function GET(request: Request) {
+export async function GET() {
 
   try {
 

@@ -1,26 +1,29 @@
 /**
  * @file /app/common-name/[specimenName]/page.tsx
+ * 
  * @fileoverview page containing a list of potential matches based on the user's "common name" query;
  * In this context, a "common name" query is any search not matching a species of genus. This page is routed
  * to from the iNaturalist page.
  */
 
-import { fetchCommonNameInfo } from "@/functions/server/fetchFunctions";
-import { CommonNameInfo, SiteReadyModels } from "@/interface/interface";
+// Typical imports
+import { fetchCommonNameInfo } from "@/functions/server/fetchFunctions"
+import { CommonNameInfo} from "@/interface/interface"
 
-import CommonNameList from "@/components/CommonName/CommonNameList";
-import Header from "@/components/Header/Header";
-import Foot from "@/components/Shared/Foot";
-import PageWrapper from "@/components/Shared/PageWrapper";
+// Default imports
+import CommonNameList from "@/components/CommonName/CommonNameList"
+import Header from "@/components/Header/Header"
+import Foot from "@/components/Shared/Foot"
+import PageWrapper from "@/components/Shared/PageWrapper"
 
+// Main component
+export default async function CommonNameSearchPage({ params }: { params: { specimenName: string } }){
 
-const CommonNameSearchPage = async ({ params }: { params: { specimenName: string } }) => {
+  // Variables
+  const specimenName: string = params.specimenName || ''
+  const commonNameInfo: CommonNameInfo[] = await fetchCommonNameInfo(specimenName)
 
-  const specimenName: string = params.specimenName || '';
-  const commonNameInfo: CommonNameInfo[] = await fetchCommonNameInfo(specimenName);
-
-  return (
-    <>
+  return <>
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"></meta>
       <title>3D Herbarium Common Name Search</title>
       <Header headerTitle={specimenName} pageRoute="inaturalist" searchTerm={specimenName} />
@@ -34,7 +37,4 @@ const CommonNameSearchPage = async ({ params }: { params: { specimenName: string
         <Foot />
       </PageWrapper>
     </>
-  );
-};
-
-export default CommonNameSearchPage;
+}

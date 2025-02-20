@@ -10,12 +10,10 @@ export default function App() {
 
   redirect('/collections/search')
 
-  return (
-    <>
+  return <>
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"></meta>
       <meta name="description" content="An annotated collection of 3D Models by the Cal Poly Humboldt Vertebrate Museum and its Students"></meta>
       <title>3D Vertebrate Museum</title>
     </>
-  )
 }
 

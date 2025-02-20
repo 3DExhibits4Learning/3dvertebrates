@@ -34,14 +34,12 @@ export default async function Page() {
 
         // Get authorized users
         const authorizedUsers = await getAuthorizedUsers().catch(e => serverErrorHandler(path, e.message, "Couldn't get authorized users", 'getAuthorizedUsers()', false)) as authorized[]
-        
+
         // Get email
         let email = session?.user?.email as string
 
         // Authorized user
-        if (!(email || authorizedUsers.some(user => user.email === email))) {
-            return <h1>NOT AUTHORIZED</h1>
-        }
+        if (!(email || authorizedUsers.some(user => user.email === email))) return <h1>NOT AUTHORIZED</h1>
 
         // Get models to annotate, annotation models (models used as annotations themselves), and assignments
         const modelsToAnnotate = await getModelsToAnnotate().catch(e => serverErrorHandler(path, e.message, "Couldn't get models to annotate", 'getModelsToAnnotate()', false)) as model[]
@@ -57,17 +55,14 @@ export default async function Page() {
         const assignedModels = modelsToAnnotate.filter(model => studentAssignmentUids.includes(model.uid))
 
         // Typical client
-        return (
-            <>
-                <Header pageRoute="collections" headerTitle="Botany Admin" />
-                <main className="w-full min-h-[calc(100vh-177px)] h-[calc(100vh-177px)] overflow-y-auto">
-                    <StudentClient modelsToAnnotate={JSON.stringify(assignedModels)} annotationModels={JSON.stringify(unusedModelAnnotations)} />
-                </main>
-                <Foot />
-            </>
-        )
+        return <>
+            <Header pageRoute="collections" headerTitle="Botany Admin" />
+            <main className="w-full min-h-[calc(100vh-177px)] h-[calc(100vh-177px)] overflow-y-auto">
+                <StudentClient modelsToAnnotate={JSON.stringify(assignedModels)} annotationModels={JSON.stringify(unusedModelAnnotations)} />
+            </main>
+            <Foot />
+        </>
     }
-
     //Typical catch
     catch (e: any) { return <FullPageError clientErrorMessage={e.message} /> }
 }
