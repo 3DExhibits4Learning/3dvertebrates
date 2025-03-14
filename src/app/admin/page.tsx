@@ -7,7 +7,6 @@
 // Typical imports
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
-import { getUserById } from "@/functions/server/queries"
 import { getAuthorizedUsers } from "@/functions/server/queries"
 import { redirect } from "next/navigation"
 

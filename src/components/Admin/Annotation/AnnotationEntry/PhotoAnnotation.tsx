@@ -21,6 +21,7 @@ import FileInput from "@/components/Admin/AnnotationFields/ImageInput"
 export default function PhotoAnnotationEntry() {
 
     const annotationEntryData = (useContext(AnnotationEntryData) as annotationEntryContext).annotationEntryData
+    const photoPath = process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? 'X:' + annotationEntryData.url.slice(5) : 'public' + annotationEntryData.url
 
     return <>
         {
@@ -49,7 +50,7 @@ export default function PhotoAnnotationEntry() {
 
                     </div>
                     
-                    {annotationEntryData.imageVisible && <img className='rounded-sm inline-block w-1/2 max-w-[600px] h-full' src={annotationEntryData.url as string} alt={'Annotation Image'}></img>}
+                    {annotationEntryData.imageVisible && <img className='rounded-sm inline-block w-1/2 max-w-[600px] h-full' src={`/api/nfs?path=${photoPath}`} alt={'Annotation Image'}></img>}
                
                 </div>
                 
