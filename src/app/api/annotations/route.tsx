@@ -245,6 +245,8 @@ export async function PATCH(request: Request) {
                     if (data.get('mediaTransition')) {
 
                         let deletion
+                        console.log('thisran0')
+                        console.log(data.get('oldUrl'))
 
                         // Delete photo annotation (if it was a photo annotation)
                         if (data.get('previousMedia') === 'photo') {
