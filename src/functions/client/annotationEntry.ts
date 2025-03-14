@@ -309,6 +309,7 @@ export const annotationUpdateData = (aeData: annotationEntry, apData: annotation
     if (apData.activeAnnotationType !== aeData.annotationType) {
         data.set('mediaTransition', 'true')
         data.set('previousMedia', apData.activeAnnotationType as string)
+        if(apData.activeAnnotationType === 'photo') data.set('oldUrl', (apData.activeAnnotation as photo_annotation).url)
     }
 
     // Annotations table data (for update)
