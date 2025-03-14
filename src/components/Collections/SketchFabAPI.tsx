@@ -109,6 +109,8 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
 
     if (s && annotations && api) {
 
+      console.log('Annotations Ready')
+
       // Create and go to the first annotation if it exists
       if (s.model.annotationPosition) {
         const position = JSON.parse(s.model.annotationPosition)

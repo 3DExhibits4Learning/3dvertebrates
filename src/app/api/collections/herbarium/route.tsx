@@ -34,7 +34,7 @@ export async function GET(request: Request) {
         const results = await Promise.all(promises)
 
         // Typical return
-        routeHandlerTypicalResponse("Success", results)
+        return routeHandlerTypicalResponse("Success", results)
     }
     // Typical catch
     catch (e: any) { return routeHandlerTypicalCatch(e.message) }

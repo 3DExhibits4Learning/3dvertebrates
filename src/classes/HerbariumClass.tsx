@@ -50,7 +50,7 @@ export default class Herbarium {
     for (let annotation of this.annotations.annotations) {
       if ((annotation.annotation as photo_annotation | model_annotation)?.annotator) {
         const annotator = (annotation.annotation as photo_annotation | model_annotation)?.annotator
-        return annotator;
+        return annotator
       }
     }
   }
