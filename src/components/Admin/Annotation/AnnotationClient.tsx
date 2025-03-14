@@ -81,7 +81,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     return <AnnotationClientData.Provider value={annotationClientContext} >
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />
 
-        <div className="flex w-full h-full">
+        <div className="flex w-full h-full text-[#004C46 dark:text-white]">
             <section className="h-full w-1/5 min-w-[325px]">
 
                 {/* Accordion holds all imported models - this will be replaced with an autocomplete*/}

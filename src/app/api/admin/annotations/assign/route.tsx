@@ -52,5 +52,5 @@ export async function POST(request: NextRequest) {
         return routeHandlerTypicalResponse(student ? 'Model Assigned' : 'Model Unassigned', { updateModelTable, assignment })
     }
     // Typical catch
-    catch (e: any) { routeHandlerTypicalCatch(e.message) }
+    catch (e: any) { return routeHandlerTypicalCatch(e.message) }
 }

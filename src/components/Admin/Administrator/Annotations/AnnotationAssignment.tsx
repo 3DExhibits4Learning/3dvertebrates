@@ -42,6 +42,9 @@ export default function AnnotationAssignment(props: { students: studentsAssignme
         setEmail(email)
     }
 
+    console.log(student)
+    console.log(email)
+
     // Annotation assign (or unassign) handler
     const assignAnnotationHandler = async () => {
         const args = annotationAssigned ? [assignmentUid, null, email] : [assignmentUid, student, email]
