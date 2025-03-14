@@ -24,11 +24,11 @@ export default async function Page() {
     const session = await getServerSession(authOptions)
     const authorizedUsers = await getAuthorizedUsers()
     let email = session?.user?.email as string
+    const user = authorizedUsers.find(user => user.email === email)
 
     // Redirect or display 'NOT AUTHORIZED'
-    if (!authorizedUsers.some(user => user.email === email)) return <h1>NOT AUTHORIZED</h1>
+    if (!user) return <h1>NOT AUTHORIZED</h1>
     else {
-        const user = await getUserById(session.user.id)
         if(user?.role === 'admin') redirect('/admin/management')
         else if(user?.role === 'student') redirect('/admin/student')
         else return <h1>NOT AUTHORIZED</h1>
