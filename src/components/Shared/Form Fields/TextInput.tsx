@@ -20,7 +20,7 @@ export default function TextInput(props: { value: string, setValue?: Dispatch<Se
 
             </p>
             <input
-                className={`w-4/5 min-w-[300px] max-w-[500px] rounded-xl mb-4 dark:bg-[#27272a] dark:hover:bg-[#3E3E47] h-[42px] px-4 text-[14px] outline-[#004C46] text-black dark:text-white ${props.leftMargin}`}
+                className={`w-4/5 min-w-[300px] max-w-[500px] rounded-xl mb-4 dark:bg-[#27272a] dark:hover:bg-[#3E3E47] h-[42px] px-4 text-[14px] outline-[#004C46] text-[#004C46] dark:text-white ${props.leftMargin}`}
                 type='text'
                 onChange={(e) => {
                     if(props.setValue)props.setValue(e.target.value)

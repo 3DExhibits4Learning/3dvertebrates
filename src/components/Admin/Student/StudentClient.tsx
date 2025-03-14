@@ -19,7 +19,7 @@ export default function StudentClient(props: { modelsToAnnotate: string, annotat
     }
 
     return (
-        <Accordion className="dark: text-[#F5F3E7]">
+        <Accordion className="text-[#004C46] dark:text-[#F5F3E7]">
             <AccordionItem key='assignments' aria-label='assignments' title='Models to Annotate' classNames={{ title: accordionTitlesCss }}>
                 <AnnotationClient modelsToAnnotate={JSON.parse(props.modelsToAnnotate)} annotationModels={JSON.parse(props.annotationModels)} admin={false} />
             </AccordionItem>

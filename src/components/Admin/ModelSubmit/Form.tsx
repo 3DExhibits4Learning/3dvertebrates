@@ -122,7 +122,7 @@ export default function ModelSubmitForm() {
                 success={success}
             />
 
-            <form className='w-full lg:w-3/5 lg:border-2 m-auto lg:border-[#004C46] lg:rounded-md bg-[#D5CB9F] dark:bg-[#212121] lg:mb-16'>
+            <form className='w-full lg:w-3/5 lg:border-2 m-auto lg:border-[#004C46] lg:rounded-md bg-[#D5CB9F] dark:bg-[#212121] lg:mb-16 text-[#004C46] dark:text-white'>
 
                 <Divider />
 

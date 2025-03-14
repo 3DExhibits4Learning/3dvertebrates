@@ -10,29 +10,29 @@
 'use client'
 
 // Typical imports
-import { model } from "@prisma/client";
-import { useState, createContext, useMemo } from "react";
-import { Accordion, AccordionItem } from "@nextui-org/react";
-import { ManagerClientProps, studentsAssignmentsAndModels } from "@/interface/interface";
-import { fullModel } from "@/interface/interface";
-import { isMobileOrTablet } from "@/functions/utils/isMobile";
+import { model } from "@prisma/client"
+import { useState, createContext, useMemo } from "react"
+import { Accordion, AccordionItem } from "@nextui-org/react"
+import { ManagerClientProps, studentsAssignmentsAndModels } from "@/interface/interface"
+import { fullModel } from "@/interface/interface"
+import { isMobileOrTablet } from "@/functions/utils/isMobile"
 
 // Default imports
-import AnnotationClient from "@/components/Admin/Annotation/AnnotationClient";
-import initializeDataTransfer from "@/functions/client/dataTransfer/initializeDataTransfer";
-import terminateDataTransfer from "@/functions/client/dataTransfer/terminateDataTransfer";
-import RemoveStudent from "./Students/RemoveStudent";
-import AddStudent from "./Students/AddStudent";
-import dynamic from "next/dynamic";
-import DeleteModel from "./Model/DeleteModel";
-import AddThumbnail from "./Thumbnails/AddThumbnail";
-import UpdateThumbnailContainer from "./Thumbnails/UpdateThumbnailContainer";
-import UpdateModelContainer from "./Model/UpdateModelContainer";
-import DataTransferModal from "../../Shared/Modals/DataTransferModal";
-import StudentTable from "./Students/GetStudents";
-import Assignments from "./Assignments/Assignments";
-import FindModel from "./Model/Find";
-import ApproveModel from "./Model/Approve";
+import AnnotationClient from "@/components/Admin/Annotation/AnnotationClient"
+import initializeDataTransfer from "@/functions/client/dataTransfer/initializeDataTransfer"
+import terminateDataTransfer from "@/functions/client/dataTransfer/terminateDataTransfer"
+import RemoveStudent from "./Students/RemoveStudent"
+import AddStudent from "./Students/AddStudent"
+import dynamic from "next/dynamic"
+import DeleteModel from "./Model/DeleteModel"
+import AddThumbnail from "./Thumbnails/AddThumbnail"
+import UpdateThumbnailContainer from "./Thumbnails/UpdateThumbnailContainer"
+import UpdateModelContainer from "./Model/UpdateModelContainer"
+import DataTransferModal from "../../Shared/Modals/DataTransferModal"
+import StudentTable from "./Students/GetStudents"
+import Assignments from "./Assignments/Assignments"
+import FindModel from "./Model/Find"
+import ApproveModel from "./Model/Approve"
 
 // Dynamic imports
 const ModelSubmitForm = dynamic(() => import("@/components/Admin/ModelSubmit/Form"))

@@ -21,7 +21,7 @@ const SpeciesName = (props: { edit?: boolean, value: string, setValue: Dispatch<
                 changeFn={fetchAutoCompleteSpecies}
                 width={size}
                 listWidth={`${size} ml-12 max-w-[500px]`}
-                className={`inline-block h-[42px] ml-12 max-w-[500px] rounded-xl dark:bg-[#27272a] dark:hover:bg-[#3E3E47] px-4 text-[15px] outline-[#004C46] text-black dark:text-white`}
+                className={`inline-block h-[42px] ml-12 max-w-[500px] rounded-xl dark:bg-[#27272a] dark:hover:bg-[#3E3E47] px-4 text-[15px] outline-[#004C46] text-[#004C46] dark:text-white`}
                 value={props.value}
                 setValue={props.setValue}
                  />
