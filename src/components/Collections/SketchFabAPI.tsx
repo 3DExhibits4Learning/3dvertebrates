@@ -14,6 +14,7 @@ import { model, model_annotation, photo_annotation } from '@prisma/client'
 import { fullAnnotation, GbifImageResponse, GbifResponse } from '@/interface/interface'
 import { setViewerWidth, annotationControl, boolRinse, addCommas, arrayFromObjects } from './SketchfabDom'
 import { useSearchParams } from 'next/navigation'
+import { photoUrlPrefix } from '@/functions/client/utils'
 
 // Default imports
 import AnnotationModal from '@/components/Collections/AnnotationModal'
@@ -109,8 +110,6 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
 
     if (s && annotations && api) {
 
-      console.log('Annotations Ready')
-
       // Create and go to the first annotation if it exists
       if (s.model.annotationPosition) {
         const position = JSON.parse(s.model.annotationPosition)
@@ -168,7 +167,7 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
   useEffect(() => {
 
     if (!!index && annotations && annotations[index - 1].annotation_type == 'photo') {
-      const path = `public${annotations[index - 1].url}`
+      const path = photoUrlPrefix(annotations[index - 1].url as string)
       setImgSrc(`/api/nfs?path=${path}`)
     }
 

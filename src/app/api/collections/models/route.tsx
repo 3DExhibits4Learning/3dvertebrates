@@ -40,11 +40,17 @@ export async function GET() {
     const isAnnotationModel = (model: model) => model.site_ready && !model.base_model && model.modelApproved && model.thumbnail
     const isUsedAnnotationModel = (model: model) => modelAnnotations.some(annotationModel => annotationModel.model_annotation.uid === model.uid)
 
+    // Beta Boolean arrows
+    const isBetaSiteReadyModel = (model: model) => model.site_ready && (model.base_model && model.modelApproved) || (!model.base_model && isUsedAnnotationModel)
+
+
+
     // Site ready models - used annotaion models, site ready annotated models or unannotated site ready models
     const siteReadyModels = models.filter(model => isAnnotationModel(model) && isUsedAnnotationModel(model) || isSiteReadyModel(model) && (isAnnotatedSiteReadyModel(model) || isUnannotatedSiteReadyModel(model)))
+    const betaReadyModels = models.filter(model => isBetaSiteReadyModel(model))
 
     // Typical return
-    return routeHandlerTypicalResponse("Models obtained", siteReadyModels)
+    return routeHandlerTypicalResponse("Models obtained", betaReadyModels)
   }
   // Typical catch
   catch (e: any) { return routeHandlerTypicalCatch(e.message) }
