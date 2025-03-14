@@ -35,25 +35,25 @@ export async function POST(request: Request) {
         // Variable declarations
         const file = formData.get('file') as File
         const uid = formData.get('uid') as string
-        var path = `public/data/Vertebrates/Thumbnails/${uid}`
 
         // Return if any data is missing
         if (!file || !uid) throw Error('File or UID is missing')
 
         // file => arrayBuffer => Buffer
-        const bytes = await file.arrayBuffer()
+        const bytes = await file.arrayBuffer().catch(e => routeHandlerErrorHandler(e.message, path, 'file.arrayBuffer()', "Couldn't get array buffer")) as ArrayBuffer
         const buffer = Buffer.from(bytes)
-        var filePath = process.env.LOCAL_ENV === 'development' ? `X:/Vertebrates/Thumbnails/${uid}` : `public/data/Vertebrates/Thumbnails/${uid}`
+        const dir = process.env.LOCAL_ENV === 'development' ? `X:/Vertebrates/Thumbnails/${uid}` : `public/data/Vertebrates/Thumbnails/${uid}`
 
         // Make directory, update path
-        await mkdir(filePath, { recursive: true }).catch(e => routeHandlerErrorHandler(e.message, filePath, 'mkdir()', "Couldn't make directory"))
-        filePath = join(filePath, file.name)
+        await mkdir(dir, { recursive: true }).catch(e => routeHandlerErrorHandler(e.message, path, 'mkdir()', "Couldn't make directory"))
+        const filePath = join(dir, file.name)
 
         // @ts-ignore - typescript thinks writeFile doesn't take a buffer
-        await writeFile(path, buffer).catch(e => routeHandlerErrorHandler(e.message, path, 'writeFile()', "Couldn't write file"))
+        await writeFile(filePath, buffer).catch(e => routeHandlerErrorHandler(e.message, path, 'writeFile()', "Couldn't write file"))
         
         // Update the thumbnail column for the model in the database (remove 'public' and follwing slash, then escape remaining forward slashes in path before DB entry)
-        const update = await prisma.model.update({ where: { uid: uid }, data: { thumbnail: filePath.slice(7).replace('/', '\/') } }).catch(e => routeHandlerErrorHandler(e.message, path, 'prisma.model.update()', "Couldn't update thumbnail in database"))
+        const dbUrl = `data/Vertebrates/Thumbnails/${uid}/${file.name}`
+        const update = await prisma.model.update({ where: { uid: uid }, data: { thumbnail: dbUrl.replaceAll('/', '\\') } }).catch(e => routeHandlerErrorHandler(e.message, path, 'prisma.model.update()', "Couldn't update thumbnail in database"))
 
         //Return Successful
         return routeHandlerTypicalResponse('Thumbnail Added', update)
