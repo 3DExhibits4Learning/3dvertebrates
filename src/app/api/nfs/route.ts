@@ -11,12 +11,10 @@ import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/
 /**
  * @function GET
  * @param request http request
- * @returns filebuffer
+ * @returns Buffer
  */
 export async function GET(request: Request) {
-
     try {
-
         // Current route
         const route = 'src/app/api/nfs/route.ts'
         

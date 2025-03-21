@@ -38,6 +38,17 @@ export function routeHandlerErrorHandler(route: string, errorMessage: string, fn
 }
 
 /**
+ * @param path 
+ * @param errorMessage 
+ * @param fn 
+ * @param clientErrorMessage 
+ */
+export function serverActionErrorHandler(path: string, errorMessage: string, fn: string, clientErrorMessage: string) {
+    console.error(routeHandlerError(path, errorMessage, fn))
+    throw Error(clientErrorMessage)
+}
+
+/**
  * @param errorMessage response object for catch() on route handelers
  * @returns Response object with client error message as data, response and statusText values and a 400 status
  */

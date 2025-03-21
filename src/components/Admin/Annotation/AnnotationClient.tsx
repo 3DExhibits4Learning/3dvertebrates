@@ -24,12 +24,12 @@ import { annotationsAndPositionsReducer } from "@/functions/client/reducers/anno
 import { annotationClientSpecimenReducer } from "@/functions/client/reducers/annotationClientSpecimen"
 import { getIndex, getAssignmentArgs, getAssignmentLabel, activeAnnotationChangeHandler, modelOrAnnotationChangeHandler, modelClickHandler } from "@/functions/client/annotationClient"
 import { initialAnnotationsAndPositions, initialSpecimenData } from "@/interface/initializers"
+import { assignAnnotation, unassignAnnotation } from "@/functions/server/admin/administrator"
 
 // Default imports
 import BotanistRefWrapper from "./AnnotationModelViewerRef"
 import AreYouSure from "@/components/Shared/Modals/AreYouSure"
 import AnnotationEntry from "./AnnotationEntry"
-import assignAnnotation from "@/functions/client/managerClient/assignAnnotation"
 import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler"
 import StudentSelect from "@/components/Admin/Administrator/Students/SelectStudents"
 
@@ -69,14 +69,18 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     const rejectAnnotationsHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, rejectAnnotations, [specimenData.uid], 'Rejecting annotations')
     const unapproveAnnotationsHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unapproveAnnotations, [specimenData.uid], 'Unapproving annotations')
 
-    // Annotation assign (or unassign) handler
-    const assignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, assignAnnotation, getAssignmentArgs(specimenData, name, props.students, email), getAssignmentLabel(specimenData))
+    // Annotation assign and unassign handlers
+    const assignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, assignAnnotation, [name, email, specimenData.uid], 'Assigning annotation of model')
+    const getAnnotationUnassignmentEmail = () => (props.students as studentsAssignmentsAndModels[]).find(student => student.assignment.find(assignment => assignment.uid === specimenData.uid))?.email
+    const unassignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unassignAnnotation, [getAnnotationUnassignmentEmail(), specimenData.uid], 'Unassigning annotation of model')
 
     // Set the activeAnnotation when its dependency is changed from the BotanistModelViewer, either via clicking an annotation or creating a new one
     useEffect(() => activeAnnotationChangeHandler(annotationsAndPositions, annotationsAndPositionsDispatch), [annotationsAndPositions.activeAnnotationIndex]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // Set relevant model data onPress of the Accordion or when an annotation record has been changed in the database
     useEffect(() => { newAnnotationEnabled.current = false; modelOrAnnotationChangeHandler(specimenData, annotationsAndPositionsDispatch) }, [specimenData.uid, annotationsAndPositions.annotationSavedOrDeleted])
+
+    console.log(props.students)
 
     return <AnnotationClientData.Provider value={annotationClientContext} >
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />
@@ -142,43 +146,23 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
                                         {
                                             // Approval button
                                             specimenData.annotated && !specimenData.annotationsApproved &&
-                                            <div className="flex">
-                                                <Button onPress={() => approveAnnotationsHandler()}
-                                                    className="text-white mt-2 text-lg"
-                                                >
-                                                    Approve
-                                                </Button>
-                                            </div>
+                                            <div className="flex"><Button onPress={() => approveAnnotationsHandler()} className="text-white mt-2 text-lg">Approve</Button></div>
                                         }
                                         {
                                             // Unapproval button
                                             specimenData.annotated && specimenData.annotationsApproved &&
-                                            <div className="flex">
-                                                <Button onPress={() => unapproveAnnotationsHandler()}
-                                                    className="text-white mt-2 text-lg"
-                                                >
-                                                    Unapprove
-                                                </Button>
-                                            </div>
+                                            <div className="flex"><Button onPress={() => unapproveAnnotationsHandler()} className="text-white mt-2 text-lg">Unapprove</Button></div>
                                         }
-                                        <div className="flex">
-                                            <Button onPress={() => assignAnnotationHandler()}
-                                                className="text-white mt-2 text-lg"
-                                            >
-                                                Unassign
-                                            </Button>
-                                        </div>
+                                        <div className="flex"><Button onPress={() => unassignAnnotationHandler()} className="text-white mt-2 text-lg">Unassign</Button></div>
                                     </>
                                 }
                                 {
                                     // New annotation button
-                                    !annotationsAndPositions.newAnnotationEnabled &&
-                                    annotationsAndPositions.activeAnnotationIndex != 'new' &&
-                                    annotationsAndPositions.firstAnnotationPosition != undefined &&
-                                    <Button onPress={() => { newAnnotationEnabled.current = true; annotationsAndPositionsDispatch({ type: 'newAnnotation' }) }}
+                                    !annotationsAndPositions.newAnnotationEnabled && annotationsAndPositions.activeAnnotationIndex != 'new' && annotationsAndPositions.firstAnnotationPosition != undefined &&
+                                    <Button
+                                        onPress={() => { newAnnotationEnabled.current = true; annotationsAndPositionsDispatch({ type: 'newAnnotation' }) }}
                                         className="text-white mt-2 text-lg"
-                                        isDisabled={annotationsAndPositions.repositionEnabled}
-                                    >
+                                        isDisabled={annotationsAndPositions.repositionEnabled}>
                                         + New Annotation
                                     </Button>
                                 }
