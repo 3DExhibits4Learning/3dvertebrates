@@ -24,21 +24,11 @@ export default function AnnotationEntryTransferModal() {
     return <Modal isOpen={transferState.transferModalOpen} isDismissable={false} hideCloseButton isKeyboardDismissDisabled={true}>
         <ModalContent>
             <ModalBody className="text-center">
-                {
-                    transferState.transferring &&
-                    <Spinner label={transferState.loadingLabel} />
-
-                }
-                {
-                    !transferState.transferring &&
-                    <p>{transferState.result}</p>
-                }
+                {transferState.transferring && <Spinner label={transferState.loadingLabel} />}
+                {!transferState.transferring && <p>{transferState.result}</p>}
             </ModalBody>
             <ModalFooter className="flex justify-center">
-                {
-                    !transferState.transferring &&
-                    <Button color="primary" onPress={() => dispatch({ type: 'annotationSavedOrDeleted' })}>OK</Button>
-                }
+                {!transferState.transferring && <Button color="primary" onPress={() => dispatch({ type: 'annotationSavedOrDeleted' })}>OK</Button>}
             </ModalFooter>
         </ModalContent>
     </Modal>
