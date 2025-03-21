@@ -19,12 +19,11 @@ import { studentsAssignmentsAndModels, annotationClientData } from "@/interface/
 import { toUpperFirstLetter } from "@/functions/utils/toUpperFirstLetter"
 import { Button } from "@nextui-org/react"
 import { DataTransferContext } from "@/components/Admin/Administrator/ManagerClient"
-import { approveAnnotations, unapproveAnnotations, rejectAnnotations } from "@/functions/client/managerClient/approveAnnotations"
 import { annotationsAndPositionsReducer } from "@/functions/client/reducers/annotationsAndPositions"
 import { annotationClientSpecimenReducer } from "@/functions/client/reducers/annotationClientSpecimen"
 import { getIndex, getAssignmentArgs, getAssignmentLabel, activeAnnotationChangeHandler, modelOrAnnotationChangeHandler, modelClickHandler } from "@/functions/client/annotationClient"
 import { initialAnnotationsAndPositions, initialSpecimenData } from "@/interface/initializers"
-import { assignAnnotation, unassignAnnotation } from "@/functions/server/admin/administrator"
+import { assignAnnotation, unassignAnnotation, approveAnnotations, unapproveAnnotations } from "@/functions/server/admin/administrator"
 
 // Default imports
 import BotanistRefWrapper from "./AnnotationModelViewerRef"
@@ -66,7 +65,6 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
 
     // Approve/Unapprove annotation handlers
     const approveAnnotationsHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, approveAnnotations, [specimenData.uid], 'Approving annotations')
-    const rejectAnnotationsHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, rejectAnnotations, [specimenData.uid], 'Rejecting annotations')
     const unapproveAnnotationsHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unapproveAnnotations, [specimenData.uid], 'Unapproving annotations')
 
     // Annotation assign and unassign handlers
@@ -79,8 +77,6 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
 
     // Set relevant model data onPress of the Accordion or when an annotation record has been changed in the database
     useEffect(() => { newAnnotationEnabled.current = false; modelOrAnnotationChangeHandler(specimenData, annotationsAndPositionsDispatch) }, [specimenData.uid, annotationsAndPositions.annotationSavedOrDeleted])
-
-    console.log(props.students)
 
     return <AnnotationClientData.Provider value={annotationClientContext} >
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />

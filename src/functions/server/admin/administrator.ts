@@ -30,7 +30,7 @@ export const assignAnnotation = async (student: string, email: string, uid: stri
         // Annotator update + assignment queries
         const updateAnnotator = prisma.model.update({ where: { uid: uid }, data: { annotator: student } })
         const assignModelForAnnotation = prisma.assignment.create({ data: { uid: uid, email: email } })
-        
+
         // Await transaction and inform student of assignment
         await prisma.$transaction([updateAnnotator, assignModelForAnnotation]).catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction([updateAnnotator, assignModelForAnnotation])', "Couldn't assign model to student"))
         await informStudentOfAssignment(process.env.NODE_ENV === 'production' ? email : "ab632@humboldt.edu", "beta.3dvertebrates.org")
@@ -38,7 +38,7 @@ export const assignAnnotation = async (student: string, email: string, uid: stri
         // Success message
         return `Model assigned to ${student} for annotation`
     }
-    catch(e: any) {return e.message}
+    catch (e: any) { return e.message }
 }
 
 /**
@@ -55,12 +55,47 @@ export const unassignAnnotation = async (email: string, uid: string) => {
         // Annotator update + assignment queries
         const updateAnnotator = prisma.model.update({ where: { uid: uid }, data: { annotator: null } })
         const unassignModelForAnnotation = prisma.assignment.delete({ where: { uid: uid, email: email } })
-        
+
         // Await transaction and inform student of assignment
-        await prisma.$transaction([updateAnnotator, unassignModelForAnnotation]).catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction([updateAnnotator, unassignModelForAnnotation])', "Couldn't unassign model to student"))
+        await prisma.$transaction([updateAnnotator, unassignModelForAnnotation])
+            .catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction([updateAnnotator, unassignModelForAnnotation])', "Couldn't unassign model to student"))
 
         // Success message
         return `Model unassigned`
     }
-    catch(e: any) {return e.message}
+    catch (e: any) { return e.message }
+}
+
+/**
+ * 
+ * @param uid 
+ * @returns 
+ */
+export const approveAnnotations = async (uid: string) => {
+    try {
+        // Approve model annotations
+        await prisma.model.update({ where: { uid: uid }, data: { annotationsApproved: true } })
+            .catch(e => serverActionErrorHandler(path, e.message, 'prisma.model.update({ where: { uid: uid }, data: { annotationsApproved: true } })', "Unable to approve model"))
+
+        // Return succes message
+        return "Annotations approved"
+    }
+    catch (e: any) { return e.message }
+}
+
+/**
+ * 
+ * @param uid 
+ * @returns 
+ */
+export const unapproveAnnotations = async (uid: string) => {
+    try {
+        // Approve model annotations
+        await prisma.model.update({ where: { uid: uid }, data: { annotationsApproved: false } })
+            .catch(e => serverActionErrorHandler(path, e.message, 'prisma.model.update({ where: { uid: uid }, data: { annotationsApproved: false } })', "Unable to unapprove model"))
+
+        // Return succes message
+        return "Annotations unapproved"
+    }
+    catch (e: any) { return e.message }
 }
