@@ -7,6 +7,7 @@ import { Dispatch } from "react";
 import { SetStateAction } from "react";
 import { annotations, photo_annotation, video_annotation, model, model_annotation, software, tags, authorized, assignment } from "@prisma/client";
 import { annotationDataTransferAction } from "./actions";
+import { ChildProcessWithoutNullStreams } from "child_process";
 
 export interface dispatch {
   type: string
@@ -76,7 +77,18 @@ export interface annotationClientData {
   annotationsAndPositions: annotationsAndPositions,
   annotationsAndPositionsDispatch: Dispatch<any>,
   specimenData: annotationClientSpecimen,
-  specimenDataDispatch: Dispatch<any>
+  specimenDataDispatch: Dispatch<any>,
+  handlers: {
+    approveAnnotationsHandler: Function,
+    unapproveAnnotationsHandler: Function,
+    assignAnnotationHandler: Function,
+    unassignAnnotationHandler: Function,
+    setNameAndEmailStates: Function
+  }
+  student:{
+    name: string | null | undefined,
+    email: string | null | undefined
+  }
 }
 
 export interface SearchHeaderProps {
