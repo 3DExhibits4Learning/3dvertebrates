@@ -26,9 +26,9 @@ import { initialAnnotationsAndPositions, initialSpecimenData } from "@/interface
 import { assignAnnotation, unassignAnnotation, approveAnnotations, unapproveAnnotations } from "@/functions/server/admin/administrator"
 
 // Default imports
-import BotanistRefWrapper from "./AnnotationModelViewerRef"
+import BotanistRefWrapper from "../Annotation Model Viwer/AnnotationModelViewerRef"
 import AreYouSure from "@/components/Shared/Modals/AreYouSure"
-import AnnotationEntry from "./AnnotationEntry"
+import AnnotationEntry from "../AnnotationEntry/AnnotationEntry"
 import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler"
 import StudentSelect from "@/components/Admin/Administrator/Students/SelectStudents"
 

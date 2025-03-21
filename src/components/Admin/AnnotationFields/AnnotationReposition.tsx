@@ -1,7 +1,7 @@
 'use client'
 
 import { useContext } from "react"
-import { AnnotationClientData } from "../Annotation/AnnotationClient"
+import { AnnotationClientData } from "../Annotation/Annotation Client/AnnotationClient"
 import { annotationClientData } from "@/interface/interface"
 
 export default function AnnotationReposition() {

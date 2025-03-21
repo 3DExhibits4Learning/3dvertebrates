@@ -1,7 +1,7 @@
 'use client'
 
 import { useContext } from "react"
-import { AnnotationEntryData } from "../AnnotationEntry"
+import { AnnotationEntryData } from "./AnnotationEntry"
 import { annotationEntryContext } from "@/interface/interface"
 import TextInput from "@/components/Shared/Form Fields/TextInput"
 

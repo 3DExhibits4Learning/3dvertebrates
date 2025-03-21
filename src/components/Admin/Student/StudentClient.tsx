@@ -13,7 +13,7 @@ import { Accordion, AccordionItem } from "@nextui-org/react"
 import { isMobileOrTablet } from "@/functions/utils/isMobile"
 
 // Default imports
-import AnnotationClient from "../Annotation/AnnotationClient"
+import AnnotationClient from "../Annotation/Annotation Client/AnnotationClient"
 import ModelSubmitForm from "../ModelSubmit/Form"
 
 export default function StudentClient(props: { modelsToAnnotate: string, annotationModels: string }) {

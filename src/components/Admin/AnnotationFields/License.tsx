@@ -1,7 +1,7 @@
 'use client'
 
 import { SetStateAction, Dispatch, useContext } from "react"
-import { AnnotationEntryData } from "../Annotation/AnnotationEntry"
+import { AnnotationEntryData } from "../Annotation/AnnotationEntry/AnnotationEntry"
 
 export default function License(props: {license: string, setLicense?: Dispatch<SetStateAction<string>>, field?: string}) {
 

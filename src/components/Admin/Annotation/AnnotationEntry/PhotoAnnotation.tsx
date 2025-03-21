@@ -8,13 +8,13 @@
 
 // Typical imports
 import { useContext } from "react"
-import { AnnotationEntryData } from "../AnnotationEntry"
+import { AnnotationEntryData } from "./AnnotationEntry"
 import { annotationEntryContext } from "@/interface/interface"
 
 // Default imports
 import TextInput from "@/components/Shared/Form Fields/TextInput"
 import License from "../../AnnotationFields/License"
-import Annotation from "../Annotation"
+import Annotation from "./Annotation"
 import FileInput from "@/components/Admin/AnnotationFields/ImageInput"
 
 // Main JSX

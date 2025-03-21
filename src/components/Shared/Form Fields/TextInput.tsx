@@ -1,7 +1,7 @@
 'use client'
 
 import { SetStateAction, Dispatch, useContext } from "react"
-import { AnnotationEntryData } from "@/components/Admin/Annotation/AnnotationEntry"
+import { AnnotationEntryData } from "@/components/Admin/Annotation/AnnotationEntry/AnnotationEntry"
 
 export default function TextInput(props: { value: string, setValue?: Dispatch<SetStateAction<string>> | Function, title: string, required?: boolean, leftMargin?: string, textSize?: string, field?: string }) {
     

@@ -11,7 +11,7 @@
 
 // Typical imports
 import { MutableRefObject, useEffect, useRef, forwardRef, ForwardedRef, useState, useContext } from 'react';
-import { AnnotationClientData } from './AnnotationClient';
+import { AnnotationClientData } from '../Annotation Client/AnnotationClient';
 import { annotationClientData, fullAnnotation } from '@/interface/interface';
 import { removeHigherAnnotations, replaceHigherAnnotations } from '@/functions/client/AnnotationModelViewer';
 

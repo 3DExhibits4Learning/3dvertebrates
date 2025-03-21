@@ -1,11 +1,11 @@
 'use client'
 
 import { useContext } from "react"
-import { AnnotationEntryData } from "../AnnotationEntry"
+import { AnnotationEntryData } from "./AnnotationEntry"
 import { annotationEntryContext } from "@/interface/interface"
 import TextInput from "@/components/Shared/Form Fields/TextInput"
 import ModelAnnotationSelect from "../../AnnotationFields/ModelAnnotationSelect"
-import Annotation from "../Annotation"
+import Annotation from "./Annotation"
 import dynamic from "next/dynamic"
 import { model } from "@prisma/client"
 const ModelViewer = dynamic(() => import('@/components/Shared/ModelViewer'), { ssr: false })

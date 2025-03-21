@@ -13,7 +13,7 @@ import * as aeFn from '@/functions/client/annotationEntry'
 // Typical imports
 import { useState, useEffect, useContext, createContext, useReducer } from "react"
 import { AnnotationEntryProps, annotationClientData, annotationEntryContext } from "@/interface/interface"
-import { AnnotationClientData } from "./AnnotationClient"
+import { AnnotationClientData } from "../Annotation Client/AnnotationClient"
 import { getInitialAnnotationEntryData } from "@/interface/initializers"
 
 // Default imports
@@ -21,8 +21,8 @@ import annotationEntryReducer from "@/functions/client/reducers/AnnotationEntryD
 import dataTransferHandler from '@/functions/client/dataTransfer/dataTransferHandler'
 import annotationDataTransferReducer from '@/functions/client/reducers/annotationEntryDataTransfer'
 import AnnotationEntryTransferModal from './AnnotationEntryModal'
-import FirstAnnotationEntry from './AnnotationEntry/FirstAnnotationEntry'
-import AnnotationEntryWrapper from './AnnotationEntry/AnnotationEntryWrapper'
+import FirstAnnotationEntry from './FirstAnnotationEntry'
+import AnnotationEntryWrapper from './AnnotationEntryWrapper'
 
 // Data context initialization
 export const AnnotationEntryData = createContext<annotationEntryContext | ''>('')

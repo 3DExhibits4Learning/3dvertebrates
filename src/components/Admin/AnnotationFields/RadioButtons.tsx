@@ -1,7 +1,7 @@
 'use client'
 
 import { useContext } from "react"
-import { AnnotationEntryData } from "../Annotation/AnnotationEntry"
+import { AnnotationEntryData } from "../Annotation/AnnotationEntry/AnnotationEntry"
 import { annotationEntryContext } from "@/interface/interface"
 
 export default function RadioButtons() {

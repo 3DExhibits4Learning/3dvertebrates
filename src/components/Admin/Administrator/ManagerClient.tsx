@@ -18,7 +18,7 @@ import { fullModel } from "@/interface/interface"
 import { isMobileOrTablet } from "@/functions/utils/isMobile"
 
 // Default imports
-import AnnotationClient from "@/components/Admin/Annotation/AnnotationClient"
+import AnnotationClient from "@/components/Admin/Annotation/Annotation Client/AnnotationClient"
 import initializeDataTransfer from "@/functions/client/dataTransfer/initializeDataTransfer"
 import terminateDataTransfer from "@/functions/client/dataTransfer/terminateDataTransfer"
 import RemoveStudent from "./Students/RemoveStudent"
