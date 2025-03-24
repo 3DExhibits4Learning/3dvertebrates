@@ -11,7 +11,7 @@ import { Modal, ModalContent, ModalBody, ModalFooter, Spinner, Button } from "@n
 import { useContext } from "react";
 import { AnnotationEntryData } from "./AnnotationEntry";
 import { annotationClientData, annotationEntryContext } from "@/interface/interface";
-import { AnnotationClientData } from "../Annotation Client/AnnotationClient";
+import { AnnotationClientData } from "@/components/Admin/Annotation/Annotation Client/AnnotationClient";
 
 // Main JSX
 export default function AnnotationEntryTransferModal() {

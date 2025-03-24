@@ -13,7 +13,7 @@ import * as aeFn from '@/functions/client/annotationEntry'
 // Typical imports
 import { useState, useEffect, useContext, createContext, useReducer } from "react"
 import { AnnotationEntryProps, annotationClientData, annotationEntryContext } from "@/interface/interface"
-import { AnnotationClientData } from "../Annotation Client/AnnotationClient"
+import { AnnotationClientData } from "@/components/Admin/Annotation/Annotation Client/AnnotationClient"
 import { getInitialAnnotationEntryData } from "@/interface/initializers"
 
 // Default imports

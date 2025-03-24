@@ -1,9 +1,10 @@
 /**
  * @file src/functions/client/AnnotationModelViewer.ts
  * 
- * @fileoverview 
+ * @fileoverview logic file for the annotation model viewer
  */
 
+// Typical imports
 import { annotationsAndPositions } from "@/interface/interface"
 import { MutableRefObject, Dispatch } from "react"
 import { fullAnnotation } from "@/interface/interface"
@@ -37,18 +38,44 @@ export const replaceHigherAnnotations = (apData: annotationsAndPositions, sketch
     }
 }
 
+/**
+ * 
+ * @param info 
+ * @param dispatch 
+ * @param camera 
+ * @param activeAnnotationIndex 
+ */
 export const dispatchNewPosition = (info: any, dispatch: any, camera: any, activeAnnotationIndex: number | 'new' | undefined) => {
     const positionArray = Array.from(info.position3D)
     dispatch({ type: 'newPosition', position: JSON.stringify([positionArray, camera.position, camera.target]) })
     if (activeAnnotationIndex !== 'new') dispatch({ type: 'newAnnotationIndex', index: 'new' })
 }
 
-export const createAnnotation = (info: any,
-    newAnnotationEnabled: MutableRefObject<boolean>,
-    temporaryAnnotationIndex: MutableRefObject<number>,
-    sketchfabApi: any,
-    apData: annotationsAndPositions,
-    apDataDispatch: Dispatch<any>) => {
+/**
+ * 
+ * @param sketchfabApi 
+ * @param index 
+ * @returns 
+ */
+export const removeAnnotation = async (sketchfabApi: any, index: number) => {
+    return new Promise((res) => {
+        sketchfabApi.removeAnnotation(index, (err: any) => {
+            if (!err) res
+            else throw Error('Model Viewer Error')
+        })
+    })
+}
+
+/**
+ * 
+ * @param info 
+ * @param newAnnotationEnabled 
+ * @param temporaryAnnotationIndex 
+ * @param sketchfabApi 
+ * @param apData 
+ * @param apDataDispatch 
+ */
+export const createAnnotation = (info: any, newAnnotationEnabled: MutableRefObject<boolean>, temporaryAnnotationIndex: MutableRefObject<number | undefined>, sketchfabApi: any, apData: annotationsAndPositions, apDataDispatch: Dispatch<any>) => {
 
     // Check flags before anything
     if (newAnnotationEnabled) {
@@ -85,7 +112,7 @@ export const repositionAnnotation = (info: any, apData: annotationsAndPositions,
         removeHigherAnnotations(apData, sketchfabApi)
 
         // Remove current annotation
-        sketchfabApi.removeAnnotation(apData.activeAnnotationIndex as number - 1, (err: any) => {if (err) throw Error('Model Viewer Error')})
+        sketchfabApi.removeAnnotation(apData.activeAnnotationIndex as number - 1, (err: any) => { if (err) throw Error('Model Viewer Error') })
 
         // Get camera position 
         sketchfabApi.getCameraLookAt((err: any, camera: any) => {
@@ -97,7 +124,7 @@ export const repositionAnnotation = (info: any, apData: annotationsAndPositions,
                 'Taxonomy and Description'
 
             // Create annotation and replace higher annotations
-            sketchfabApi.createAnnotationFromScenePosition(info.position3D, camera.position, camera.target, `${title}`, '', (err: any, index: any) => { 
+            sketchfabApi.createAnnotationFromScenePosition(info.position3D, camera.position, camera.target, `${title}`, '', (err: any, index: any) => {
                 if (err) throw Error('Model Viewer Error')
                 temporaryAnnotationIndex.current = index
                 replaceHigherAnnotations(apData, sketchfabApi, temporaryAnnotationIndex.current as number)

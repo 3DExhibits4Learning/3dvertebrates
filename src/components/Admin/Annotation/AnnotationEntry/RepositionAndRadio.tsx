@@ -1,7 +1,7 @@
 'use client'
 
-import AnnotationReposition from "../../AnnotationFields/AnnotationReposition"
-import RadioButtons from "../../AnnotationFields/RadioButtons"
+import AnnotationReposition from "@/components/Admin/Annotation/AnnotationFields/AnnotationReposition"
+import RadioButtons from "@/components/Admin/Annotation/AnnotationFields/RadioButtons"
 
 export default function RepositionAndRadio(props:{new: boolean, index: number}) {
     return (

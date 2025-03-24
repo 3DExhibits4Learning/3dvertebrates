@@ -13,9 +13,9 @@ import { annotationEntryContext } from "@/interface/interface"
 
 // Default imports
 import TextInput from "@/components/Shared/Form Fields/TextInput"
-import License from "../../AnnotationFields/License"
+import License from "@/components/Admin/Annotation/AnnotationFields/License"
 import Annotation from "./Annotation"
-import FileInput from "@/components/Admin/AnnotationFields/ImageInput"
+import FileInput from "@/components/Admin/Annotation/AnnotationFields/ImageInput"
 
 // Main JSX
 export default function PhotoAnnotationEntry() {

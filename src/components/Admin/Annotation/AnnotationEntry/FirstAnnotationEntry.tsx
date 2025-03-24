@@ -1,6 +1,6 @@
 'use client'
 
-import AnnotationReposition from "../../AnnotationFields/AnnotationReposition"
+import AnnotationReposition from "../AnnotationFields/AnnotationReposition"
 import { Button } from "@nextui-org/react"
 
 
