@@ -3,7 +3,7 @@
  * 
  * @fileoverview handler to obtain site ready models
  * 
- * @todo import singleton and handle queries directly
+ * @todo convert to server action
  */
 
 // Typical imports

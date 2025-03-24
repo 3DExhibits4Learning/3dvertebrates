@@ -2,6 +2,8 @@
  * @file src/app/api/admin/models/route.tsx
  * 
  * @fileoverview handler to obtain full 3d models
+ * 
+ * @todo convert to server action
  */
 
 // Typical imports

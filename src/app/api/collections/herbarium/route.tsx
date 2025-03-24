@@ -2,6 +2,8 @@
  * @file src\app\api\collections\herbarium\route.tsx
  * 
  * @fileoverview handler which instantiates the client side Hebarium class
+ * 
+ * @todo convert to server action
  */
 
 // Typical imports

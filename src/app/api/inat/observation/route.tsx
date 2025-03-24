@@ -2,6 +2,8 @@
  * @file src/app/api/inat/observation/route.tsx
  * 
  * @fileoverview inat observation route handler
+ * 
+ * @todo convert to server action
  */
 
 // Typical imports

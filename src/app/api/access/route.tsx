@@ -2,6 +2,8 @@
  * @file src/app/api/access/route.tsx
  * 
  * @fileoverview route handler to check validity of a JWT
+ * 
+ * @todo convert to server action
  */
 
 // Typical imports

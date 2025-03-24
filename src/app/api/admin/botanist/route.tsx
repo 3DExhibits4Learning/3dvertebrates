@@ -3,9 +3,7 @@
  * 
  * @fileoverview handler for the model annotations class(GET), handler for marking a model as annotated (POST)
  * 
- * @todo import singleton and handle queries directly
- * @todo establish seperate route for base annotations or their children
- * @todo rename the route and change all corresponding fetches
+ * @todo convert to server actions
  */
 
 // Typical imports

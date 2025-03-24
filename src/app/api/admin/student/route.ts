@@ -3,7 +3,7 @@
  * 
  * @fileoverview handler for adding (POST) or removing (DELETE) students from the project
  * 
- * @todo import singleton and handle queries directly
+ * @todo convert to server action
  */
 
 // Typical imports

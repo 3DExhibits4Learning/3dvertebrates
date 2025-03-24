@@ -3,6 +3,8 @@
  * 
  * @fileoverview handler for admins to approve 3D models
  * 
+ * @todo convert to server action
+ * 
  */
 
 // Typical imports

@@ -2,7 +2,7 @@
  * @file src/app/api/admin/models/delete/route.tsx
  * @fileoverview the route handler for deletion of 3D models (and any associated annotations)
  * 
- * @todo delete 3d model from sketchfab
+ * @todo convert to server action
  */
 
 // Typical imports

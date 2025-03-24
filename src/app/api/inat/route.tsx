@@ -2,6 +2,8 @@
  * @file src/app/api/inat/route.tsx
  * 
  * @fileoverview handler for getting iNat userId from username (GET), or messaging another iNat user (POST)
+ * 
+ * @todo convert to server action
  */
 
 // Typical imports

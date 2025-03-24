@@ -3,7 +3,7 @@
  * 
  * @fileoverview inat route handler
  * 
- * @todo refactor
+ * @todo convert to server action
  */
 
 import { routeHandlerTypicalCatch } from "@/functions/server/error"
