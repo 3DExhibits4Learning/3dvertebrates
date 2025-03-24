@@ -22,7 +22,11 @@ import dataTransferHandler from '@/functions/client/dataTransfer/dataTransferHan
 import annotationDataTransferReducer from '@/functions/client/reducers/annotationEntryDataTransfer'
 import AnnotationEntryTransferModal from './AnnotationEntryModal'
 import FirstAnnotationEntry from './FirstAnnotationEntry'
-import AnnotationEntryWrapper from './AnnotationEntryWrapper'
+import RepositionAndRadio from "./RepositionAndRadio"
+import PhotoAnnotationEntry from "./PhotoAnnotation"
+import VideoAnnotationEntry from "./VideoAnnotation"
+import ModelAnnotationEntry from "./ModelAnnotationEntry"
+import AnnotationEntryButtons from "./Buttons"
 
 // Data context initialization
 export const AnnotationEntryData = createContext<annotationEntryContext | ''>('')
@@ -78,24 +82,22 @@ export default function AnnotationEntry(props: AnnotationEntryProps) {
     useEffect(() => aeFn.enableSaveOrUpdateButton(apData, annotationEntryData, enableFirstAnnotation, props.index, props.new, setCreateDisabled, setSaveDisabled, isNewPosition), enableDependencies) // eslint-disable-line react-hooks/exhaustive-deps  
 
     // JSX for first annotation
-    if (props.index === 1) return <>
-        <AnnotationEntryData.Provider value={annotationEntryContext}>
-            <AnnotationEntryTransferModal />
-            <FirstAnnotationEntry new={props.new} updateAnnotation={updateAnnotation} createAnnotation={createAnnotation} saveDisabled={saveDisabled} createDisabled={createDisabled} />
-        </AnnotationEntryData.Provider>
-    </>
+    if (props.index === 1) return <AnnotationEntryData.Provider value={annotationEntryContext}>
+        <AnnotationEntryTransferModal />
+        <FirstAnnotationEntry new={props.new} updateAnnotation={updateAnnotation} createAnnotation={createAnnotation} saveDisabled={saveDisabled} createDisabled={createDisabled} />
+    </AnnotationEntryData.Provider>
 
     // JSX for all other annotations
     return <AnnotationEntryData.Provider value={annotationEntryContext}>
         <AnnotationEntryTransferModal />
-        <AnnotationEntryWrapper
-            new={props.new}
-            index={props.index}
-            createAnnotation={createAnnotation}
-            updateAnnotation={updateAnnotation}
-            deleteAnnotation={deleteAnnotation}
-            saveDisabled={saveDisabled}
-            createDisabled={createDisabled}
-            annotationModels={props.annotationModels} />
+        <div className="w-[98%] min-w-[925px] h-fit flex flex-col border border-[#004C46] dark:border-white mt-4 ml-[1%] rounded-xl">
+            <RepositionAndRadio new={props.new} index={props.index} />
+            <section className="w-full h-fit">
+                <PhotoAnnotationEntry />
+                <VideoAnnotationEntry />
+                <ModelAnnotationEntry annotationModels={props.annotationModels} />
+            </section>
+            <AnnotationEntryButtons new={props.new} index={props.index} createAnnotation={createAnnotation} updateAnnotation={updateAnnotation} deleteAnnotation={deleteAnnotation} createDisabled={createDisabled} saveDisabled={saveDisabled} />
+        </div>
     </AnnotationEntryData.Provider>
 }

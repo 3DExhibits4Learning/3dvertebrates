@@ -10,7 +10,7 @@
 // Typical imports
 import { MutableRefObject, useEffect, useRef, forwardRef, ForwardedRef, useState, useContext } from 'react'
 import { AnnotationClientData } from '../Annotation Client/AnnotationClient'
-import { annotationClientData, fullAnnotation } from '@/interface/interface'
+import { annotationClientData } from '@/interface/interface'
 
 // Logic import
 import * as fn from '@/functions/client/AnnotationModelViewer'
@@ -41,7 +41,6 @@ const BotanistModelViewer = forwardRef((props: { minHeight?: string }, ref: Forw
     const repositionAnnotationWrapper = (info: any) => fn.repositionAnnotation(info, apData, sketchfabApi, temporaryAnnotationIndex, apDataDispatch)
     const annotationSelectHandlerWrapper = (index: any) => fn.annotationSelectHandler(index, newAnnotationEnabled, apDataDispatch)
     const instantiateAnnotationsWrapper = () => fn.instantiateAnnotations(apData, apiRef.current)
-
 
     // Sketchfab API initialization success object
     const successObj = {

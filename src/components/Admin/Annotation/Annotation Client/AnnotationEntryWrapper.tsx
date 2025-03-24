@@ -40,14 +40,12 @@ export default function AnnotationEntryWrapper(props: {modelsToAnnotate: model[]
                 </div>
             }
             {
-                // This indicates a databased annotation
-                typeof (annotationsAndPositions.activeAnnotationIndex) === 'number' &&
-                <AnnotationEntry index={getIndex(annotationsAndPositions) as number} new={false} annotationModels={props.annotationModels} />
+                // Databased annotation
+                typeof (annotationsAndPositions.activeAnnotationIndex) === 'number' && <AnnotationEntry index={getIndex(annotationsAndPositions) as number} new={false} annotationModels={props.annotationModels} />
             }
             {
-                // This indicates a new annotation
-                typeof (annotationsAndPositions.activeAnnotationIndex) === 'string' &&
-                <AnnotationEntry index={getIndex(annotationsAndPositions) as number} new annotationModels={props.annotationModels} />
+                // New annotation
+                typeof (annotationsAndPositions.activeAnnotationIndex) === 'string' && <AnnotationEntry index={getIndex(annotationsAndPositions) as number} new annotationModels={props.annotationModels} />
             }
         </section>
     </div>

@@ -95,12 +95,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
                             title={toUpperFirstLetter(model.spec_name)}
                             classNames={{ title: 'text-[ #004C46] text-2xl' }}
                             onPress={() => modelClickHandler(modelClicked.current as boolean, model, annotationsAndPositionsDispatch, specimenDataDispatch)}>
-                            {
-                                annotationsAndPositions.firstAnnotationPosition !== undefined &&
-                                <div className="h-[400px]">
-                                    <BotanistRefWrapper ref={newAnnotationEnabled} />
-                                </div>
-                            }
+                            {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px]"><BotanistRefWrapper ref={newAnnotationEnabled} /></div>}
                             <AdminAnnotation admin={props.admin} students={props.students as studentsAssignmentsAndModels[]} />
                             <AnnotationButtons setModalOpen={setModalOpen} ref={newAnnotationEnabled} />
                         </AccordionItem>
