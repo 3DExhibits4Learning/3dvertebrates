@@ -3,8 +3,6 @@
  * 
  * @fileoverview model viewer that allows for embedding annotations
  * 
- * @todo extract and import stand alone functions
- * @todo extract Effect logic in to stand alone functions, extract and import
  */
 
 "use client"
@@ -13,10 +11,9 @@
 import { MutableRefObject, useEffect, useRef, forwardRef, ForwardedRef, useState, useContext } from 'react'
 import { AnnotationClientData } from '../Annotation Client/AnnotationClient'
 import { annotationClientData, fullAnnotation } from '@/interface/interface'
-import { removeHigherAnnotations, replaceHigherAnnotations, createAnnotation } from '@/functions/client/AnnotationModelViewer'
 
-// Default imports
-import Sketchfab from '@sketchfab/viewer-api';
+// Logic import
+import * as fn from '@/functions/client/AnnotationModelViewer'
 
 // Main JSX
 const BotanistModelViewer = forwardRef((props: { minHeight?: string }, ref: ForwardedRef<boolean>) => {
@@ -31,6 +28,7 @@ const BotanistModelViewer = forwardRef((props: { minHeight?: string }, ref: Forw
     const newAnnotationEnabled = ref as MutableRefObject<boolean>
     const modelViewer = useRef<HTMLIFrameElement>()
     const temporaryAnnotationIndex = useRef<number>()
+    const apiRef = useRef<any>()
 
     // States
     const [sketchfabApi, setSketchfabApi] = useState<any>()
@@ -38,100 +36,16 @@ const BotanistModelViewer = forwardRef((props: { minHeight?: string }, ref: Forw
     // Minimum height of model viewer
     const minHeight = props.minHeight ? props.minHeight : '150px'
 
-    const createAnnotationWrapper = (info: any) => createAnnotation(info, newAnnotationEnabled, temporaryAnnotationIndex, sketchfabApi, apData, apDataDispatch)
+    // Wrappers
+    const createAnnotationWrapper = (info: any) => fn.createAnnotation(info, newAnnotationEnabled, temporaryAnnotationIndex, sketchfabApi, apData, apDataDispatch)
+    const repositionAnnotationWrapper = (info: any) => fn.repositionAnnotation(info, apData, sketchfabApi, temporaryAnnotationIndex, apDataDispatch)
+    const annotationSelectHandlerWrapper = (index: any) => fn.annotationSelectHandler(index, newAnnotationEnabled, apDataDispatch)
+    const instantiateAnnotationsWrapper = () => fn.instantiateAnnotations(apData, apiRef.current)
 
-    // const createAnnotation = (info: any) => {
-
-    //     if (newAnnotationEnabled.current) {
-
-    //         // Remove previous annotation if there is a new click
-    //         if (temporaryAnnotationIndex.current != undefined) sketchfabApi.removeAnnotation(temporaryAnnotationIndex.current, (err: any) => { })
-
-    //         // Get camera position and create annotation
-    //         sketchfabApi.getCameraLookAt((err: any, camera: any) => {
-    //             sketchfabApi.createAnnotationFromScenePosition(info.position3D, camera.position, camera.target, '', '', (err: any, index: any) => { temporaryAnnotationIndex.current = index })
-
-    //             // If the click was on the 3d model (and not the background) set position/activeAnnotation data, or else set position undefined
-    //             if (info.position3D) {
-    //                 const positionArray = Array.from(info.position3D)
-    //                 apDataDispatch({ type: 'newPosition', position: JSON.stringify([positionArray, camera.position, camera.target]) })
-    //                 if (apData.activeAnnotationIndex !== 'new') apDataDispatch({ type: 'newAnnotationIndex', index: 'new' })
-    //             }
-    //             else apDataDispatch({ type: 'newPosition', position: undefined })
-    //         })
-    //     }
-    // }
-
-    /**
-     * 
-     * @param info 
-     */
-    const repositionAnnotation = (info: any) => {
-
-        if (apData.repositionEnabled) {
-
-            // Remove higher annotations 
-            removeHigherAnnotations(apData, sketchfabApi)
-
-            // Remove current annotation
-            sketchfabApi.removeAnnotation(apData.activeAnnotationIndex as number - 1, (err: any) => { })
-
-            // Get camera position 
-            sketchfabApi.getCameraLookAt((err: any, camera: any) => {
-
-                // Determine title
-                const title = (apData.annotations as fullAnnotation[])[apData.activeAnnotationIndex as number - 2]?.title ?
-                    `${(apData.annotations as fullAnnotation[])[apData.activeAnnotationIndex as number - 2].title}` :
-                    'Taxonomy and Description'
-
-                // Create annotation and replace higher annotations
-                sketchfabApi.createAnnotationFromScenePosition(info.position3D, camera.position, camera.target, `${title}`, '', (err: any, index: any) => {
-                    temporaryAnnotationIndex.current = index
-                    replaceHigherAnnotations(apData, sketchfabApi, temporaryAnnotationIndex.current as number)
-                })
-
-                // If the click was on the 3d model (and not the background) set position/activeAnnotation data, or else set position undefined
-                if (info.position3D) {
-                    const positionArray = Array.from(info.position3D)
-                    apDataDispatch({ type: 'newPosition', position: JSON.stringify([positionArray, camera.position, camera.target]) })
-                }
-                else apDataDispatch({ type: 'newPosition', position: undefined })
-            })
-        }
-    }
-
-    // Annotation select handler
-    const annotationSelectHandler = (index: any) => {
-        if (newAnnotationEnabled.current) return
-        else if (index != -1) apDataDispatch({ type: 'newAnnotationIndex', index: index + 1 })
-    }
 
     // Sketchfab API initialization success object
     const successObj = {
-        success: function onSuccess(api: any) {
-            setSketchfabApi(api)
-            api.current = api
-            api.start()
-            api.addEventListener('viewerready', function () {
-
-                // Create the first annotation if it exists
-                if (apData.firstAnnotationPosition) {
-                    api.createAnnotationFromScenePosition(apData.firstAnnotationPosition[0], apData.firstAnnotationPosition[1], apData.firstAnnotationPosition[2], 'Taxonomy and Description', '', (err: any, index: any) => { })
-                }
-
-                // Create any futher annotations that exist
-                if (apData.annotations) {
-                    for (let i in apData.annotations) {
-                        if (apData.annotations[i].position) {
-                            const position = JSON.parse(apData.annotations[i].position)
-                            api.createAnnotationFromScenePosition(position[0], position[1], position[2], `${apData.annotations[i].title}`, '', (err: any, index: any) => { })
-                        }
-                    }
-                }
-            })
-        },
-
-        // Sketchfab viewer initialization settings
+        success: (api: any) => { setSketchfabApi(api); apiRef.current = api; api.start(); api.addEventListener('viewerready', instantiateAnnotationsWrapper) },
         error: function onError() { },
         ui_stop: 0,
         ui_infos: 0,
@@ -143,73 +57,32 @@ const BotanistModelViewer = forwardRef((props: { minHeight?: string }, ref: Forw
         ui_fadeout: 0
     }
 
-    // This effect initializes the viewer
-    useEffect(() => {
-        const iframe = modelViewer.current as HTMLIFrameElement
-        iframe.src = specimen.uid as string
-        const client = new Sketchfab(iframe)
-        client.init(specimen.uid, successObj)
-    }, [specimen.uid, apData.annotations]) // eslint-disable-line react-hooks/exhaustive-deps
+    // Initialize the viewer
+    useEffect(() => fn.initializeViewer(modelViewer.current as HTMLIFrameElement, specimen.uid as string, successObj), [specimen.uid, apData.annotations]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    // This effect removes the temporary annotation when its cancelled
-    useEffect(() => {
-        if (sketchfabApi && temporaryAnnotationIndex.current != undefined) {
-            sketchfabApi.removeAnnotation(temporaryAnnotationIndex.current, (err: any) => { })
-            apDataDispatch({ type: 'newPosition', position: undefined })
-        }
-    }, [apData.cancelledAnnotation]) // eslint-disable-line react-hooks/exhaustive-deps
+    // Remove a temporary annotation when its cancelled
+    useEffect(() => fn.cancelAnnotation(sketchfabApi, temporaryAnnotationIndex, apDataDispatch), [apData.cancelledAnnotation]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    // This effect adds the createAnnotation listener onClick when the associated state is enabled (or vice versa)
+    // Add the createAnnotation listener onClick when the associated state is enabled (or vice versa); cleanup function to ensure listeners aren't added twice
     useEffect(() => {
-        if (sketchfabApi && apData.newAnnotationEnabled === true) {
-            temporaryAnnotationIndex.current = undefined
-            sketchfabApi.addEventListener('click', createAnnotation, { pick: 'fast' })
-        }
-        else if (sketchfabApi) sketchfabApi.removeEventListener('click', createAnnotationWrapper, { pick: 'fast' })
-
+        fn.addOrRemoveCreateAnnotationEvent(sketchfabApi, apData, temporaryAnnotationIndex, createAnnotationWrapper)
         return () => { if (sketchfabApi) sketchfabApi.removeEventListener('click', createAnnotationWrapper, { pick: 'fast' }) }
     }, [apData.newAnnotationEnabled]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    // This effect allows repositioning of the activeAnnotation onClick (or removes it when there is no active annotation, or a new annotation)
+    // Allow repositioning of the activeAnnotation onClick (or removes it when there is no active annotation, or a new annotation); cleanup function to ensure listeners aren't added twice
     useEffect(() => {
-        if (sketchfabApi && apData.activeAnnotationIndex !== undefined && apData.activeAnnotationIndex !== 'new' && apData.repositionEnabled) {
-            sketchfabApi.addEventListener('click', repositionAnnotation, { pick: 'fast' })
-        }
-
-        else if (sketchfabApi) sketchfabApi.removeEventListener('click', repositionAnnotation, { pick: 'fast' })
-
-        return () => { if (sketchfabApi) sketchfabApi.removeEventListener('click', repositionAnnotation, { pick: 'fast' }) }
+        fn.addOrRemoveRepositionAnnotationEvent(sketchfabApi, apData, repositionAnnotationWrapper)
+        return () => { if (sketchfabApi) sketchfabApi.removeEventListener('click', repositionAnnotationWrapper, { pick: 'fast' }) }
     }, [apData.activeAnnotationIndex, apData.repositionEnabled]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // This effect repositions an annotation to its original location when the annotation reposition checkbox is unchecked
+    useEffect(() => fn.annotationRepositionUncheckedHandler(apData, temporaryAnnotationIndex, sketchfabApi), [apData.repositionEnabled]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Initialize the annotation select event and handle corresponding state changes within the handler; cleanup function to ensure listeners aren't added twice
+    // Note that the annotation select event is triggered by any click on the viewer, even those not on an annotation. Such events return and index of -1
     useEffect(() => {
-
-        if (apData.activeAnnotationIndex === 1) {
-            temporaryAnnotationIndex.current = undefined
-            removeHigherAnnotations(apData, sketchfabApi)
-            sketchfabApi.removeAnnotation(apData.activeAnnotationIndex as number - 1, (err: any) => { })
-            const position = apData.firstAnnotationPosition as string
-            sketchfabApi.createAnnotationFromScenePosition(position[0], position[1], position[2], 'Placeholder', '', (err: any, index: any) => { replaceHigherAnnotations(apData, sketchfabApi, temporaryAnnotationIndex.current as number) })
-        }
-        else if (sketchfabApi && apData.position3D !== (apData.annotations as fullAnnotation[])[apData.activeAnnotationIndex as number - 2]?.position && !apData.repositionEnabled) {
-            temporaryAnnotationIndex.current = undefined
-            removeHigherAnnotations(apData, sketchfabApi)
-            sketchfabApi.removeAnnotation(apData.activeAnnotationIndex as number - 1, (err: any) => { })
-            const position = JSON.parse((apData.annotations as fullAnnotation[])[apData.activeAnnotationIndex as number - 2].position as string)
-            sketchfabApi.createAnnotationFromScenePosition(position[0], position[1], position[2], 'Placeholder', '', (err: any, index: any) => { replaceHigherAnnotations(apData, sketchfabApi, temporaryAnnotationIndex.current as number) })
-        }
-    }, [apData.repositionEnabled]) // eslint-disable-line react-hooks/exhaustive-deps
-
-    // This effect initializes the annotation select event handler and handles corresponding state changes within the handler
-    useEffect(() => {
-
-        // Set the activeAnnotationIndex when an annotation is selected
-        // Note that this event is triggered by any click, even those not on an annotation. Such events return and index of -1
-
-        if (sketchfabApi && !apData.repositionEnabled) sketchfabApi.addEventListener('annotationSelect', annotationSelectHandler)
-        else if (sketchfabApi) sketchfabApi.removeEventListener('annotationSelect', annotationSelectHandler)
-
-        return () => { if (sketchfabApi) sketchfabApi.removeEventListener('annotationSelect', annotationSelectHandler) }
+        fn.addOrRemoveAnnotationSelectEvent(sketchfabApi, apData, annotationSelectHandlerWrapper)
+        return () => { if (sketchfabApi) sketchfabApi.removeEventListener('annotationSelect', annotationSelectHandlerWrapper) }
     }, [sketchfabApi, apData.activeAnnotationIndex, apData.repositionEnabled]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // Simple iframe with ref
