@@ -1,6 +1,8 @@
 'use client'
 
 import { fullAnnotation } from "@/interface/interface"
+import { getBaseAnnotations, getMediaAnnotation } from "@/functions/server/admin/annotator"
+import { model_annotation, photo_annotation, video_annotation } from "@prisma/client"
 
 class ModelAnnotations {
 
@@ -15,21 +17,12 @@ class ModelAnnotations {
 
         let promises = []
 
-        const annotations = await fetch(`/api/admin/botanist?uid=${uid}&type=getAnnotations`)
-            .then(res => res.json())
-            .then(json => json.response)
-
-        for (let i in annotations) {
-            promises.push(
-                fetch(`/api/admin/botanist?id=${annotations[i].annotation_id}&type=getAnnotation&annotationType=${annotations[i].annotation_type}`)
-                    .then(res => res.json())
-                    .then(json => json.response)
-            )
-        }
+        const annotations = await getBaseAnnotations(uid) as fullAnnotation[]
+        for (let i in annotations) { promises.push(getMediaAnnotation(annotations[i].annotation_id, annotations[i].annotation_type)) }
 
         await Promise.all(promises).then(res => {
             for (let i = 0; i < annotations.length; i++) {
-                annotations[i].annotation = res[i]
+                annotations[i].annotation = res[i] as photo_annotation | video_annotation | model_annotation
             }
         })
 

@@ -4,14 +4,13 @@ import { model } from "@prisma/client"
 import { useState, useEffect, useContext } from "react"
 import { DataTransferContext } from "../ManagerClient"
 import { Button } from "@nextui-org/react"
+import { approveModel, deleteModel } from "@/functions/server/admin/administrator"
 
 import AdminItemContainer from "../ItemContainer"
 import Select from "@/components/Shared/Form Fields/Select"
 import dynamic from "next/dynamic"
 import ApproveModelData from "./ApproveModelData"
 import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler"
-import deleteModel from "@/functions/client/managerClient/deleteModel"
-import approveModel from "@/functions/client/managerClient/approveModel"
 
 const ModelViewer = dynamic(() => import("@/components/Shared/ModelViewer"), { ssr: false })
 

@@ -8,15 +8,19 @@
 
 'use client'
 
-import { Button } from "@nextui-org/react";
-import { useState } from "react";
-import Select from "@/components/Shared/Form Fields/Select";
-import { fullModel } from "@/interface/interface";
-import deleteModel from "@/functions/client/managerClient/deleteModel";
-import { useContext } from "react";
-import { DataTransferContext } from "../ManagerClient";
-import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler";
+// Typical imports
+import { Button } from "@nextui-org/react"
+import { deleteModel } from "@/functions/server/admin/administrator"
+import { useState } from "react"
+import { fullModel } from "@/interface/interface"
+import { useContext } from "react"
+import { DataTransferContext } from "../ManagerClient"
 
+// Default imports
+import Select from "@/components/Shared/Form Fields/Select"
+import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler"
+
+// Main JSX
 export default function DeleteModel(props: { models: fullModel[] | undefined }) {
 
     const initializeDataTransfer = useContext(DataTransferContext).initializeDataTransferHandler
@@ -26,8 +30,7 @@ export default function DeleteModel(props: { models: fullModel[] | undefined }) 
 
     const deleteModelHandler = async (uid: string) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, deleteModel, [uid], "Deleting Model and Annotations")
 
-    return (
-        <section className="w-full flex justify-center">
+    return <section className="w-full flex justify-center">
             <div className="w-1/2 flex flex-col border-2 border-[#00856A] rounded-xl bg-[#D5CB9F] dark:bg-[#212121]">
                 <section className="ml-12">
                     <p className="my-12 text-xl">This will <b>permanantly delete</b> the 3D model <b>and</b> any annotations associated with it.</p>
@@ -47,5 +50,4 @@ export default function DeleteModel(props: { models: fullModel[] | undefined }) 
                 </section>
             </div>
         </section>
-    )
 }

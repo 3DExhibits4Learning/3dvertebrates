@@ -1,8 +1,10 @@
 'use client'
 
-import { GbifImageResponse, GbifMediaResponse, GbifProfile } from "@/interface/interface"
+import { software, model, photo_annotation, model_annotation } from "@prisma/client"
+import { getCollectionMetadata } from "@/functions/server/collections"
+import { GbifImageResponse, GbifProfile } from "@/interface/interface"
+
 import ModelAnnotations from "./ModelAnnotationsClass"
-import { software, model, annotations, photo_annotation, model_annotation } from "@prisma/client"
 
 export default class Herbarium {
 
@@ -32,10 +34,7 @@ export default class Herbarium {
     var annotations: any
     var promises = []
 
-    promises.push(fetch(`/api/collections/herbarium?uid=${model.uid}&usageKey=${usageKey.toString()}&specimenName=${model.spec_name}`)
-      .then(res => res.json())
-      .then(json => json.response))
-
+    promises.push(getCollectionMetadata(model.uid, usageKey, model.spec_name))
     promises.push(ModelAnnotations.retrieve(model.uid))
 
     await Promise.all(promises).then(res => {

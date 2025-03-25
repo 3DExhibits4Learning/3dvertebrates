@@ -2,6 +2,8 @@
  * @file src/components/Admin/Annotation/Annotation Client/AnnotationButtons.tsx
  * 
  * @fileoverview annotation client buttons for: new annotaton, mark as annotated and cancel annotation
+ * 
+ * @todo remove 'mark as annotated button' after model has been marked as annotated
  */
 
 // Typical imports
@@ -34,8 +36,7 @@ const AnnotationButtons = forwardRef((props: {setModalOpen: Dispatch<SetStateAct
         }
         {
             // 'Mark as annotated' button
-            annotationsAndPositions.annotations &&
-            annotationsAndPositions.annotations?.length >= 6 &&
+            annotationsAndPositions.annotations && annotationsAndPositions.annotations?.length >= 4 && 
             <>
                 <br></br>
                 <Button onPress={() => props.setModalOpen(true)}

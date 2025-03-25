@@ -1,12 +1,22 @@
+/**
+ * @file src/components/Admin/Administrator/Students/AddStudent.tsx
+ * 
+ * @fileoverview administration component for adding students to the project
+ */
+
 'use client'
 
-import TextInput from "@/components/Shared/Form Fields/TextInput"
+// Typcial imports
 import { useState, useEffect, useContext } from "react"
+import { addStudent } from "@/functions/server/admin/administrator"
 import { Button } from "@nextui-org/react"
 import { DataTransferContext } from "../ManagerClient"
-import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler"
-import addStudent from "@/functions/client/managerClient/addStudent"
 
+// Default imports
+import TextInput from "@/components/Shared/Form Fields/TextInput"
+import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler"
+
+// Main JSX
 export default function AddStudent() {
 
     const initializeDataTransfer = useContext(DataTransferContext).initializeDataTransferHandler

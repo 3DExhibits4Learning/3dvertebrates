@@ -4,6 +4,12 @@
  * @fileoverview server side error functions
  */
 
+/**
+ * 
+ * @param e 
+ * @returns 
+ */
+export const catchMessage = (e: any) => `Error: ${e.message}`
 
 /**
  * @param route path of the route handler
