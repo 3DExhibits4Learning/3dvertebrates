@@ -43,8 +43,6 @@ export async function GET() {
     // Beta Boolean arrows
     const isBetaSiteReadyModel = (model: model) => model.site_ready && (model.base_model && model.modelApproved) || (!model.base_model && isUsedAnnotationModel)
 
-
-
     // Site ready models - used annotaion models, site ready annotated models or unannotated site ready models
     const siteReadyModels = models.filter(model => isAnnotationModel(model) && isUsedAnnotationModel(model) || isSiteReadyModel(model) && (isAnnotatedSiteReadyModel(model) || isUnannotatedSiteReadyModel(model)))
     const betaReadyModels = models.filter(model => isBetaSiteReadyModel(model))

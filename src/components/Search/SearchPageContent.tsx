@@ -1,14 +1,19 @@
 /**
- * @file /components/Search/SearchPageContent.tsx
- * @fileoverview list of 3D models available on the site.
+ * @file src/components/Search/SearchPageContent.tsx
+ * 
+ * @fileoverview list of 3D models available on the site
  */
 
 'use client'
 
+// Typical imports
 import { useEffect, useState, useRef } from "react"
+import { model } from "@prisma/client"
+import { getCollectionModels } from "@/functions/server/collections"
+
+// Default imports
 import SearchPageModelList from "./SearchPageModelList"
 import SubHeader from "./SubHeader"
-import { model } from "@prisma/client"
 
 const getUniqueModelers = (models: model[]): string[] => {
   const uniqueModelers = new Set<string>()
@@ -35,43 +40,42 @@ const SearchPageContent = () => {
 
   useEffect(() => {
 
-    const getModels = async () => await fetch('/api/collections/models')
-      .then(res => res.json())
-      .then(json => {
-        siteReadyModels.current = json.response
-        if (siteReadyModels.current) {
-          let a = getUniqueModelers(siteReadyModels.current as model[])
-          let b = getUniqueAnnotators(siteReadyModels.current as model[])
-          a.unshift('All'); b.unshift('All')
-          setModeledByList(a)
-          setAnnotatedByList(b)
-        }
-      })
+    const getModels = async () => {
+      const models = await getCollectionModels()
+
+      if (typeof models !== 'string') {
+        siteReadyModels.current = models as model[]
+        let a = getUniqueModelers(models)
+        let b = getUniqueAnnotators(models)
+        a.unshift('All')
+        b.unshift('All')
+        setModeledByList(a)
+        setAnnotatedByList(b)
+      }
+    }
 
     getModels()
 
   }, [])
 
-  return (
-    <>
-      {
-        modeledByList && annotatedByList &&
-        <>
-          <SubHeader
-            modeledByList={modeledByList}
-            annotatedByList={annotatedByList}
-            modeler={selectedModeler}
-            annotator={selectedAnnotator}
-            setSelectedModeler={setSelectedModeler}
-            setSelectedAnnotator={(setSelectedAnnotator)}
-          />
-          <br />
-          <SearchPageModelList models={siteReadyModels.current as model[]} selectedModeler={selectedModeler} selectedAnnotator={selectedAnnotator} />
-          <br />
-        </>
-      }
-    </>
-  )
+  return <>
+    {
+      modeledByList && annotatedByList &&
+      <>
+        <SubHeader
+          modeledByList={modeledByList}
+          annotatedByList={annotatedByList}
+          modeler={selectedModeler}
+          annotator={selectedAnnotator}
+          setSelectedModeler={setSelectedModeler}
+          setSelectedAnnotator={(setSelectedAnnotator)}
+        />
+        <br />
+        <SearchPageModelList models={siteReadyModels.current as model[]} selectedModeler={selectedModeler} selectedAnnotator={selectedAnnotator} />
+        <br />
+      </>
+    }
+  </>
 }
 
 export default SearchPageContent
