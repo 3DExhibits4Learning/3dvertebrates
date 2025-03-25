@@ -7,11 +7,11 @@
  */
 
 // Typical imports
-import { getAccount } from "@/functions/server/queries";
-import { Account } from "@prisma/client";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
-import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/server/error";
+import { getAccount } from "@/functions/server/queries"
+import { Account } from "@prisma/client"
+import { getServerSession } from "next-auth"
+import { authOptions } from "../auth/[...nextauth]/route"
+import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/server/error"
 
 // THIS IS A DYNAMIC ROUTE
 export const dynamic = 'force-dynamic'
@@ -27,7 +27,6 @@ const route = 'src/app/api/access/route.tsx'
 export async function GET(request: Request) {
 
     try{
-
         // Get session
         const session = await getServerSession(authOptions).catch(e => routeHandlerErrorHandler(route, e.message, 'getServerSession(authOptions)', "Coulnd't get server session"))
 
