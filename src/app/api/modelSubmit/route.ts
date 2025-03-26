@@ -12,7 +12,9 @@ import { LatLngLiteral } from "leaflet"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { redirect } from "next/navigation"
-import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/server/error"
+import { nonFatalError, routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/server/error"
+import { readFile, unlink } from "fs/promises"
+import { getTmpPath } from "@/functions/server/admin/modelSubmit"
 
 // Defualt imports
 import routeHandlerTypicalResponse from "@/functions/server/typicalSuccessResponse"
@@ -52,31 +54,36 @@ export async function POST(request: Request) {
         const tags: string[] = JSON.parse(data.get('tags') as string)
         const position: { lat: string, lng: string } = JSON.parse(data.get('position') as string)
         const speciesAcquisitionDate = data.get('speciesAcquisitionDate') as string
-        const modelFile = data.get('modelFile') as File | Blob
         const baseOrAnnotation = data.get('baseOrAnnotation') as string
         const commonName = data.get('commonName') ? data.get('commonName') as string : ''
+        const tmpId = data.get('tmpId') as string
+
+        // Obtain model file from tmp
+        const modelPath = await getTmpPath(tmpId) 
+        const modelBuffer = await readFile(modelPath).catch(e => routeHandlerErrorHandler(route, e.message, 'readFile(modelPath)', "Couldn't read model file")) as Buffer
+        const blob = new Blob([modelBuffer])
 
         // Form and fetch Variables 
         const formData = new FormData
         formData.set('orgProject', process.env.SKETCHFAB_PROJECT_3DVERTEBRATES as string)
-        formData.set('modelFile', modelFile)
+        formData.set('modelFile', blob, `${species}.zip`)
         formData.set('visibility', 'private')
         formData.set('options', JSON.stringify({ background: { color: "#000000" } }))
         const orgModelUploadEnd = `https://api.sketchfab.com/v3/orgs/${process.env.SKETCHFAB_ORGANIZATION}/models`
         var modelUid = ''
 
-        // Session variables
+        // Session variables, database transaction array
         const email = session.user?.email
         const user = session.user.name ?? ''
-
-        // Database transaction array
         const transactions = []
 
         // Upload model file to sketchfab and instantiate modelUid
-        await fetch(orgModelUploadEnd, { headers: requestHeader, method: 'POST', body: formData }).then((res) => {
-            if (!res.ok) routeHandlerErrorHandler(route, res.statusText, 'fetch(orgModelUploadEnd)', "Bad upload request")
-            return res.json()
-        }).then(json => modelUid = json.uid).catch(e => routeHandlerErrorHandler(route, e.message, 'fetch(orgModelUploadEnd)', "Bad upload request"))
+        await fetch(orgModelUploadEnd, { headers: requestHeader, method: 'POST', body: formData })
+            .then((res) => {
+                if (!res.ok) routeHandlerErrorHandler(route, res.statusText, 'fetch(orgModelUploadEnd)', "Bad upload request")
+                return res.json()
+            })
+            .then(json => modelUid = json.uid).catch(e => routeHandlerErrorHandler(route, e.message, 'fetch(orgModelUploadEnd)', "Bad upload request"))
 
         // Push model query onto transactions
         transactions.push(prisma.model.create({
@@ -100,8 +107,9 @@ export async function POST(request: Request) {
         for (let i in software) { transactions.push(prisma.software.create({ data: { uid: modelUid, software: software[i] } })) }
         for (let i in tags) { transactions.push(prisma.tags.create({ data: { uid: modelUid, tag: tags[i] } })) }
 
-        // Await transaction
+        // Await transaction, delete model file from disk
         const transaction = await prisma.$transaction(transactions).catch(e => routeHandlerErrorHandler(route, e.message, 'prisma.transaction(transactions)', "Couldn't enter model into database"))
+        await unlink(modelPath).catch(e => nonFatalError(route, e.message, `unlink(${tmpId})`, 'POST'))
 
         // Typical success return
         return routeHandlerTypicalResponse('Model added successfully', transaction)
@@ -205,7 +213,7 @@ export async function PATCH(request: Request) {
         // Push software + tag updates
         for (let i in software) transaction.push(prisma.software.create({ data: { uid: uid, software: software[i] } }))
         for (let i in tags) transaction.push(prisma.tags.create({ data: { uid: uid, tag: tags[i] } }))
-        
+
         // Await transaction
         const update = await prisma.$transaction(transaction).catch(e => routeHandlerErrorHandler(route, e.message, "prisma.$transaction(transaction)", "Couldn't update model data"))
 
@@ -213,5 +221,5 @@ export async function PATCH(request: Request) {
         return routeHandlerTypicalResponse('Model added.', update)
     }
     // Typical catch
-    catch (e: any) {return routeHandlerTypicalCatch(e.message)}
+    catch (e: any) { return routeHandlerTypicalCatch(e.message) }
 }
