@@ -4,6 +4,7 @@
  * @fileoverview These are the route handlers for uploading and editing 3D models
  * 
  * @todo throw error on failure of required data check
+ * @todo merge PUT and PATCH functions so that model reupload can be included in database transaction
  */
 
 // Typical imports
@@ -59,8 +60,8 @@ export async function POST(request: Request) {
         const tmpId = data.get('tmpId') as string
         const fileName = data.get('fileName') as string
 
-        // Obtain model file from tmp
-        const modelPath = await getTmpPath(tmpId) 
+        // Obtain model blob from tmp
+        const modelPath = await getTmpPath(tmpId)
         const modelBuffer = await readFile(modelPath).catch(e => routeHandlerErrorHandler(route, e.message, 'readFile(modelPath)', "Couldn't read model file")) as Buffer
         const blob = new Blob([modelBuffer])
 
@@ -132,22 +133,33 @@ export async function PUT(request: Request) {
 
         // Get form data and initialize variables
         const data = await request.formData().catch(e => routeHandlerErrorHandler(route, e.message, 'request.formData()', "Couldn't get form data")) as FormData
-        const modelFile = data.get('modelFile') as File
         const uid = data.get('uid') as string
+        const tmpId = data.get('tmpId') as string
+        const fileName = data.get('fileName') as string
         const orgModelUploadEnd = `https://api.sketchfab.com/v3/orgs/${process.env.SKETCHFAB_ORGANIZATION}/models/${uid}`
+
+        // Obtain model blob from tmp
+        const modelPath = await getTmpPath(tmpId)
+        const modelBuffer = await readFile(modelPath).catch(e => routeHandlerErrorHandler(route, e.message, 'readFile(modelPath)', "Couldn't read model file")) as Buffer
+        const blob = new Blob([modelBuffer])
 
         // Set reupload form data
         const reuploadData = new FormData()
         reuploadData.set('orgProject', process.env.SKETCHFAB_PROJECT_3DVERTEBRATES as string)
-        reuploadData.set('modelFile', modelFile)
+        reuploadData.set('modelFile', blob, fileName)
         reuploadData.set('visibility', 'private')
         reuploadData.set('options', JSON.stringify({ background: { color: "#000000" } }))
 
         // Upload model file to sketchfab and instantiate modelUid
-        const reupload = await fetch(orgModelUploadEnd, { headers: requestHeader, method: 'PUT', body: reuploadData }).then((res) => {
-            if (!res.ok) routeHandlerErrorHandler(route, res.statusText, 'fetch(orgModelUploadEnd)', "Bad upload request")
-            return res.json()
-        }).then(json => json).catch(e => routeHandlerErrorHandler(route, e.message, "fetch(orgModelUploadEnd", "Couldn't reupload model"))
+        const reupload = await fetch(orgModelUploadEnd, { headers: requestHeader, method: 'PUT', body: reuploadData })
+            .then((res) => {
+                if (!res.ok) routeHandlerErrorHandler(route, res.statusText, 'fetch(orgModelUploadEnd)', "Bad upload request")
+                return res.json()
+            })
+            .then(json => json).catch(e => routeHandlerErrorHandler(route, e.message, "fetch(orgModelUploadEnd", "Couldn't reupload model"))
+        
+        // Delete tmp file
+        await unlink(modelPath).catch(e => nonFatalError(route, e.message, `unlink(${tmpId})`, 'PUT'))
 
         // Typical response
         return routeHandlerTypicalResponse('Model added.', reupload)

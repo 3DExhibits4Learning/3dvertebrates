@@ -8,6 +8,7 @@
 
 import { isZipFile } from "../utils/zip"
 import JSZip from 'jszip'
+import { v4 as uuidv4 } from 'uuid'
 
 /**
  * 
@@ -16,7 +17,7 @@ import JSZip from 'jszip'
  */
 export const chunkFileToTmp = async (zip: Blob | File, tmpId: string) => {
     // Declare chunk size and offset
-    const chunkSize = 4 * 1024 * 1024
+    const chunkSize = 4 * 1024 * 1024 // 4 MB chunks
     var offset = 0
 
     // Fetch chunks until file upload is complete
@@ -38,9 +39,16 @@ export const chunkFileToTmp = async (zip: Blob | File, tmpId: string) => {
 }
 
 export const zipFileIfNeeded = async (file: File | Blob, fileName: string) => {
+    // Return file if it's already zipped
     if (await isZipFile(file)) return file
 
+    // Return zipped file
     const zip = new JSZip()
     zip.file(fileName, file)
     return await zip.generateAsync({ type: 'blob' })
+}
+
+export const uploadFileToTmp = async(file: File, tmpId: string) => {
+    const model = file as File
+    await chunkFileToTmp(model, tmpId).catch(e => { throw Error(e.message) })
 }

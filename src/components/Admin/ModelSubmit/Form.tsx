@@ -1,9 +1,8 @@
 /**
  * @file src/components/ModelSubmit/UpdateModelForm.tsx
+ * 
  * @fileoverview client component containing the form for uploading 3D models
  * 
- * @todo replace map component with individual (non required) lat and lng fields per request
- * @todo add red asterisks to mandatory fields
  */
 
 'use client'
@@ -13,7 +12,7 @@ import { useState, useEffect } from 'react'
 import { Button } from "@nextui-org/react"
 import { Divider } from '@nextui-org/react'
 import { v4 as uuidv4 } from 'uuid'
-import { chunkFileToTmp } from '@/functions/client/modelSubmit'
+import { chunkFileToTmp, uploadFileToTmp } from '@/functions/client/modelSubmit'
 
 // Default imports
 import ArtistName from './ArtistNameField'
@@ -65,10 +64,10 @@ export default function ModelSubmitForm() {
             const formTags = JSON.stringify(software.map(obj => obj.value))
             const formPosition = JSON.stringify({ lat: lat, lng: lng })
 
-            // Chunk file to temporary disk storage 
+            // Write file to tmp 
             const model = file as File
             const tmpId = uuidv4()
-            await chunkFileToTmp(model, tmpId).catch(e => { throw Error(e.message) })
+            await uploadFileToTmp(model, tmpId).catch(e => { throw Error(e.message) })
 
             // Set form data
             const data = new FormData()
