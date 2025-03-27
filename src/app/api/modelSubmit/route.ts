@@ -57,6 +57,7 @@ export async function POST(request: Request) {
         const baseOrAnnotation = data.get('baseOrAnnotation') as string
         const commonName = data.get('commonName') ? data.get('commonName') as string : ''
         const tmpId = data.get('tmpId') as string
+        const fileName = data.get('fileName') as string
 
         // Obtain model file from tmp
         const modelPath = await getTmpPath(tmpId) 
@@ -66,7 +67,7 @@ export async function POST(request: Request) {
         // Form and fetch Variables 
         const formData = new FormData
         formData.set('orgProject', process.env.SKETCHFAB_PROJECT_3DVERTEBRATES as string)
-        formData.set('modelFile', blob, `${species}.zip`)
+        formData.set('modelFile', blob, fileName)
         formData.set('visibility', 'private')
         formData.set('options', JSON.stringify({ background: { color: "#000000" } }))
         const orgModelUploadEnd = `https://api.sketchfab.com/v3/orgs/${process.env.SKETCHFAB_ORGANIZATION}/models`

@@ -10,21 +10,21 @@
  * @param file File 
  * @returns boolean indicating whether a file is zip by its file extension
  */
-export const isZipByExtension = (file: File) => file.name.toLowerCase().endsWith('.zip')
+export const isZipByExtension = (file: File | Blob) => file.name.toLowerCase().endsWith('.zip')
 
 /**
  * 
  * @param file File
  * @returns boolean indicating whether a file is zip by its mime type
  */
-export const isZipByMimeType = (file: File) => file.type === 'application/zip'
+export const isZipByMimeType = (file: File | Blob) => file.type === 'application/zip'
 
 /**
  * 
  * @param file File
  * @returns boolean indicating whether or not the first few bytes of the file contain the signature of a zip file
  */
-export async function isZipByMagicNumber(file: File) {
+export async function isZipByMagicNumber(file: File | Blob) {
 
     // Reader, first 4 bytes of the file
     const reader = new FileReader()
@@ -46,5 +46,5 @@ export async function isZipByMagicNumber(file: File) {
  * @param file File
  * @returns 
  */
-export const isZipFile = async (file: File) => isZipByExtension(file) || isZipByMimeType(file) || await isZipByMagicNumber(file)
+export const isZipFile = async (file: File | Blob) => isZipByExtension(file) || isZipByMimeType(file) || await isZipByMagicNumber(file)
 

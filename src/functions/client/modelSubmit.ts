@@ -37,7 +37,7 @@ export const chunkFileToTmp = async (zip: Blob | File, tmpId: string) => {
     return
 }
 
-export const zipFileIfNeeded = async (file: File, fileName: string) => {
+export const zipFileIfNeeded = async (file: File | Blob, fileName: string) => {
     if (await isZipFile(file)) return file
 
     const zip = new JSZip()

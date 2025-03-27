@@ -13,8 +13,7 @@ import { useState, useEffect } from 'react'
 import { Button } from "@nextui-org/react"
 import { Divider } from '@nextui-org/react'
 import { v4 as uuidv4 } from 'uuid'
-import { chunkFileToTmp, zipFileIfNeeded } from '@/functions/client/modelSubmit'
-import { isZipFile } from '@/functions/utils/zip'
+import { chunkFileToTmp } from '@/functions/client/modelSubmit'
 
 // Default imports
 import ArtistName from './ArtistNameField'
@@ -27,7 +26,6 @@ import ModelInput from './ModelInput'
 import LatLng from './LatLng'
 import BaseOrAnnotation from './BaseOrAnnotation'
 import TextInput from '@/components/Shared/Form Fields/TextInput'
-import JSZip from 'jszip'
 
 // Main component
 export default function ModelSubmitForm() {
@@ -67,8 +65,8 @@ export default function ModelSubmitForm() {
             const formTags = JSON.stringify(software.map(obj => obj.value))
             const formPosition = JSON.stringify({ lat: lat, lng: lng })
 
-            // Chunk file to temporary disk storage
-            const model = await zipFileIfNeeded(file as File, `${species}.zip`)
+            // Chunk file to temporary disk storage 
+            const model = file as File
             const tmpId = uuidv4()
             await chunkFileToTmp(model, tmpId).catch(e => { throw Error(e.message) })
 
@@ -84,6 +82,7 @@ export default function ModelSubmitForm() {
             data.set('baseOrAnnotation', baseOrAnnotation)
             data.set('commonName', commonName)
             data.set('tmpId', tmpId)
+            data.set('fileName', model.name)
 
             // Upload 3d model to sketchfab and insert model data into database via associated route handler
             await fetch('/api/modelSubmit', { method: 'POST', body: data })
