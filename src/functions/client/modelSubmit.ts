@@ -47,8 +47,3 @@ export const zipFileIfNeeded = async (file: File | Blob, fileName: string) => {
     zip.file(fileName, file)
     return await zip.generateAsync({ type: 'blob' })
 }
-
-export const uploadFileToTmp = async(file: File, tmpId: string) => {
-    const model = file as File
-    await chunkFileToTmp(model, tmpId).catch(e => { throw Error(e.message) })
-}

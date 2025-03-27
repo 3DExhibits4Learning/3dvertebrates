@@ -127,7 +127,6 @@ export const enableModelAnnotationCreate = (aeData: annotationEntry, position: s
 
     // Required fields
     const valueArray = [aeData.annotationTitle, aeData.modelAnnotationUid !== 'select', aeData.annotation, position]
-    console.log(valueArray)
 
     // Enable button if all required fields are populated
     if (valueArray.every(allTruthy)) setCreateDisabled(false)

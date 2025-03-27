@@ -14,7 +14,7 @@ import { Button } from "@nextui-org/react"
 import { Divider } from '@nextui-org/react'
 import { UpdateModelFormProps } from '@/interface/interface'
 import { v4 as uuidv4 } from 'uuid'
-import { chunkFileToTmp, uploadFileToTmp } from '@/functions/client/modelSubmit'
+import { chunkFileToTmp } from '@/functions/client/modelSubmit'
 
 // Default imports
 import ProcessSelect from './ProcessSelectField'
@@ -24,7 +24,6 @@ import TextInput from '../../Shared/Form Fields/TextInput'
 import AutoCompleteWrapper from '../../Shared/Form Fields/AutoCompleteWrapper'
 import ModelInput from './ModelInput'
 import LatLng from './LatLng'
-import JSZip from 'jszip'
 
 // Main component
 export default function UpdateModelForm(props: UpdateModelFormProps) {
@@ -77,7 +76,7 @@ export default function UpdateModelForm(props: UpdateModelFormProps) {
 
                 const modelFile = file as File
                 const tmpId = uuidv4()
-                await uploadFileToTmp(modelFile, tmpId).catch(e => { throw Error(e.message) })
+                await chunkFileToTmp(modelFile, tmpId).catch(e => { throw Error(e.message) })
 
                 const modelReuploadData = new FormData()
                 modelReuploadData.set('uid', model.uid)
@@ -112,10 +111,7 @@ export default function UpdateModelForm(props: UpdateModelFormProps) {
             data.set('commonName', commonName)
 
             // Update model data in the database and set resultant states
-            await fetch('/api/modelSubmit', {
-                method: 'PATCH',
-                body: data
-            })
+            await fetch('/api/modelSubmit', {method: 'PATCH',body: data})
                 .then(res => res.json())
                 .then(json => {
                     setResult(json.data)
@@ -149,13 +145,17 @@ export default function UpdateModelForm(props: UpdateModelFormProps) {
         const initialSoftware = model.software.map((softwareObject) => ({ value: softwareObject.software }))
         const initialTags = model.tags.map((tagObject) => ({ value: tagObject.tag }))
         const initialFormValues = JSON.stringify([model.spec_name, model.spec_acquis_date, model.modeled_by, model.build_process, model.lat, model.lng, initialSoftware, initialTags])
-        const currentFormValues = JSON.stringify([species, speciesAcquisitionDate, artist, buildMethod, lat, lng, software, tags])
+        const currentFormValues = JSON.stringify([species, speciesAcquisitionDate, artist, buildMethod, lat ? lat : null, lng ? lng : null, software, tags])
+
+        console.log(initialFormValues)
+        console.log(currentFormValues)
+        console.log(!!file)
 
         // Set upload disabled button state
-        if (species && artist && buildMethod && software.length && currentFormValues !== initialFormValues) setUpdateDisabled(false)
+        if (species && artist && buildMethod && software.length && currentFormValues !== initialFormValues || file) setUpdateDisabled(false)
         else setUpdateDisabled(true)
 
-    }, [species, speciesAcquisitionDate, artist, buildMethod, software, tags])
+    }, [species, speciesAcquisitionDate, artist, buildMethod, software, tags, file])
 
     return <>
         <DataTransferModal open={open} transferring={transferring} result={result} loadingLabel='Uploading 3D Model' href='/admin' modelUpload />
