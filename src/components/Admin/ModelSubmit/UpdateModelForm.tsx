@@ -21,9 +21,9 @@ import ProcessSelect from './ProcessSelectField'
 import TagInput from './Tags'
 import DataTransferModal from '../../Shared/Modals/DataTransferModal'
 import TextInput from '../../Shared/Form Fields/TextInput'
-import AutoCompleteWrapper from '../../Shared/Form Fields/AutoCompleteWrapper'
 import ModelInput from './ModelInput'
 import LatLng from './LatLng'
+import SpeciesName from './SpeciesNameField'
 
 // Main component
 export default function UpdateModelForm(props: UpdateModelFormProps) {
@@ -147,10 +147,6 @@ export default function UpdateModelForm(props: UpdateModelFormProps) {
         const initialFormValues = JSON.stringify([model.spec_name, model.spec_acquis_date, model.modeled_by, model.build_process, model.lat, model.lng, initialSoftware, initialTags])
         const currentFormValues = JSON.stringify([species, speciesAcquisitionDate, artist, buildMethod, lat ? lat : null, lng ? lng : null, software, tags])
 
-        console.log(initialFormValues)
-        console.log(currentFormValues)
-        console.log(!!file)
-
         // Set upload disabled button state
         if (species && artist && buildMethod && software.length && currentFormValues !== initialFormValues || file) setUpdateDisabled(false)
         else setUpdateDisabled(true)
@@ -170,7 +166,7 @@ export default function UpdateModelForm(props: UpdateModelFormProps) {
 
             <Divider className='mb-6' />
 
-            <AutoCompleteWrapper value={species} setValue={setSpecies} />
+            <SpeciesName value={species} setValue={setSpecies} />
             <TextInput value={commonName} setValue={setCommonName} title='Common Name' leftMargin='ml-12' textSize='text-2xl' />
             <LatLng lat={lat} lng={lng} setLat={setLat} setLng={setLng} />
             <TagInput key={reRenderKey} value={tags} setValue={setTags} defaultValues={tagString} />

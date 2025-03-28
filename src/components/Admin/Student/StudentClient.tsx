@@ -4,6 +4,7 @@
  * @fileoverview parent component of student client interface
  * 
  * @todo allow models to be submitted from mobile, only require desktop for annotation
+ * @todo add model update component
  */
 
 'use client'
@@ -15,6 +16,8 @@ import { isMobileOrTablet } from "@/functions/utils/isMobile"
 // Default imports
 import AnnotationClient from "../Annotation/Annotation Client/AnnotationClient"
 import ModelSubmitForm from "../ModelSubmit/Form"
+import UpdateModelForm from "../ModelSubmit/UpdateModelForm"
+import UpdateModelContainer from "../Administrator/Model/UpdateModelContainer"
 
 export default function StudentClient(props: { modelsToAnnotate: string, annotationModels: string }) {
 
@@ -28,11 +31,14 @@ export default function StudentClient(props: { modelsToAnnotate: string, annotat
     }
 
     return <Accordion className="text-[#004C46] dark:text-[#F5F3E7]">
-        <AccordionItem key='assignments' aria-label='assignments' title='Models to Annotate' classNames={{ title: accordionTitlesCss }}>
+        <AccordionItem key='assignments' aria-label='Assignments' title='Models to Annotate' classNames={{ title: accordionTitlesCss }}>
             <AnnotationClient modelsToAnnotate={JSON.parse(props.modelsToAnnotate)} annotationModels={JSON.parse(props.annotationModels)} admin={false} />
         </AccordionItem>
-        <AccordionItem key='modelSumbit' aria-label='modelSumbit' title='Submit Model' classNames={{ title: accordionTitlesCss }}>
+        <AccordionItem key='modelSumbit' aria-label='Model Sumbit' title='Submit Model' classNames={{ title: accordionTitlesCss }}>
             <ModelSubmitForm />
+        </AccordionItem>
+        <AccordionItem key='updateModel' aria-label='Update Model' title='Update Model' classNames={{ title: accordionTitlesCss }}>
+            <UpdateModelContainer models={JSON.parse(props.modelsToAnnotate)}/>
         </AccordionItem>
     </Accordion>
 }

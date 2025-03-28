@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react'
 import { Button } from "@nextui-org/react"
 import { Divider } from '@nextui-org/react'
 import { v4 as uuidv4 } from 'uuid'
-import { chunkFileToTmp, uploadFileToTmp } from '@/functions/client/modelSubmit'
+import { chunkFileToTmp } from '@/functions/client/modelSubmit'
 
 // Default imports
 import ArtistName from './ArtistNameField'
@@ -67,7 +67,7 @@ export default function ModelSubmitForm() {
             // Write file to tmp 
             const model = file as File
             const tmpId = uuidv4()
-            await uploadFileToTmp(model, tmpId).catch(e => { throw Error(e.message) })
+            await chunkFileToTmp(model, tmpId).catch(e => { throw Error(e.message) })
 
             // Set form data
             const data = new FormData()

@@ -2,6 +2,8 @@
  * @file src\components\Admin\Annotation\AnnotationEntry\Annotation.tsx
  * 
  * @fileoverview annotation (text) entry component
+ * 
+ * @todo automate text hyperlink
  */
 
 'use client'
@@ -22,8 +24,7 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
             <textarea
                 className={`w-[95%] min-w-[300px] min-h-[400px] rounded-xl mb-4 dark:bg-[#27272a] dark:hover:bg-[#3E3E47] h-[42px] p-4 text-[14px] outline-[#004C46]`}
                 value={props.annotation}
-                onChange={(e) => props.setAnnotation ? props.setAnnotation(e.target.value) : dispatch ? dispatch({ type: 'setStringValue', field: props.field, string: e.target.value }) : null}
-            >
+                onChange={(e) => props.setAnnotation ? props.setAnnotation(e.target.value) : dispatch ? dispatch({ type: 'setStringValue', field: props.field, string: e.target.value }) : null}>
             </textarea>
         </>
 }
