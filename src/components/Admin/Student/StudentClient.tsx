@@ -37,7 +37,7 @@ export default function StudentClient(props: { modelsToAnnotate: string, annotat
         <AccordionItem key='modelSumbit' aria-label='Model Sumbit' title='Submit Model' classNames={{ title: accordionTitlesCss }}>
             <ModelSubmitForm />
         </AccordionItem>
-        <AccordionItem key='updateModel' aria-label='Update Model' title='Update Model' classNames={{ title: accordionTitlesCss }}>
+        <AccordionItem key='updateModel' aria-label='Update Model' title='Update Model to Annotate' classNames={{ title: accordionTitlesCss }}>
             <UpdateModelContainer models={JSON.parse(props.modelsToAnnotate)}/>
         </AccordionItem>
     </Accordion>
