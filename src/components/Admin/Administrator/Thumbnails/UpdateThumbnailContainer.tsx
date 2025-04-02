@@ -21,8 +21,7 @@ export default function UpdateThumbnailContainer(props: { modelsWithThumbnails: 
 
     const updateThumbnailHandler = async (uid: string) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, updateThumbnail, [uid, file], 'Updating Thumbnail')
 
-    return (
-        <div className="w-full flex justify-center">
+    return <div className="w-full flex justify-center">
             <section className="flex flex-col w-1/2 pt-8 bg-[#D5CB9F] rounded-md px-4 border border-[#004C46] dark:bg-[#212121]">
                 {
                     props.modelsWithThumbnails && props.modelsWithThumbnails.length > 0 &&
@@ -46,5 +45,4 @@ export default function UpdateThumbnailContainer(props: { modelsWithThumbnails: 
                 }
             </section>
         </div>
-    )
 }

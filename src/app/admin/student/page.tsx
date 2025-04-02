@@ -13,7 +13,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { getAuthorizedUsers } from "@/functions/server/queries"
 import { serverErrorHandler } from "@/functions/server/error"
 import { model, assignment, authorized } from "@prisma/client"
-import { annotationWithModel } from "@/interface/interface"
+import { annotationWithModel, fullModel } from "@/interface/interface"
 import { isAnnotationModel, isUsedAnnotationModel } from "@/functions/server/utils/filters";
 
 // Default imports
@@ -42,7 +42,7 @@ export default async function Page() {
         if (!(email || authorizedUsers.some(user => user.email === email))) return <h1>NOT AUTHORIZED</h1>
 
         // Get models to annotate, annotation models (models used as annotations themselves), and assignments
-        const modelsToAnnotate = await getModelsToAnnotate().catch(e => serverErrorHandler(path, e.message, "Couldn't get models to annotate", 'getModelsToAnnotate()', false)) as model[]
+        const modelsToAnnotate = await getModelsToAnnotate().catch(e => serverErrorHandler(path, e.message, "Couldn't get models to annotate", 'getModelsToAnnotate()', false)) as fullModel[]
         const annotationModels = await getAllAnnotationModels().catch(e => serverErrorHandler(path, e.message, "Couldn't get annotation models", 'getModelsToAnnotate()', false)) as model[]
         const assignments = await getAssignments().catch(e => serverErrorHandler(path, e.message, "Couldn't get assignments", 'getAssignments()', false)) as assignment[]
 

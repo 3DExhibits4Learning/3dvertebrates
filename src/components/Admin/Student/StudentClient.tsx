@@ -12,13 +12,17 @@
 // Typical imports
 import { Accordion, AccordionItem } from "@nextui-org/react"
 import { isMobileOrTablet } from "@/functions/utils/isMobile"
+import { model } from "@prisma/client"
+import { fullModel } from "@/interface/interface"
 
 // Default imports
 import AnnotationClient from "../Annotation/Annotation Client/AnnotationClient"
 import ModelSubmitForm from "../ModelSubmit/Form"
-import UpdateModelForm from "../ModelSubmit/UpdateModelForm"
 import UpdateModelContainer from "../Administrator/Model/UpdateModelContainer"
+import AddThumbnail from "../Administrator/Thumbnails/AddThumbnail"
+import UpdateThumbnailContainer from "../Administrator/Thumbnails/UpdateThumbnailContainer"
 
+// Main JSX
 export default function StudentClient(props: { modelsToAnnotate: string, annotationModels: string }) {
 
     // Tailwind variables
@@ -30,15 +34,38 @@ export default function StudentClient(props: { modelsToAnnotate: string, annotat
         </main>
     }
 
+    // Ts declaration, filter
+    const modelsToAnnotate = JSON.parse(props.modelsToAnnotate) as model[] | fullModel[]
+    const modelsNeedingThumbnails = modelsToAnnotate.filter(model => model.thumbnail === null)
+
     return <Accordion className="text-[#004C46] dark:text-[#F5F3E7]">
-        <AccordionItem key='assignments' aria-label='Assignments' title='Models to Annotate' classNames={{ title: accordionTitlesCss }}>
-            <AnnotationClient modelsToAnnotate={JSON.parse(props.modelsToAnnotate)} annotationModels={JSON.parse(props.annotationModels)} admin={false} />
-        </AccordionItem>
+        
         <AccordionItem key='modelSumbit' aria-label='Model Sumbit' title='Submit Model' classNames={{ title: accordionTitlesCss }}>
             <ModelSubmitForm />
         </AccordionItem>
-        <AccordionItem key='updateModel' aria-label='Update Model' title='Update Model to Annotate' classNames={{ title: accordionTitlesCss }}>
-            <UpdateModelContainer models={JSON.parse(props.modelsToAnnotate)}/>
+        
+        <AccordionItem key='assignments' aria-label='Assignments' title='Assigned Models' classNames={{ title: accordionTitlesCss }}>
+            <AnnotationClient modelsToAnnotate={modelsToAnnotate} annotationModels={JSON.parse(props.annotationModels)} admin={false} />
         </AccordionItem>
+        
+        <AccordionItem key='updateModel' aria-label='Update Model' title='Update Model' classNames={{ title: accordionTitlesCss }}>
+            <UpdateModelContainer models={modelsToAnnotate as fullModel[]} />
+        </AccordionItem>
+
+        {/* AccordionItem holds nested "Thumbnails" accordion */}
+        <AccordionItem key={'adminThumbnails'} aria-label={'New Specimen'} title='Thumbnails' classNames={{ title: accordionTitlesCss }}>
+            {/* "Thumbnails" nested accordion */}
+            <Accordion>
+                {/* Add thumbnail form */}
+                <AccordionItem key='modelsWithoutThumbnails' aria-label={'modelsWithoutThumbnails'} title='Models' classNames={{ title: accordionTitlesCss }}>
+                    <AddThumbnail modelsNeedingThumbnails={modelsNeedingThumbnails as model[] | undefined} />
+                </AccordionItem>
+                {/* Update thumbnail form */}
+                <AccordionItem key='updateThumbnail' aria-label={'updateThumbnail'} title='Update' classNames={{ title: accordionTitlesCss }}>
+                    <UpdateThumbnailContainer modelsWithThumbnails={modelsToAnnotate.filter(model => model.thumbnail !== null)} />
+                </AccordionItem>
+            </Accordion>
+        </AccordionItem>
+    
     </Accordion>
 }

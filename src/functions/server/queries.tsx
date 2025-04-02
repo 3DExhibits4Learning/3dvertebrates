@@ -699,6 +699,11 @@ export const getModelsToAnnotate = async () => {
       base_model: true,
       annotated: false,
     },
+    include: {
+      software: true,
+      tags: true,
+      assignment: true
+    }
   })
 
   return modelsToAnnotate
