@@ -11,8 +11,11 @@
 // Typical imports
 import { SetStateAction, Dispatch, useContext, useState, useRef, useEffect, MutableRefObject } from "react"
 import { AnnotationEntryData } from "./AnnotationEntry"
-import { button, ModalBody } from "@nextui-org/react"
-import { Modal } from "@nextui-org/react"
+import { insertAnnotationHyperlink, toggleLinkComponent } from "@/functions/client/annotationEntry"
+import { Button } from "@nextui-org/react"
+import Image from "next/image"
+
+// Default imports
 import HyperlinkModal from "@/components/Shared/Modals/HyperLink"
 
 // Main JSX
@@ -22,45 +25,48 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
     const context = useContext(AnnotationEntryData)
     const dispatch = context ? context.annotationEntryDataDispatch : null
 
+    // States
     const [hyperlinkUrl, setHyperlinkUrl] = useState('')
-    const [hyperlinkText, setHyperlinkText] = useState('')
+    const [selectionText, setSelectionText] = useState('')
+    const [linkAdded, setLinkAdded] = useState(0)
 
     // Refs
     const dialog = useRef<HTMLDialogElement>()
     const divTextArea = useRef<HTMLDivElement>()
+    const selectionRange = useRef<Range>()
 
-    const getSelection = () => { if (typeof window !== 'undefined' && window.getSelection()) return window.getSelection() as Selection }
+    // Hyperlink wrapper
+    const annotationHyperlinkInsertionWrapper = () => insertAnnotationHyperlink(selectionRange, hyperlinkUrl, selectionText, dialog, setSelectionText, divTextArea, setLinkAdded, linkAdded)
 
-    // Dark mode hyperlink hex: #4EA8DE
-    // Light mode hyperlink hex: #0000EE
-
-    const replaceText = (selection: Selection | undefined) => {
-
-        if (selection) {
-            const range = selection.getRangeAt(0)
-            const text = selection.toString()
-            const newHtml = `<span style="color: #4EA8DE; text-decoration: underline;"><a href="${hyperlinkUrl}" target="_blank" rel="noopener noreferrer">${text}</a></span>`
-            const tempDiv = document.createElement("div")
-            tempDiv.innerHTML = newHtml
-            const newNode = tempDiv.firstChild
-            range.deleteContents()
-            range.insertNode(newNode as ChildNode)
-        }
-        else console.log('No Selection')
-    }
-
+    // Set div text area innerHTML
     useEffect(() => {
-        if (!dialog.current?.open) (dialog.current as HTMLDialogElement).show()
-        else (dialog.current as HTMLDialogElement).close()
-    })
+        const textArea = divTextArea.current as HTMLDivElement
+        textArea.innerHTML = props.annotation
+    }, [])
+
+    // Trigger state update when a hyperlink is added (signaling a change to the annotation thus enabling the save button)
+    useEffect(() => {
+        if (linkAdded) {
+            const textArea = divTextArea.current as HTMLDivElement
+            props.setAnnotation ? props.setAnnotation(textArea.innerHTML) : dispatch ? dispatch({ type: 'setStringValue', field: props.field, string: textArea.innerHTML }) : null
+        }
+    }, [linkAdded])
 
     return <>
-        <HyperlinkModal ref={dialog} />
+        <HyperlinkModal ref={dialog} setHyperLinkUrl={setHyperlinkUrl} hyperlinkWrapper={annotationHyperlinkInsertionWrapper} selectionText={selectionText} setSelectionText={setSelectionText} />
         <div className="flex justify-between w-[95%]">
             <p className="text-xl mb-1">Annotation<span className="text-red-600 ml-1">*</span></p>
-            <div><button onClick={() => replaceText(getSelection())}>Hyperlink</button></div>
+            <div className="relative">
+                <Button onClick={() => toggleLinkComponent(dialog, selectionRange, setSelectionText)} size='sm' className="bottom-1">
+                    <Image src="/White Link Icon.svg" width={20} height={10} alt="Logo" className="pt-[3px]" />
+                </Button>
+            </div>
         </div>
-        <div ref={divTextArea as MutableRefObject<HTMLDivElement>} contentEditable className="w-[95%] min-w-[300px] min-h-[400px] rounded-xl mb-4 dark:bg-[#27272a] dark:hover:bg-[#3E3E47] p-4 text-[14px] outline-[#004C46]">
+        <div
+            ref={divTextArea as MutableRefObject<HTMLDivElement>}
+            contentEditable
+            className="w-[95%] min-w-[300px] min-h-[400px] rounded-xl mb-4 dark:bg-[#27272a] dark:hover:bg-[#3E3E47] p-4 text-[14px] outline-[#004C46] text-white"
+            onInput={e => props.setAnnotation ? props.setAnnotation(e.currentTarget.innerHTML) : dispatch ? dispatch({ type: 'setStringValue', field: props.field, string: e.currentTarget.innerHTML }) : null}>
         </div>
         {/* <textarea
                 className={`w-[95%] min-w-[300px] min-h-[400px] rounded-xl mb-4 dark:bg-[#27272a] dark:hover:bg-[#3E3E47] h-[42px] p-4 text-[14px] outline-[#004C46]`}

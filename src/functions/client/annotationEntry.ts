@@ -10,14 +10,80 @@
 'use client'
 
 // Imports
-import { annotationClientSpecimen, annotationEntry, annotationsAndPositions } from "@/interface/interface"
+import { annotationClientSpecimen, annotationEntry, annotationsAndPositions, UpdateModelFormContainerProps } from "@/interface/interface"
 import { photo_annotation, video_annotation, model_annotation } from "@prisma/client"
-import { SetStateAction, Dispatch } from "react"
+import { SetStateAction, Dispatch, MutableRefObject, MouseEvent } from "react"
 import { v4 as uuidv4 } from 'uuid'
 import { annotationEntryAction } from "@/interface/actions"
 
 export const allTruthy = (value: any) => value ? true : false
 export const allSame = (originalValues: any[], currentValues: any[]) => JSON.stringify(originalValues) === JSON.stringify(currentValues) ? true : false
+
+/**
+ * 
+ * @param dialog 
+ * @returns 
+ */
+export const toggleLinkComponent = (dialog: MutableRefObject<HTMLDialogElement | undefined>, selectionRange: MutableRefObject<Range | undefined>, setSelectionText: Dispatch<SetStateAction<string>>) => {
+
+    const selection = getSelection()
+    if (selection && selection.toString().length > 0) {
+        selectionRange.current = selection.getRangeAt(0).cloneRange()
+        setSelectionText(selection.toString())
+    }
+    else {
+        selection
+    }
+
+    if (dialog.current) {
+        if (!dialog.current?.open) (dialog.current as HTMLDialogElement).show()
+        else (dialog.current as HTMLDialogElement).close()
+    }
+    return
+}
+
+/**
+ * 
+ * @returns 
+ */
+export const getSelection = () => {
+    if (typeof window !== 'undefined' && (window.getSelection() as Selection).toString().length > 0) return window.getSelection() as Selection
+    return undefined
+}
+
+/**
+ * 
+ * @param selection 
+ * @param hyperlinkUrl 
+ * @param hyperlinkText 
+ * @param divTextArea 
+ * Dark mode hyperlink hex: #4EA8DE
+ * Light mode hyperlink hex: #0000EE
+ */
+export const insertAnnotationHyperlink = (
+    selectionRange: MutableRefObject<Range | undefined>,
+    hyperlinkUrl: string,
+    selectionText: string,
+    dialog: MutableRefObject<HTMLDialogElement | undefined>,
+    setSelectionText: Dispatch<SetStateAction<string>>,
+    divTextArea: MutableRefObject<HTMLDivElement | undefined>,
+    setLinkAdded: Dispatch<SetStateAction<number>>,
+    linkAdded: number
+) => {
+    const range = selectionRange.current as Range
+    const newHtml = `<span style="color: #4EA8DE; text-decoration: underline;"><a href="${hyperlinkUrl}" target="_blank" rel="noopener noreferrer">${selectionText}</a></span>`
+    const tempDiv = document.createElement("div")
+    tempDiv.innerHTML = newHtml
+    const newNode = tempDiv.firstChild
+    range.deleteContents()
+    range.insertNode(newNode as ChildNode)
+    const textArea = divTextArea.current as HTMLDivElement
+    textArea.innerHTML += '&nbsp;'
+    setLinkAdded(linkAdded + 1)
+    dialog.current?.close()
+    setSelectionText('')
+}
+
 /**
  * 
  * @param photoAnnotation photo_annotation from the database
@@ -308,7 +374,7 @@ export const annotationUpdateData = (aeData: annotationEntry, apData: annotation
     if (apData.activeAnnotationType !== aeData.annotationType) {
         data.set('mediaTransition', 'true')
         data.set('previousMedia', apData.activeAnnotationType as string)
-        if(apData.activeAnnotationType === 'photo') data.set('oldUrl', (apData.activeAnnotation as photo_annotation).url)
+        if (apData.activeAnnotationType === 'photo') data.set('oldUrl', (apData.activeAnnotation as photo_annotation).url)
     }
 
     // Annotations table data (for update)
