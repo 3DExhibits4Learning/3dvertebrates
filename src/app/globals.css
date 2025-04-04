@@ -427,3 +427,54 @@ tags.tagify {
   text-decoration: 'none' !;
   --readonly-striped: 0
 }
+
+.hyperlink {
+  color: #0645ad;
+  /* Standard blue link color */
+  text-decoration: underline;
+  /* Underline like a normal link */
+  cursor: pointer;
+  /* Show pointer on hover */
+}
+
+.hyperlink:visited {
+  color: #0b0080;
+  /* Visited link color (dark purple) */
+}
+
+.hyperlink:hover {
+  color: #3366cc;
+  /* Slightly lighter on hover */
+  text-decoration: underline;
+  /* Keep underline (or make bold if you want) */
+}
+
+.hyperlink:active {
+  color: #d30000;
+  /* Clicked/active link color */
+}
+
+@media (prefers-color-scheme: dark) {
+  .hyperlink {
+    color: #4ea1ff;
+    /* Bright blue for visibility on dark */
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .hyperlink:visited {
+    color: #9d7eff;
+    /* Soft purple for visited */
+  }
+
+  .hyperlink:hover {
+    color: #73baff;
+    /* Lighter blue on hover */
+    text-decoration: underline;
+  }
+
+  .hyperlink:active {
+    color: #ff4e4e;
+    /* Red-ish on click */
+  }
+}

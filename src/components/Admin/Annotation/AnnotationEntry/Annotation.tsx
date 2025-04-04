@@ -57,15 +57,16 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
         <div className="flex justify-between w-[95%]">
             <p className="text-xl mb-1">Annotation<span className="text-red-600 ml-1">*</span></p>
             <div className="relative">
-                <Button onClick={() => toggleLinkComponent(dialog, selectionRange, setSelectionText)} size='sm' className="bottom-1">
+                <Button className='bg-[#004C46] bottom-1' onClick={() => toggleLinkComponent(dialog, selectionRange, setSelectionText)} size='sm'>
                     <Image src="/White Link Icon.svg" width={20} height={10} alt="Logo" className="pt-[3px]" />
                 </Button>
             </div>
         </div>
         <div
             ref={divTextArea as MutableRefObject<HTMLDivElement>}
+            id='divTextArea'
             contentEditable
-            className="w-[95%] min-w-[300px] min-h-[400px] rounded-xl mb-4 dark:bg-[#27272a] dark:hover:bg-[#3E3E47] p-4 text-[14px] outline-[#004C46] text-white"
+            className="w-[95%] min-w-[300px] min-h-[400px] rounded-xl mb-4 bg-white dark:bg-[#27272a] dark:hover:bg-[#3E3E47] p-4 text-[14px] outline-[#004C46] text-[#004C46] dark:text-white"
             onInput={e => props.setAnnotation ? props.setAnnotation(e.currentTarget.innerHTML) : dispatch ? dispatch({ type: 'setStringValue', field: props.field, string: e.currentTarget.innerHTML }) : null}>
         </div>
         {/* <textarea

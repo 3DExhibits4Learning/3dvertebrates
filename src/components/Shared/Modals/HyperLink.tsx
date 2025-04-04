@@ -1,23 +1,22 @@
 import { forwardRef, LegacyRef, SetStateAction, Dispatch } from "react"
+import { Button } from "@nextui-org/react"
 
 const HyperlinkModal = forwardRef((props: { selectionText?: string, setHyperLinkUrl: Dispatch<SetStateAction<string>>, hyperlinkWrapper: Function, setSelectionText: Dispatch<SetStateAction<string>> }, ref) => {
 
     const closeDialog = () => {
         props.setSelectionText('')
-        if (typeof window !== 'undefined') {
-            (document.getElementById('hyperlinkComponent') as HTMLDialogElement).close()
-        }
+        if (typeof window !== 'undefined') (document.getElementById('hyperlinkComponent') as HTMLDialogElement).close()
     }
 
-    return <dialog id='hyperlinkComponent' className='rounded-xl p-8' ref={ref as LegacyRef<HTMLDialogElement>}>
+    return <dialog id='hyperlinkComponent' className='bg-[#212121] rounded-xl p-4' ref={ref as LegacyRef<HTMLDialogElement>}>
         <section>
 
             {
                 !props.selectionText &&
-                <section>
-                    <p>Select text to insert hyperlink</p>
+                <section className="">
+                    <p className="text-white">Select text in the annotation field to insert hyperlink</p>
                     <div className="flex w-full justify-center mt-8">
-                        <button onClick={closeDialog}>Close</button>
+                        <Button className='bg-[#00856A] text-white' onClick={closeDialog}>OK</Button>
                     </div>
                 </section>
             }
@@ -28,17 +27,17 @@ const HyperlinkModal = forwardRef((props: { selectionText?: string, setHyperLink
                     <div>Link:
                         <input
                             type='text'
-                            className="`w-4/5 min-w-[300px] rounded-xl mb-4 dark:bg-[#27272a] dark:hover:bg-[#3E3E47] h-[42px] px-4 outline-[#004C46] text-[#004C46] dark:text-white"
+                            className="w-4/5 min-w-[300px] rounded-xl mb-4 dark:bg-[#27272a] dark:hover:bg-[#3E3E47] h-[42px] px-4 outline-[#004C46] text-[#004C46] dark:text-white ml-2"
                             onChange={e => props.setHyperLinkUrl(e.target.value)}>
                         </input>
                     </div>
 
-                    <section className="flex justify-between">
+                    <section className="flex justify-around">
                         <div>
-                            <button onClick={() => props.hyperlinkWrapper()}>Insert Link</button>
+                            <Button className='bg-[#004C46]' onClick={() => props.hyperlinkWrapper()}>Insert Link</Button>
                         </div>
                         <div>
-                            <button onClick={closeDialog}>Cancel</button>
+                            <Button variant='light' onClick={closeDialog}>Cancel</Button>
                         </div>
                     </section>
                 </>

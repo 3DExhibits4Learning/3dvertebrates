@@ -19,6 +19,8 @@ import { annotationEntryAction } from "@/interface/actions"
 export const allTruthy = (value: any) => value ? true : false
 export const allSame = (originalValues: any[], currentValues: any[]) => JSON.stringify(originalValues) === JSON.stringify(currentValues) ? true : false
 
+const isHyperLinkSelectionValid = (selection: Selection | undefined) => selection && selection.toString().length > 0 && selection.anchorNode?.parentElement?.id === 'divTextArea'
+
 /**
  * 
  * @param dialog 
@@ -26,17 +28,15 @@ export const allSame = (originalValues: any[], currentValues: any[]) => JSON.str
  */
 export const toggleLinkComponent = (dialog: MutableRefObject<HTMLDialogElement | undefined>, selectionRange: MutableRefObject<Range | undefined>, setSelectionText: Dispatch<SetStateAction<string>>) => {
 
-    const selection = getSelection()
-    if (selection && selection.toString().length > 0) {
+    const selection = getSelection() as Selection
+
+    if (isHyperLinkSelectionValid(selection)) {
         selectionRange.current = selection.getRangeAt(0).cloneRange()
         setSelectionText(selection.toString())
     }
-    else {
-        selection
-    }
 
     if (dialog.current) {
-        if (!dialog.current?.open) (dialog.current as HTMLDialogElement).show()
+        if (!dialog.current?.open) (dialog.current as HTMLDialogElement).showModal()
         else (dialog.current as HTMLDialogElement).close()
     }
     return
@@ -71,7 +71,7 @@ export const insertAnnotationHyperlink = (
     linkAdded: number
 ) => {
     const range = selectionRange.current as Range
-    const newHtml = `<span style="color: #4EA8DE; text-decoration: underline;"><a href="${hyperlinkUrl}" target="_blank" rel="noopener noreferrer">${selectionText}</a></span>`
+    const newHtml = `<span class='hyperlink'><a href="${hyperlinkUrl}" target="_blank" rel="noopener noreferrer">${selectionText}</a></span>`
     const tempDiv = document.createElement("div")
     tempDiv.innerHTML = newHtml
     const newNode = tempDiv.firstChild
