@@ -3,7 +3,7 @@
  * 
  * @fileoverview route handler to update model thumbnails
  * 
- * @todo make patch method along with post method from /api/thumbmail/add
+ * @todo move to /api/thumnail as PATCH method
  */
 
 // Typical imports
