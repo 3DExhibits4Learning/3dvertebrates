@@ -51,7 +51,8 @@ export async function POST(request: Request) {
         await writeFile(filePath, buffer).catch(e => routeHandlerErrorHandler(e.message, path, 'writeFile()', "Couldn't write file"))
 
         // Update the thumbnail column for the model in the database
-        const update = await prisma.model.update({ where: { uid: uid }, data: { thumbnail: filePath.slice(7) } }).catch(e => routeHandlerErrorHandler(e.message, path, 'prisma.model.update()', "Couldn't update thumbnail in database"))
+        const dbUrl = `data/Vertebrates/Thumbnails/${uid}/${file.name}`
+        const update = await prisma.model.update({ where: { uid: uid }, data: { thumbnail: dbUrl.replaceAll('/', '\\') } }).catch(e => routeHandlerErrorHandler(e.message, path, 'prisma.model.update()', "Couldn't update thumbnail in database"))
 
         // Delete old thumbnail
         await unlink('public/' + oldThumbnailObject?.thumbnail).catch(e => console.log(routeHandlerError(path, e.message, 'unlink', 'POST', true)))
