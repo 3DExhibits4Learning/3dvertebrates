@@ -45,7 +45,7 @@ const SearchPageModelList = (props: SearchPageModelListProps) => {
                     <img
                       alt={'Image of ' + (model as model).spec_name}
                       role='button'
-                      src={process.env.NEXT_PUBLIC_LOCAL === 'development' ? `/api/nfs?path=X:` + model.thumbnail?.replace(/\\/g, "/").slice(4) : `/api/nfs?path=public/${model.thumbnail?.replace(/\\/g, "/")}`} // BUG: Prisma/MySQL changes forward slash to backslash; hence the replace()
+                      src={process.env.NEXT_PUBLIC_LOCAL === 'development' ? `/api/nfs?path=/Users/ab632/X` + model.thumbnail?.replace(/\\/g, "/").slice(4) : `/api/nfs?path=public/${model.thumbnail?.replace(/\\/g, "/")}`} // BUG: Prisma/MySQL changes forward slash to backslash; hence the replace()
                       className='w-full h-[calc(100vh-275px)] min-h-[25rem] max-h-[30rem] object-cover relative z-5 rounded-t-md'
                       onError={(e: SyntheticEvent<HTMLImageElement, Event>) => { handleImgError(e.currentTarget, noImage) }}/>
                   </a>
