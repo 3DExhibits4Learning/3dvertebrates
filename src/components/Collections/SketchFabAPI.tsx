@@ -217,7 +217,7 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
                     </div>
                     <div className='w-[65%] py-[20px] justify-center items-center text-center px-[2%]'>
                       {s.commonNames.length > 1 && !s.model.comm_name_string && <p>Common Names: {addCommas(s.commonNames)}</p>}
-                      {s.commonNames.length === 1 && !s.model.comm_name_string && <p>Common Names: {s.commonNames[0]}</p>}
+                      {s.commonNames.length === 1 && !s.model.comm_name_string && <p>Common Name: {s.commonNames[0]}</p>}
                       {s.model.comm_name_string && <p>Common Names: {s.model.comm_name_string}</p>} 
                       {s.profile.extinct !== '' && <p>Extinct: {boolRinse(s.profile.extinct as string)}</p>}
                       {s.profile.habitat && <p>Habitat: {toUpperFirstLetter(s.profile.habitat)}</p>}
