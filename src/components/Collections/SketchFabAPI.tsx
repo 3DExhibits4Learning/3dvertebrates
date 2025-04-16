@@ -216,8 +216,9 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
                       <p> Profile </p>
                     </div>
                     <div className='w-[65%] py-[20px] justify-center items-center text-center px-[2%]'>
-                      {s.commonNames.length > 1 && <p>Common Names: {addCommas(s.commonNames)}</p>}
-                      {s.commonNames.length == 1 && <p>Common Names: {s.commonNames[0]}</p>}
+                      {s.commonNames.length > 1 && !s.model.comm_name_string && <p>Common Names: {addCommas(s.commonNames)}</p>}
+                      {s.commonNames.length === 1 && !s.model.comm_name_string && <p>Common Names: {s.commonNames[0]}</p>}
+                      {s.model.comm_name_string && <p>Common Names: {s.model.comm_name_string}</p>} 
                       {s.profile.extinct !== '' && <p>Extinct: {boolRinse(s.profile.extinct as string)}</p>}
                       {s.profile.habitat && <p>Habitat: {toUpperFirstLetter(s.profile.habitat)}</p>}
                       {s.profile.freshwater !== '' && <p>Freshwater: {boolRinse(s.profile.freshwater as string)}</p>}
@@ -306,6 +307,6 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
         }
       </div>
     </>
-  );
-};
-export default SFAPI;
+  )
+}
+export default SFAPI
