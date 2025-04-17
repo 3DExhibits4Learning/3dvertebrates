@@ -21,6 +21,7 @@ import AnnotationModal from '@/components/Collections/AnnotationModal'
 import Sketchfab from '@sketchfab/viewer-api'
 import ModelAnnotation from './AnnotationModel'
 import Vertebrates from '@/classes/HerbariumClass'
+import { stripTagsExceptIAP } from '@/functions/client/utils/utils'
 
 const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model: model, images: GbifImageResponse[], imageTitle: string }) => {
 
@@ -167,7 +168,8 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
   useEffect(() => {
 
     if (!!index && annotations && annotations[index - 1].annotation_type == 'photo') {
-      const path = photoUrlPrefix(annotations[index - 1].url as string)
+      // const path = photoUrlPrefix(annotations[index - 1].url as string)
+      const path = process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? 'X:' + (annotations[index - 1].url as string).slice(5) : 'public' + (annotations[index - 1].url as string)
       setImgSrc(`/api/nfs?path=${path}`)
     }
 
