@@ -1,33 +1,44 @@
-import noImage from '../../../public/noImage.png'
+/**
+ * @file src\components\Search\SearchPageModelList.tsx
+ * 
+ * @fileoverview list of models available given any search parameters
+ */
+
+// Typical imports
 import { handleImgError } from '@/functions/utils/imageHandler'
 import { SyntheticEvent } from 'react'
 import { model } from '@prisma/client'
 import { toUpperFirstLetter } from '@/functions/utils/toUpperFirstLetter'
-import { getNfsPath, photoUrlPrefix } from '@/functions/client/utils'
+import { getNfsPath} from '@/functions/client/utils'
 
-type SearchPageModelListProps = {
-  models: model[]
-  selectedModeler: string | undefined
-  selectedAnnotator: string | undefined
-}
+// Default imports
+import noImage from '../../../public/noImage.png'
 
-const SearchPageModelList = (props: SearchPageModelListProps) => {
+export default function SearchPageModelList(props: {models: model[], selectedModeler: string | undefined, selectedAnnotator: string | undefined}){
 
+  // Declartations
   const models = props.models
   const selectedModeler: string | undefined = props.selectedModeler
   const selectedAnnotator = props.selectedAnnotator
   var filteredModels: model[]
 
+  /**
+   * 
+   * @param selection 
+   * @returns 
+   */
   const selectionCheck = (selection: string | undefined) => {
     if (selection === 'All' || selection === '' || selection === undefined) return true
     else return false
   }
 
+  // Convert this to function and export
   filteredModels = models.filter(model =>
     (selectionCheck(props.selectedModeler) || model.modeled_by === selectedModeler) &&
     (selectionCheck(props.selectedAnnotator) || model.annotator === selectedAnnotator)
   )
 
+  // Extract sub components
   return <>
     {
       filteredModels && filteredModels.length === 0 &&
@@ -72,5 +83,3 @@ const SearchPageModelList = (props: SearchPageModelListProps) => {
     </section >
   </>
 }
-
-export default SearchPageModelList
