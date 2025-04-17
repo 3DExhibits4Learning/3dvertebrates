@@ -11,7 +11,7 @@
  */
 
 export const photoUrlPrefix = (url: string) => {
-    process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? `/api/nfs?path=${getLocalNfsPrefix()}${url.slice(5)}` : `public${url}`
+    process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? `/api/nfs?path=${getLocalNfsPrefix()}${url.slice(5)}` : `public/${url}`
 }
 
 export const getNfsPath = (rawUrl: string) => {
