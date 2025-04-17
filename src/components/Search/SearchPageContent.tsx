@@ -41,7 +41,7 @@ const SearchPageContent = () => {
   useEffect(() => {
 
     const getModels = async () => {
-      const models = await getCollectionModels()
+      const models = JSON.parse(await getCollectionModels())
 
       if (typeof models !== 'string') {
         siteReadyModels.current = models as model[]
@@ -68,8 +68,7 @@ const SearchPageContent = () => {
           modeler={selectedModeler}
           annotator={selectedAnnotator}
           setSelectedModeler={setSelectedModeler}
-          setSelectedAnnotator={(setSelectedAnnotator)}
-        />
+          setSelectedAnnotator={(setSelectedAnnotator)}/>
         <br />
         <SearchPageModelList models={siteReadyModels.current as model[]} selectedModeler={selectedModeler} selectedAnnotator={selectedAnnotator} />
         <br />

@@ -58,7 +58,7 @@ export const getCollectionModels = async () => {
         const betaReadyModels = models.filter(model => isBetaSiteReadyModel(model))
 
         // Typical return
-        return betaReadyModels
+        return JSON.stringify(betaReadyModels)
     }
     // Typical catch
     catch (e: any) { return catchMessage(e.message) }
