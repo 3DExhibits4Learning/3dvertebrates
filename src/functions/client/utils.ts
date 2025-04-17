@@ -10,15 +10,11 @@
  * @returns appropriate url based on whether the environment is local development
  */
 
-export const photoUrlPrefix = (url: string) => {
-    process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? `/api/nfs?path=${getLocalNfsPrefix()}${url.slice(5)}` : `public/${url}`
-}
+export const photoUrlPrefix = (url: string) => process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? `/api/nfs?path=${getLocalNfsPrefix()}${url.slice(5)}` : `/api/nfs?public/${url}`
 
 export const getNfsPath = (rawUrl: string) => {
     const url = replaceBackslashWithForwardSlash(rawUrl)
-    const path = process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? `/api/nfs?path=${getLocalNfsPrefix()}${url.slice(4)}` : `/api/nfs?path=public/${url}`
-    console.log('PATH:', path)
-    return path
+    return process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? `/api/nfs?path=${getLocalNfsPrefix()}${url.slice(4)}` : `/api/nfs?path=public/${url}`
 }
 
 /**
