@@ -269,7 +269,7 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
                   </div>
                   <div id="annotationDivText">
                     <br></br>
-                    <p dangerouslySetInnerHTML={{ __html: stripTagsExceptIAP((annotations[index - 1].annotation as photo_annotation).annotation) }} className='m-auto pr-[3%] pl-[2%] text-center fade' />
+                    <p dangerouslySetInnerHTML={{ __html: (annotations[index - 1].annotation as photo_annotation).annotation }} className='m-auto pr-[3%] pl-[2%] text-center fade' />
                   </div>
                   <div id="annotationDivCitation">
                     <br></br>
@@ -294,7 +294,7 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
                   </div>
                   <div id="annotationDivText">
                     <br></br>
-                    <p dangerouslySetInnerHTML={{ __html: stripTagsExceptIAP((annotations[index - 1].annotation as model_annotation).annotation) }} className='m-auto pr-[3%] pl-[2%] text-center fade' />
+                    <p dangerouslySetInnerHTML={{ __html: (annotations[index - 1].annotation as model_annotation).annotation }} className='m-auto pr-[3%] pl-[2%] text-center fade' />
                   </div>
                   <div id="annotationDivCitation">
                     <br></br>
