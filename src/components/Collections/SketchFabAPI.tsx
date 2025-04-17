@@ -168,8 +168,9 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
   useEffect(() => {
 
     if (!!index && annotations && annotations[index - 1].annotation_type == 'photo') {
-      const path = photoUrlPrefix(annotations[index - 1].url as string)
-      setImgSrc(path)
+      // const path = photoUrlPrefix(annotations[index - 1].url as string)
+      const path = process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? 'X:' + (annotations[index - 1].url as string).slice(5) : 'public' + (annotations[index - 1].url as string)
+      setImgSrc(`/api/nfs?path=${path}`)
     }
 
   }, [index]) // eslint-disable-line react-hooks/exhaustive-deps
