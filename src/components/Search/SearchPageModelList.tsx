@@ -67,8 +67,7 @@ export default function SearchPageModelList(props: {models: model[], selectedMod
                     <a
                       href={"/collections/" + (model as model).spec_name}
                       rel='noopener noreferrer'
-                      className='text-[#004C46] dark:text-[#C3D5D1] text-xl'
-                    >
+                      className='text-[#004C46] dark:text-[#C3D5D1] text-xl'>
                       <i className='text-lg'>{(model as model).spec_name.charAt(0).toUpperCase() + (model as model).spec_name.slice(1)}</i>
                     </a>
                   </section>
