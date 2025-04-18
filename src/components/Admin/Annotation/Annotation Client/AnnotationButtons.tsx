@@ -13,7 +13,7 @@ import { forwardRef, MutableRefObject, SetStateAction, useContext, Dispatch } fr
 import { annotationClientData } from "@/interface/interface"
 
 // Main JSX
-const AnnotationButtons = forwardRef((props: {setModalOpen: Dispatch<SetStateAction<boolean>>}, ref) =>{
+const AnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetStateAction<boolean>> }, ref) => {
 
     // Context, variables
     const context = useContext(AnnotationClientData) as annotationClientData
@@ -35,8 +35,21 @@ const AnnotationButtons = forwardRef((props: {setModalOpen: Dispatch<SetStateAct
             </Button>
         }
         {
+            // New annotation button
+            !annotationsAndPositions.newAnnotationEnabled && annotationsAndPositions.activeAnnotationIndex !== 'new' && annotationsAndPositions.firstAnnotationPosition !== undefined &&
+            <>
+                <br></br>
+                <Button
+                    onPress={() => {}}
+                    className="text-white mt-2 text-lg"
+                    isDisabled={annotationsAndPositions.repositionEnabled}>
+                    Renumber annotations
+                </Button>
+            </>
+        }
+        {
             // 'Mark as annotated' button
-            annotationsAndPositions.annotations && annotationsAndPositions.annotations?.length >= 4 && 
+            annotationsAndPositions.annotations && annotationsAndPositions.annotations?.length >= 4 &&
             <>
                 <br></br>
                 <Button onPress={() => props.setModalOpen(true)}
