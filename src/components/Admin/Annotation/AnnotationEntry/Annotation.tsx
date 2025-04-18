@@ -59,6 +59,7 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
         <div className="flex justify-between w-full">
             <p className="text-xl mb-1">Annotation
                 {props.notRequired !== true && <span className="text-red-600 ml-1">*</span>}
+                {props.notRequired == true && <span className="ml-1">(Optional)</span>}
                 </p>
             <div>
                 <Button className='bg-[#004C46]' onClick={() => toggleLinkComponent(dialog, selectionRange, setSelectionText)} size='sm'>
