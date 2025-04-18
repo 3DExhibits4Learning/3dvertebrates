@@ -14,14 +14,12 @@ import { model, model_annotation, photo_annotation } from '@prisma/client'
 import { fullAnnotation, GbifImageResponse, GbifResponse } from '@/interface/interface'
 import { setViewerWidth, annotationControl, boolRinse, addCommas, arrayFromObjects } from './SketchfabDom'
 import { useSearchParams } from 'next/navigation'
-import { photoUrlPrefix } from '@/functions/client/utils'
 
 // Default imports
 import AnnotationModal from '@/components/Collections/AnnotationModal'
 import Sketchfab from '@sketchfab/viewer-api'
 import ModelAnnotation from './AnnotationModel'
 import Vertebrates from '@/classes/HerbariumClass'
-import { stripTagsExceptIAP } from '@/functions/client/utils/utils'
 
 const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model: model, images: GbifImageResponse[], imageTitle: string }) => {
 

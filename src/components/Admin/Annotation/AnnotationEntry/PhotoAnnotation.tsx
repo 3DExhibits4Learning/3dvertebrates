@@ -32,9 +32,9 @@ export default function PhotoAnnotationEntry() {
 
             <section className="mt-4 w-full h-fit">
 
-                <div className="flex h-fit">
+                <div className="flex h-fit w-full">
 
-                    <div className="flex flex-col w-1/2">
+                    <div className="flex flex-col w-1/2 max-w-[700px]">
 
                         <div className="ml-12">
                             <TextInput value={annotationEntryData.annotationTitle as string} field={'annotationTitle'} title='Annotation Title' required />
@@ -55,14 +55,16 @@ export default function PhotoAnnotationEntry() {
 
                     {
                         annotationEntryData.imageVisible &&
-                        <div className="flex w-1/2 max-w-[600px] h-[540px] p-6">
-                            <img className='rounded-sm object-fill' src={photoPath} alt={'Annotation Image'}></img>
+                        <div className="flex w-full justify-center">
+                            <div className="flex w-full max-w-[600px] h-[540px] px-12 pb-4">
+                                <img className='rounded-sm object-fill w-full h-full' src={photoPath} alt={'Annotation Image'}></img>
+                            </div>
                         </div>
                     }
 
                 </div>
 
-                <div className="ml-12">
+                <div className="mx-12">
                     <Annotation annotation={annotationEntryData.annotation} field='annotation' />
                 </div>
 

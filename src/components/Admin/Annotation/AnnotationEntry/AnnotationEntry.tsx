@@ -90,7 +90,7 @@ export default function AnnotationEntry(props: AnnotationEntryProps) {
     // JSX for all other annotations
     return <AnnotationEntryData.Provider value={annotationEntryContext}>
         <AnnotationEntryTransferModal />
-        <div className="w-[98%] min-w-[925px] h-fit flex flex-col border border-[#004C46] dark:border-white mt-4 ml-[1%] rounded-xl">
+        <div className="w-[98%] min-w-[925px] max-w-[2000px] h-fit flex flex-col border border-[#004C46] dark:border-white mt-4 ml-[1%] rounded-xl">
             <RepositionAndRadio new={props.new} index={props.index} />
             <section className="w-full h-fit">
                 <PhotoAnnotationEntry />
