@@ -13,7 +13,7 @@ import { forwardRef, MutableRefObject, SetStateAction, useContext, Dispatch } fr
 import { annotationClientData } from "@/interface/interface"
 
 // Main JSX
-const AnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetStateAction<boolean>> }, ref) => {
+const AnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetStateAction<boolean>>, setReorderOpen:  Dispatch<SetStateAction<boolean>>}, ref) => {
 
     // Context, variables
     const context = useContext(AnnotationClientData) as annotationClientData
@@ -40,7 +40,7 @@ const AnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetStateAc
             <>
                 <br></br>
                 <Button
-                    onPress={() => {}}
+                    onPress={() => {props.setReorderOpen(true)}}
                     className="text-white mt-2 text-lg"
                     isDisabled={annotationsAndPositions.repositionEnabled}>
                     Renumber annotations

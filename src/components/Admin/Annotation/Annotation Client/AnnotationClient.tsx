@@ -31,6 +31,7 @@ import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHan
 import AnnotationEntryWrapper from "./AnnotationEntryWrapper"
 import AdminAnnotation from "./AdminAnnotation"
 import AnnotationButtons from "./AnnotationButtons"
+import ModalWrapper from "@/components/Shared/Modals/ModalWrapper"
 
 // Exported context
 export const AnnotationClientData = createContext<annotationClientData | ''>('')
@@ -48,6 +49,9 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
 
     // Data transfer state (for 'Are you sure' modal)
     const [modalOpen, setModalOpen] = useState<boolean>(false)
+
+    // Reorder annotations states
+    const [isOpen, setIsOpen] = useState(false)
 
     // Refs
     const modelClicked = useRef<boolean>()
@@ -85,6 +89,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     return <AnnotationClientData.Provider value={annotationClientContext} >
 
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />
+        <ModalWrapper isOpen={isOpen} setIsOpen={setIsOpen}/>
 
         <div className="flex flex-col w-full h-full text-[#004C46 dark:text-white]">
 
@@ -100,7 +105,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
                                 onPress={() => modelClickHandler(modelClicked.current as boolean, model, annotationsAndPositionsDispatch, specimenDataDispatch)}>
                                 {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px]"><BotanistRefWrapper ref={newAnnotationEnabled} /></div>}
                                 <AdminAnnotation admin={props.admin} students={props.students as studentsAssignmentsAndModels[]} />
-                                <AnnotationButtons setModalOpen={setModalOpen} ref={newAnnotationEnabled} />
+                                <AnnotationButtons setModalOpen={setModalOpen} ref={newAnnotationEnabled} setReorderOpen={setIsOpen}/>
                             </AccordionItem>
                         )}
                     </Accordion>
