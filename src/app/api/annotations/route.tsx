@@ -114,7 +114,7 @@ export async function POST(request: Request) {
 
                     // Annotation creation, transaction
                     const newVideoBaseAnnotation = prisma.annotations.create({ data: newAnnotationData })
-                    const newVideoAnnotation = prisma.video_annotation.create({ data: { url: data.get('url') as string, length: data.get('length') as string, annotation_id: data.get('annotation_id') as string } })
+                    const newVideoAnnotation = prisma.video_annotation.create({ data: { url: data.get('url') as string, length: data.get('length') as string, annotation_id: data.get('annotation_id') as string, annotation: data.get('annotation') as string}})
                     const newVideoAnnotations = await prisma.$transaction([newVideoBaseAnnotation, newVideoAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, ' prisma.$transaction([newAnnotation, newVideoAnnotation]', "Couldn't create video annotation"))
 
                     // Typical response
@@ -275,7 +275,8 @@ export async function PATCH(request: Request) {
                             data: {
                                 url: data.get('url') as string,
                                 length: data.get('length') as string,
-                                annotation_id: data.get('annotation_id') as string
+                                annotation_id: data.get('annotation_id') as string,
+                                annotation: data.get('annotation') as string,
                             }
                         })
 

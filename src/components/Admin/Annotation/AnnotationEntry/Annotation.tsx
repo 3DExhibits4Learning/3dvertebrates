@@ -13,13 +13,15 @@ import { SetStateAction, Dispatch, useContext, useState, useRef, useEffect, Muta
 import { AnnotationEntryData } from "./AnnotationEntry"
 import { insertAnnotationHyperlink, toggleLinkComponent } from "@/functions/client/annotationEntry"
 import { Button } from "@nextui-org/react"
+
+// Default imports
 import Image from "next/image"
 
 // Default imports
 import HyperlinkModal from "@/components/Shared/Modals/HyperLink"
 
 // Main JSX
-export default function Annotation(props: { annotation: string, setAnnotation?: Dispatch<SetStateAction<string>>, field?: string }) {
+export default function Annotation(props: { annotation: string, setAnnotation?: Dispatch<SetStateAction<string>>, field?: string, notRequired?: boolean }) {
 
     // Context
     const context = useContext(AnnotationEntryData)
@@ -42,7 +44,7 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
     useEffect(() => {
         const textArea = divTextArea.current as HTMLDivElement
         textArea.innerHTML = props.annotation
-    }, [])
+    }, [props.annotation])
 
     // Trigger state update when a hyperlink is added (signaling a change to the annotation thus enabling the save button)
     useEffect(() => {
@@ -55,7 +57,9 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
     return <>
         <HyperlinkModal ref={dialog} setHyperLinkUrl={setHyperlinkUrl} hyperlinkWrapper={annotationHyperlinkInsertionWrapper} selectionText={selectionText} setSelectionText={setSelectionText} />
         <div className="flex justify-between w-full">
-            <p className="text-xl mb-1">Annotation<span className="text-red-600 ml-1">*</span></p>
+            <p className="text-xl mb-1">Annotation
+                {props.notRequired !== true && <span className="text-red-600 ml-1">*</span>}
+                </p>
             <div>
                 <Button className='bg-[#004C46]' onClick={() => toggleLinkComponent(dialog, selectionRange, setSelectionText)} size='sm'>
                     <Image src="/White Link Icon.svg" width={20} height={10} alt="Logo" className="pt-[3px]" />

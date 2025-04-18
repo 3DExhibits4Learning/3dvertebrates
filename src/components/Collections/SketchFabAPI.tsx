@@ -113,7 +113,7 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
       if (s.model.annotationPosition) {
         const position = JSON.parse(s.model.annotationPosition)
         api.createAnnotationFromScenePosition(position[0], position[1], position[2], 'Taxonomy and Description', '', (err: any, index: any) => {
-          if(!annotationUid)api.gotoAnnotation(0, { preventCameraAnimation: true, preventCameraMove: false }, function (err: any, index: any) { })
+          if (!annotationUid) api.gotoAnnotation(0, { preventCameraAnimation: true, preventCameraMove: false }, function (err: any, index: any) { })
         })
 
         // Create any futher annotations that exist
@@ -125,9 +125,9 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
         }
       }
 
-      if(annotationUid){
+      if (annotationUid) {
         const annotation = annotations.find(annotation => annotation.annotation_type === 'model' && (annotation.annotation as model_annotation).uid === annotationUid)
-        if(annotation) api.gotoAnnotation(annotation.annotation_no - 1, { preventCameraAnimation: true, preventCameraMove: false }, function (err: any, index: any) { })
+        if (annotation) api.gotoAnnotation(annotation.annotation_no - 1, { preventCameraAnimation: true, preventCameraMove: false }, function (err: any, index: any) { })
         else api.gotoAnnotation(0, { preventCameraAnimation: true, preventCameraMove: false }, function (err: any, index: any) { })
       }
 
@@ -138,7 +138,7 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
 
       // Set index when an annotation is selected
       api.addEventListener('annotationSelect', function (index: number) {
-        
+
         const mediaQueryWidth = window.matchMedia('(max-width: 1023.5px)')
         const mediaQueryOrientation = window.matchMedia('(orientation: portrait)')
 
@@ -150,7 +150,7 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
         // Mobile annotation state management
         if (index != -1 && mediaQueryWidth.matches || index != -1 && mediaQueryOrientation.matches) {
           document.getElementById("annotationButton")?.click()
-          
+
           api.getAnnotation(index, function (err: any, information: any) {
             if (!err) {
               setAnnotationTitle(information.name)
@@ -218,7 +218,7 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
                     <div className='w-[65%] py-[20px] justify-center items-center text-center px-[2%]'>
                       {s.commonNames.length > 1 && !s.model.comm_name_string && <p>Common Names: {addCommas(s.commonNames)}</p>}
                       {s.commonNames.length === 1 && !s.model.comm_name_string && <p>Common Name: {s.commonNames[0]}</p>}
-                      {s.model.comm_name_string && <p>Common Names: {s.model.comm_name_string}</p>} 
+                      {s.model.comm_name_string && <p>Common Names: {s.model.comm_name_string}</p>}
                       {s.profile.extinct !== '' && <p>Extinct: {boolRinse(s.profile.extinct as string)}</p>}
                       {s.profile.habitat && <p>Habitat: {toUpperFirstLetter(s.profile.habitat)}</p>}
                       {s.profile.freshwater !== '' && <p>Freshwater: {boolRinse(s.profile.freshwater as string)}</p>}
@@ -278,11 +278,25 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
               }
 
               {
-                !!index && annotations[index - 1].annotation_type === 'video' &&
+                !!index && annotations[index - 1].annotation_type === 'video' && !annotations[index - 1].annotation.annotation &&
                 <div className="w-full h-full" id="annotationDivVideo">
                   {/*@ts-ignore - align works on iframe just fine*/}
                   <iframe align='left' className='fade w-[calc(100%-15px)] h-full' src={annotations[index - 1].url}></iframe>
                 </div>
+              }
+
+              {
+                !!index && annotations[index - 1].annotation_type === 'video' && annotations[index - 1].annotation.annotation &&
+                <>
+                  <div className="w-full h-[65%]" id="annotationDivVideo">
+                    {/*@ts-ignore - align works on iframe just fine*/}
+                    <iframe align='left' className='fade w-[calc(100%-15px)] h-full' src={annotations[index - 1].url}></iframe>
+                  </div>
+                  <div id="annotationDivText">
+                    <br></br>
+                    <p dangerouslySetInnerHTML={{ __html: (annotations[index - 1].annotation as model_annotation).annotation }} className='m-auto pr-[3%] pl-[2%] text-center fade' />
+                  </div>
+                </>
               }
 
               {

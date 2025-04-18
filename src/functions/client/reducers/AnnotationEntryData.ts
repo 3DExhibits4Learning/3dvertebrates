@@ -99,6 +99,7 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
                 length: videoAnnotation.length as string,
                 videoSource: videoAnnotation.url,
                 annotationTitle: apData.activeAnnotationTitle,
+                annotation: videoAnnotation.annotation ? videoAnnotation.annotation : '',
                 annotationType: apData.activeAnnotationType as string,
                 mediaType: 'url',
                 videoChecked: true,

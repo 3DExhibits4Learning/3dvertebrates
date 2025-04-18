@@ -148,6 +148,12 @@ export const enablePhotoAnnotatonUpdate = (apData: annotationsAndPositions, aeDa
     else setSaveDisabled(true)
 }
 
+/**
+ * 
+ * @param aeData 
+ * @param setCreateDisabled 
+ * @param position 
+ */
 export const enablePhotoAnnotationCreate = (aeData: annotationEntry, setCreateDisabled: Dispatch<SetStateAction<boolean>>, position: string) => {
     // Required fields
     const valueArray = [aeData.annotationTitle, aeData.file, aeData.author, aeData.license, aeData.annotation, position]
@@ -157,6 +163,13 @@ export const enablePhotoAnnotationCreate = (aeData: annotationEntry, setCreateDi
     else setCreateDisabled(true)
 }
 
+/**
+ * 
+ * @param apData 
+ * @param aeData 
+ * @param isNewPosition 
+ * @param setSaveDisabled 
+ */
 export const enableVideoAnnotationUpdate = (apData: annotationsAndPositions, aeData: annotationEntry, isNewPosition: boolean, setSaveDisabled: Dispatch<SetStateAction<boolean>>) => {
     // Type assertion, required value arrays
     const caseAnnotation = apData.activeAnnotation as video_annotation
@@ -168,6 +181,12 @@ export const enableVideoAnnotationUpdate = (apData: annotationsAndPositions, aeD
     else setSaveDisabled(true)
 }
 
+/**
+ * 
+ * @param aeData 
+ * @param position 
+ * @param setCreateDisabled 
+ */
 export const enableVideoAnnotationCreate = (aeData: annotationEntry, position: string, setCreateDisabled: Dispatch<SetStateAction<boolean>>) => {
     // Required fields
     const valueArray = [aeData.annotationTitle, aeData.videoSource, aeData.length, position]
@@ -177,6 +196,13 @@ export const enableVideoAnnotationCreate = (aeData: annotationEntry, position: s
     else setCreateDisabled(true)
 }
 
+/**
+ * 
+ * @param aeData 
+ * @param apData 
+ * @param isNewPosition 
+ * @param setSaveDisabled 
+ */
 export const enableModelAnnotationUpdate = (aeData: annotationEntry, apData: annotationsAndPositions, isNewPosition: boolean, setSaveDisabled: Dispatch<SetStateAction<boolean>>) => {
 
     // Type assertion, required value arrays
@@ -189,6 +215,12 @@ export const enableModelAnnotationUpdate = (aeData: annotationEntry, apData: ann
     else setSaveDisabled(true)
 }
 
+/**
+ * 
+ * @param aeData 
+ * @param position 
+ * @param setCreateDisabled 
+ */
 export const enableModelAnnotationCreate = (aeData: annotationEntry, position: string, setCreateDisabled: Dispatch<SetStateAction<boolean>>) => {
 
     // Required fields
@@ -199,6 +231,12 @@ export const enableModelAnnotationCreate = (aeData: annotationEntry, position: s
     else setCreateDisabled(true)
 }
 
+/**
+ * 
+ * @param apData 
+ * @param uid 
+ * @returns 
+ */
 export const deleteAnnotationData = (apData: annotationsAndPositions, uid: string) => {
 
     const requestObj = {
@@ -210,6 +248,14 @@ export const deleteAnnotationData = (apData: annotationsAndPositions, uid: strin
     return JSON.stringify(requestObj)
 }
 
+/**
+ * 
+ * @param index 
+ * @param uid 
+ * @param position 
+ * @param dataTransferWrapper 
+ * @param aeData 
+ */
 export const createAnnotation = (index: number, uid: string, position: string, dataTransferWrapper: Function, aeData: annotationEntry) => {
     // Simple handler for the first annotation (always taxonomy and description)
     if (index === 1) {
@@ -234,6 +280,12 @@ export const updateAnnotation = (index: number, dataTransferWrapper: Function, a
     }
 }
 
+/**
+ * 
+ * @param apData 
+ * @param uid 
+ * @param dataTransferWrapper 
+ */
 export const deleteAnnotation = (apData: annotationsAndPositions, uid: string, dataTransferWrapper: Function) => {
     const data = deleteAnnotationData(apData, uid)
     dataTransferWrapper(insertAnnotation, [data, 'DELETE'], "Deleting annotation")
@@ -268,11 +320,21 @@ export const populateFormFields = (apData: annotationsAndPositions, dispatch: Di
         }
 
         else if (apData.activeAnnotationType === 'video') dispatch({ type: 'loadVideoAnnotation', apData: apData })
-
         else if (apData.activeAnnotationType === 'model') dispatch({ type: 'loadModelAnnotation', apData: apData })
     }
 }
 
+/**
+ * 
+ * @param apData 
+ * @param aeData 
+ * @param enableFirstAnnotation 
+ * @param index 
+ * @param isNew 
+ * @param setCreateDisabled 
+ * @param setSaveDisabled 
+ * @param isNewPosition 
+ */
 export const enableSaveOrUpdateButton = (
     apData: annotationsAndPositions,
     aeData: annotationEntry,
@@ -307,6 +369,14 @@ export const enableSaveOrUpdateButton = (
     }
 }
 
+/**
+ * 
+ * @param aeData 
+ * @param uid 
+ * @param index 
+ * @param position 
+ * @returns 
+ */
 export const annotationFormData = (aeData: annotationEntry, uid: string, index: string, position: string): FormData => {
 
     // Form data, annotation ID
@@ -325,6 +395,7 @@ export const annotationFormData = (aeData: annotationEntry, uid: string, index: 
     data.set('position', position as string)
     data.set('title', aeData.annotationTitle as string)
     data.set('annotation_id', annotationId)
+    data.set('annotation', aeData.annotation)
 
     // Route handler data
     data.set('mediaType', aeData.mediaType as string)
@@ -351,7 +422,6 @@ export const annotationFormData = (aeData: annotationEntry, uid: string, index: 
         // Model_annotation table data
         case 'model':
             data.set('modelAnnotationUid', aeData.modelAnnotationUid as string)
-            data.set('annotation', aeData.annotation)
 
             break
 
@@ -359,7 +429,6 @@ export const annotationFormData = (aeData: annotationEntry, uid: string, index: 
         default:
             data.set('author', aeData.author)
             data.set('license', aeData.license)
-            data.set('annotation', aeData.annotation)
             if (aeData.photoTitle) data.set('photoTitle', aeData.photoTitle)
             if (aeData.website) data.set('website', aeData.website)
     }
@@ -367,6 +436,13 @@ export const annotationFormData = (aeData: annotationEntry, uid: string, index: 
     return data
 }
 
+/**
+ * 
+ * @param aeData 
+ * @param apData 
+ * @param specimen 
+ * @returns 
+ */
 export const annotationUpdateData = (aeData: annotationEntry, apData: annotationsAndPositions, specimen: annotationClientSpecimen): FormData => {
 
     const data = new FormData()
@@ -382,6 +458,7 @@ export const annotationUpdateData = (aeData: annotationEntry, apData: annotation
     data.set('annotation_type', aeData.annotationType)
     data.set('position', apData.position3D as string ?? apData.activeAnnotationPosition)
     data.set('title', aeData.annotationTitle as string)
+    data.set('annotation', aeData.annotation)
 
     // Set relevant data based on annotationType
     switch (aeData.annotationType) {
@@ -396,7 +473,6 @@ export const annotationUpdateData = (aeData: annotationEntry, apData: annotation
         // Model_annotation table data
         case 'model':
             data.set('modelAnnotationUid', aeData.modelAnnotationUid as string)
-            data.set('annotation', aeData.annotation)
 
             break
 
@@ -404,7 +480,6 @@ export const annotationUpdateData = (aeData: annotationEntry, apData: annotation
         default:
             data.set('author', aeData.author)
             data.set('license', aeData.license)
-            data.set('annotation', aeData.annotation)
             if (aeData.photoTitle) data.set('photoTitle', aeData.photoTitle)
             if (aeData.website) data.set('website', aeData.website)
     }

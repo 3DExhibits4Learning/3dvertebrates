@@ -81,6 +81,8 @@ export default function AnnotationEntry(props: AnnotationEntryProps) {
     useEffect(() => aeFn.populateFormFields(apData, annotationEntryDataDispatch), [apData.activeAnnotation, apData.activeAnnotationIndex]) // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => aeFn.enableSaveOrUpdateButton(apData, annotationEntryData, enableFirstAnnotation, props.index, props.new, setCreateDisabled, setSaveDisabled, isNewPosition), enableDependencies) // eslint-disable-line react-hooks/exhaustive-deps  
 
+    console.log(apData)
+
     // JSX for first annotation
     if (props.index === 1) return <AnnotationEntryData.Provider value={annotationEntryContext}>
         <AnnotationEntryTransferModal />
