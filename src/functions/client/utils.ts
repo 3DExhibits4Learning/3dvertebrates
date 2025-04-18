@@ -19,7 +19,7 @@ export const photoUrlPrefix = (url: string) => process.env.NEXT_PUBLIC_NODE_ENV 
  */
 export const getNfsPath = (rawUrl: string) => {
     const url = replaceBackslashWithForwardSlash(rawUrl)
-    return process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? `/api/nfs?path=${getLocalNfsPrefix()}${url.slice(5)}` : `/api/nfs?path=public${url}`
+    return process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? `/api/nfs?path=${getLocalNfsPrefix()}${url.slice(5)}` : `/api/nfs?path=public/${url}`
 }
 
 /**
