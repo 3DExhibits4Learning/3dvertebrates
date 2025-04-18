@@ -33,6 +33,7 @@ import StudentTable from "./Students/GetStudents"
 import Assignments from "./Assignments/Assignments"
 import FindModel from "./Model/Find"
 import ApproveModel from "./Model/Approve"
+import Select from "@/components/Shared/Form Fields/Select"
 
 // Dynamic imports
 const ModelSubmitForm = dynamic(() => import("@/components/Admin/ModelSubmit/Form"))
@@ -60,6 +61,9 @@ export default function ManagerClient(props: ManagerClientProps) {
     // Data transfer handlers for context
     const initializeDataTransferHandler = (loadingLabel: string) => initializeDataTransfer(setOpenModal, setTransferring, setLoadingLabel, loadingLabel)
     const terminateDataTransferHandler = (result: string) => terminateDataTransfer(setResult, setTransferring, result)
+
+    // Annotation model state (so that annotation client accordion isn't excessively long)
+    const [annotationModelUid, setAnnotationModelUid] = useState('')
 
     // Tailwind variables
     const accordionTitlesCss = 'text-[#004C46] text-2xl dark:text-[#F5F3E7]'
@@ -150,12 +154,12 @@ export default function ManagerClient(props: ManagerClientProps) {
 
                     {/* AccordionItem holds nested "Annotations" accordion */}
                     <AccordionItem key={'adminAnnotations'} aria-label={'New Image Set'} title={"Annotations"} classNames={{ title: 'text-[ #004C46] text-2xl' }}>
-                        <AnnotationClient
-                            modelsToAnnotate={approvedModels.filter(model => model.base_model)}
+                        <Select value={annotationModelUid} setValue={setAnnotationModelUid} models={approvedModels.filter(model => model.base_model)}/>
+                        {annotationModelUid && <AnnotationClient
+                            modelsToAnnotate={approvedModels.filter(model => model.uid === annotationModelUid)}
                             annotationModels={unusedModelAnnotations}
                             admin={props.admin}
-                            students={studentsAssignmentsAndModels}
-                        />
+                            students={studentsAssignmentsAndModels}/>}
                     </AccordionItem>
 
                 </Accordion>

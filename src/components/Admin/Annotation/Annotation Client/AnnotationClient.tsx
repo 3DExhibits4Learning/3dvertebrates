@@ -5,6 +5,8 @@
  * its most significant children are AnnotationModelViewer and AnnotationEntry; 
  * these are the three main components of the client annotation CRUD interface
  * 
+ * @todo automatically 'click' the the accordion item if their is only one
+ * 
  */
 
 'use client'
@@ -84,26 +86,28 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
 
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />
 
-        <div className="flex w-full h-full text-[#004C46 dark:text-white]">
+        <div className="flex flex-col w-full h-full text-[#004C46 dark:text-white]">
 
-            <section className="h-full w-1/5 min-w-[325px]">
-                <Accordion className="h-full" onSelectionChange={(keys: any) => modelClicked.current = keys.size ? true : false}>
-                    {props.modelsToAnnotate.map((model, i) =>
-                        <AccordionItem
-                            key={i}
-                            aria-label={'Specimen to model'}
-                            title={toUpperFirstLetter(model.spec_name)}
-                            classNames={{ title: 'text-[ #004C46] text-2xl' }}
-                            onPress={() => modelClickHandler(modelClicked.current as boolean, model, annotationsAndPositionsDispatch, specimenDataDispatch)}>
-                            {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px]"><BotanistRefWrapper ref={newAnnotationEnabled} /></div>}
-                            <AdminAnnotation admin={props.admin} students={props.students as studentsAssignmentsAndModels[]} />
-                            <AnnotationButtons setModalOpen={setModalOpen} ref={newAnnotationEnabled} />
-                        </AccordionItem>
-                    )}
-                </Accordion>
+            <section className="flex">
+                <section className="h-full w-1/5 min-w-[325px]">
+                    <Accordion className="h-full" onSelectionChange={(keys: any) => modelClicked.current = keys.size ? true : false}>
+                        {props.modelsToAnnotate.map((model, i) =>
+                            <AccordionItem
+                                key={i}
+                                aria-label={'Specimen to model'}
+                                title={toUpperFirstLetter(model.spec_name)}
+                                classNames={{ title: 'text-[ #004C46] text-2xl' }}
+                                onPress={() => modelClickHandler(modelClicked.current as boolean, model, annotationsAndPositionsDispatch, specimenDataDispatch)}>
+                                {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px]"><BotanistRefWrapper ref={newAnnotationEnabled} /></div>}
+                                <AdminAnnotation admin={props.admin} students={props.students as studentsAssignmentsAndModels[]} />
+                                <AnnotationButtons setModalOpen={setModalOpen} ref={newAnnotationEnabled} />
+                            </AccordionItem>
+                        )}
+                    </Accordion>
+                </section>
+
+                <AnnotationEntryWrapper modelsToAnnotate={props.modelsToAnnotate} admin={props.admin} annotationModels={props.annotationModels} />
             </section>
-
-            <AnnotationEntryWrapper modelsToAnnotate={props.modelsToAnnotate} admin={props.admin} annotationModels={props.annotationModels} />
 
         </div>
     </AnnotationClientData.Provider>

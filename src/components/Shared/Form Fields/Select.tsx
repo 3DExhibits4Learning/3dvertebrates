@@ -3,8 +3,9 @@
 import { SetStateAction, Dispatch } from "react"
 import { model } from "@prisma/client"
 import { toUpperFirstLetter } from "@/functions/utils/toUpperFirstLetter"
+import { fullModel } from "@/interface/interface"
 
-export default function Select(props: { value: string, setValue: Dispatch<SetStateAction<string>>, models: model[], title?: string, required?: string }) {
+export default function Select(props: { value: string, setValue: Dispatch<SetStateAction<string>>, models: model[] | fullModel[], title?: string, required?: string }) {
     return (
         <>
             {

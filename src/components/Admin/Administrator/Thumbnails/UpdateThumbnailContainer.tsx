@@ -1,24 +1,38 @@
+/**
+ * @file src/components/Admin/Administrator/Thumbnails/UpdateThumbnailContainer.tsx
+ * 
+ * @fileoverview container for thumbnail update form
+ */
+
 'use client'
 
+// Typical imports
 import { model } from "@prisma/client"
+import { SetStateAction, Dispatch, useContext, useState } from "react"
+import { DataTransferContext } from "../ManagerClient"
+
+// Default imports
 import Select from "@/components/Shared/Form Fields/Select"
 import dynamic from "next/dynamic"
-const ModelViewer = dynamic(() => import('@/components/Shared/ModelViewer'))
 import UpdateThumbnail from "./UpdateThumbnail"
-import { SetStateAction, Dispatch, useContext, useState } from "react"
 import updateThumbnail from "@/functions/client/managerClient/updateThumbnail"
-import { DataTransferContext } from "../ManagerClient"
 import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler"
 
+// Dynamic imports
+const ModelViewer = dynamic(() => import('@/components/Shared/ModelViewer'))
 
+// Main JSX
 export default function UpdateThumbnailContainer(props: { modelsWithThumbnails: model[] | undefined }) {
 
+    // Context
     const initializeDataTransfer = useContext(DataTransferContext).initializeDataTransferHandler
     const terminateDataTransfer = useContext(DataTransferContext).terminateDataTransferHandler
 
+    // States
     const [file, setFile] = useState<File>()
     const [uid, setUid] = useState<string>('')
 
+    // Update handler
     const updateThumbnailHandler = async (uid: string) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, updateThumbnail, [uid, file], 'Updating Thumbnail')
 
     return <div className="w-full flex justify-center">
