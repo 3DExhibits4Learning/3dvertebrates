@@ -41,8 +41,7 @@ const AnnotationButtons = forwardRef((props: {setModalOpen: Dispatch<SetStateAct
                 <br></br>
                 <Button onPress={() => props.setModalOpen(true)}
                     className="text-white mt-2 text-lg"
-                    isDisabled={annotationsAndPositions.repositionEnabled}
-                >
+                    isDisabled={annotationsAndPositions.repositionEnabled}>
                     Mark as Annotated
                 </Button>
             </>
@@ -57,8 +56,7 @@ const AnnotationButtons = forwardRef((props: {setModalOpen: Dispatch<SetStateAct
                     color="danger"
                     variant="light"
                     className="text-red-600 hover:text-white text-lg"
-                    onPress={() => { newAnnotationEnabled.current = false; annotationsAndPositionsDispatch({ type: 'annotationCancelled' }) }}
-                >
+                    onPress={() => { newAnnotationEnabled.current = false; annotationsAndPositionsDispatch({ type: 'annotationCancelled' }) }}>
                     Cancel Annotation
                 </Button>
             </div>
