@@ -89,7 +89,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     return <AnnotationClientData.Provider value={annotationClientContext} >
 
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />
-        <ModalWrapper isOpen={isOpen} setIsOpen={setIsOpen}/>
+        {annotationsAndPositions.annotations && <ModalWrapper isOpen={isOpen} setIsOpen={setIsOpen}/>}
 
         <div className="flex flex-col w-full h-full text-[#004C46 dark:text-white]">
 
