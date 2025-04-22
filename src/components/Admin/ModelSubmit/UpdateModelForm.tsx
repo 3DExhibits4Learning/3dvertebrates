@@ -97,8 +97,8 @@ export default function UpdateModelForm(props: UpdateModelFormProps) {
             // Set edited data
             const data = new FormData()
 
-            const formSoftware = JSON.stringify(software.filter(obj => obj.value))
-            const formTags = JSON.stringify(software.filter(obj => obj.value))
+            const formSoftware = JSON.stringify(software.map(obj => obj.value))
+            const formTags = JSON.stringify(software.map(obj => obj.value))
             const formPosition = JSON.stringify({ lat: lat, lng: lng })
 
             data.set('artist', artist)
@@ -109,6 +109,7 @@ export default function UpdateModelForm(props: UpdateModelFormProps) {
             data.set('position', formPosition)
             data.set('speciesAcquisitionDate', speciesAcquisitionDate as string)
             data.set('commonName', commonName)
+            data.set('uid', model.uid)
 
             // Update model data in the database and set resultant states
             await fetch('/api/modelSubmit', {method: 'PATCH',body: data})
@@ -127,6 +128,7 @@ export default function UpdateModelForm(props: UpdateModelFormProps) {
         catch (e: any) {
             if (process.env.LOCAL_ENV === 'development') console.error(e.message)
             setResult('Error updating model')
+            setTransferring(false)
         }
     }
 
@@ -179,7 +181,7 @@ export default function UpdateModelForm(props: UpdateModelFormProps) {
 
             <TextInput value={artist} setValue={setArtist} title='3D Modeler Name' required leftMargin='ml-12' textSize='text-2xl' />
             <ProcessSelect value={buildMethod} setValue={setBuildMethod} defaultValue={model.build_process} />
-            <TagInput key={reRenderKey1} value={software} setValue={setSoftware} defaultValues={softwareString} title='Enter any software used to create the model' marginTop='mt-12' marginBottom='mb-4' />
+            <TagInput key={reRenderKey1} value={software} setValue={setSoftware} defaultValues={softwareString} title='Enter any software used to create the model' marginTop='mt-12' marginBottom='mb-4' required />
             <ModelInput setFile={setFile} />
 
             <Button

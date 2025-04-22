@@ -10,6 +10,7 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { serverActionErrorHandler } from "../error"
+import { AnnotationNumbers } from "@/ts/ts"
 
 // SINGLETON
 import prisma from "@/functions/utils/prisma"
@@ -57,4 +58,37 @@ export const markModelAsAnnotated = async (uid: string) => {
         return 'Model marked as annotated'
     }
     catch (e: any) { return `Error: ${e.message}` }
+}
+
+/**
+ * 
+ * @param annotationNumbers 
+ * @returns 
+ */
+export const renumberAnnotationsServer = async(annotationNumbers: AnnotationNumbers[]) => {
+    try{
+        var tempAnnotationNumber = 100
+        const temporaryAnnotationNumberTransactionArr = []
+        const newAnnotationNumberTransactionArr = []
+    
+        for (let i in annotationNumbers) {
+            temporaryAnnotationNumberTransactionArr.push(prisma.annotations.update({
+                where: { annotation_id: annotationNumbers[i].id },
+                data: { annotation_no: tempAnnotationNumber }
+            }))
+
+            newAnnotationNumberTransactionArr.push(prisma.annotations.update({
+                where: { annotation_id: annotationNumbers[i].id },
+                data: { annotation_no: parseInt(annotationNumbers[i].no) }
+            }))
+            tempAnnotationNumber++
+        }
+    
+        const transactionArr = [...temporaryAnnotationNumberTransactionArr, ...newAnnotationNumberTransactionArr]
+        await prisma.$transaction(transactionArr)
+        .catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction(temporaryAnnotationNumberTransactionArr)', "Couldn't complete annotation number temporary transaction"))
+    
+        return 'Annotation numbers updated'
+    }
+    catch(e: any){return `Error: ${e.message}`}
 }

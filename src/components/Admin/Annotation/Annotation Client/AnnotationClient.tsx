@@ -23,6 +23,8 @@ import { annotationClientSpecimenReducer } from "@/functions/client/reducers/ann
 import { activeAnnotationChangeHandler, modelOrAnnotationChangeHandler, modelClickHandler } from "@/functions/client/annotationClient"
 import { initialAnnotationsAndPositions, initialSpecimenData } from "@/interface/initializers"
 import { assignAnnotation, unassignAnnotation, approveAnnotations, unapproveAnnotations } from "@/functions/server/admin/administrator"
+import { AnnotationNumbers } from "@/ts/ts"
+import { renumberAnnotationsServer } from "@/functions/server/admin/annotator"
 
 // Default imports
 import BotanistRefWrapper from "../Annotation Model Viwer/AnnotationModelViewerRef"
@@ -32,6 +34,7 @@ import AnnotationEntryWrapper from "./AnnotationEntryWrapper"
 import AdminAnnotation from "./AdminAnnotation"
 import AnnotationButtons from "./AnnotationButtons"
 import ModalWrapper from "@/components/Shared/Modals/ModalWrapper"
+import { StudentTransferContext } from "../../Student/StudentClient"
 
 // Exported context
 export const AnnotationClientData = createContext<annotationClientData | ''>('')
@@ -40,8 +43,8 @@ export const AnnotationClientData = createContext<annotationClientData | ''>('')
 export default function AnnotationClient(props: { modelsToAnnotate: model[], annotationModels: model[], admin: boolean, students?: studentsAssignmentsAndModels[] }) {
 
     // Data transfer contexts
-    const initializeDataTransfer = useContext(DataTransferContext).initializeDataTransferHandler
-    const terminateDataTransfer = useContext(DataTransferContext).terminateDataTransferHandler
+    const initializeDataTransfer = props.admin? useContext(DataTransferContext).initializeDataTransferHandler : useContext(StudentTransferContext).initializeDataTransferHandler
+    const terminateDataTransfer = props.admin? useContext(DataTransferContext).terminateDataTransferHandler : useContext(StudentTransferContext).terminateDataTransferHandler
 
     // Student states
     const [name, setName] = useState<string | null>()
@@ -64,9 +67,10 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     // Set name and email states fn
     const setNameAndEmailStates = (name: string, email: string) => { setEmail(email); setName(name) }
 
-    // Approve/Unapprove annotation handlers
+    // Approve, Unapprove and renumber annotation handlers
     const approveAnnotationsHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, approveAnnotations, [specimenData.uid], 'Approving annotations')
     const unapproveAnnotationsHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unapproveAnnotations, [specimenData.uid], 'Unapproving annotations')
+    const renumberAnnotations = async(annotationNumbers: AnnotationNumbers) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, renumberAnnotationsServer, [annotationNumbers], 'Renumbering annotations')
 
     // Annotation assign and unassign handlers
     const assignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, assignAnnotation, [name, email, specimenData.uid], 'Assigning annotation of model')
@@ -89,7 +93,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     return <AnnotationClientData.Provider value={annotationClientContext} >
 
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />
-        {annotationsAndPositions.annotations && <ModalWrapper isOpen={isOpen} setIsOpen={setIsOpen}/>}
+        {annotationsAndPositions.annotations && specimenData.uid && <ModalWrapper isOpen={isOpen} setIsOpen={setIsOpen} renumberAnnotations={renumberAnnotations}/>}
 
         <div className="flex flex-col w-full h-full text-[#004C46 dark:text-white]">
 
