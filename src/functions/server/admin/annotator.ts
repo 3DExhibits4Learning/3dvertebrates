@@ -65,12 +65,12 @@ export const markModelAsAnnotated = async (uid: string) => {
  * @param annotationNumbers 
  * @returns 
  */
-export const renumberAnnotationsServer = async(annotationNumbers: AnnotationNumbers[]) => {
-    try{
+export const renumberAnnotationsServer = async (annotationNumbers: AnnotationNumbers[]) => {
+    try {
         var tempAnnotationNumber = 100
         const temporaryAnnotationNumberTransactionArr = []
         const newAnnotationNumberTransactionArr = []
-    
+
         for (let i in annotationNumbers) {
             temporaryAnnotationNumberTransactionArr.push(prisma.annotations.update({
                 where: { annotation_id: annotationNumbers[i].id },
@@ -83,12 +83,32 @@ export const renumberAnnotationsServer = async(annotationNumbers: AnnotationNumb
             }))
             tempAnnotationNumber++
         }
-    
+
         const transactionArr = [...temporaryAnnotationNumberTransactionArr, ...newAnnotationNumberTransactionArr]
         await prisma.$transaction(transactionArr)
-        .catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction(temporaryAnnotationNumberTransactionArr)', "Couldn't complete annotation number temporary transaction"))
-    
+            .catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction(temporaryAnnotationNumberTransactionArr)', "Couldn't complete annotation number temporary transaction"))
+
         return 'Annotation numbers updated'
     }
-    catch(e: any){return `Error: ${e.message}`}
+    catch (e: any) { return `Error: ${e.message}` }
+}
+
+/**
+ * 
+ * @returns 
+ */
+export const renumberCurrentAnnotations = async () => {
+    try {
+        const uids = await prisma.annotations.findMany({ select: { uid: true }, distinct: ['uid'] })
+
+        for (let i in uids) {
+            const annotations = await prisma.annotations.findMany({ where: { uid: uids[i].uid }, orderBy: { annotation_no: 'asc' } })
+            const annotationNumbers = annotations.map((annotation, index) => ({ id: annotation.annotation_id, no: (index + 2).toString() }))
+
+            await renumberAnnotationsServer(annotationNumbers).catch(e => serverActionErrorHandler(path, e.message, 'renumberAnnotationsServer(annotationNumbers)', "Couldn't renumber annotations"))
+        }
+
+        return "Annotations renumbered"
+    }
+    catch (e: any) { return `Error: ${e.message}` }
 }
