@@ -25,7 +25,6 @@ export default function PhotoAnnotationEntry() {
 
     const annotationEntryData = (useContext(AnnotationEntryData) as annotationEntryContext).annotationEntryData
     const photoPath = getNfsPath(annotationEntryData.url)
-    console.log(annotationEntryData.annotation)
 
     return <>
         {

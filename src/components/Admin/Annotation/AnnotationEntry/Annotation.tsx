@@ -60,8 +60,6 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
         }
     }, [linkAdded])
 
-    console.log(props.annotation)
-
     return <>
         <HyperlinkModal ref={dialog} setHyperLinkUrl={setHyperlinkUrl} hyperlinkWrapper={annotationHyperlinkInsertionWrapper} selectionText={selectionText} setSelectionText={setSelectionText} />
         <div className="flex justify-between w-full">
