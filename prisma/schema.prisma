@@ -42,6 +42,7 @@ model annotations {
   model_annotation model_annotation?
 
   @@index([uid], map: "uid")
+  @@unique([uid, annotation_no])
 }
 
 model model {

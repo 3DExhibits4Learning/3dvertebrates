@@ -100,12 +100,15 @@ export const renumberAnnotationsServer = async (annotationNumbers: AnnotationNum
 export const renumberCurrentAnnotations = async () => {
     try {
         const uids = await prisma.annotations.findMany({ select: { uid: true }, distinct: ['uid'] })
+        console.log('Uids: ', uids)
 
         for (let i in uids) {
+            console.log('Getting annotations for uid: ', uids[i].uid)
             const annotations = await prisma.annotations.findMany({ where: { uid: uids[i].uid }, orderBy: { annotation_no: 'asc' } })
             const annotationNumbers = annotations.map((annotation, index) => ({ id: annotation.annotation_id, no: (index + 2).toString() }))
-
+            console.log('Renumbering annotations for uid: ', uids[i].uid)
             await renumberAnnotationsServer(annotationNumbers).catch(e => serverActionErrorHandler(path, e.message, 'renumberAnnotationsServer(annotationNumbers)', "Couldn't renumber annotations"))
+            console.log('Annotations renumbered for uid: ', uids[i].uid)
         }
 
         return "Annotations renumbered"
