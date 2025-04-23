@@ -10,6 +10,7 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { serverActionErrorHandler } from "../error"
+import { AnnotationNumbers } from "@/ts/ts"
 
 // SINGLETON
 import prisma from "@/functions/utils/prisma"
@@ -55,6 +56,59 @@ export const markModelAsAnnotated = async (uid: string) => {
         await prisma.$transaction([updateMark, updateAnnotator]).catch(e => serverActionErrorHandler(path, e.message, 'getServerSession(authOptions)', "Coulnd't get server session"))
 
         return 'Model marked as annotated'
+    }
+    catch (e: any) { return `Error: ${e.message}` }
+}
+
+/**
+ * 
+ * @param annotationNumbers 
+ * @returns 
+ */
+export const renumberAnnotationsServer = async (annotationNumbers: AnnotationNumbers[]) => {
+    try {
+        var tempAnnotationNumber = 100
+        const temporaryAnnotationNumberTransactionArr = []
+        const newAnnotationNumberTransactionArr = []
+
+        for (let i in annotationNumbers) {
+            temporaryAnnotationNumberTransactionArr.push(prisma.annotations.update({
+                where: { annotation_id: annotationNumbers[i].id },
+                data: { annotation_no: tempAnnotationNumber }
+            }))
+
+            newAnnotationNumberTransactionArr.push(prisma.annotations.update({
+                where: { annotation_id: annotationNumbers[i].id },
+                data: { annotation_no: parseInt(annotationNumbers[i].no) }
+            }))
+            tempAnnotationNumber++
+        }
+
+        const transactionArr = [...temporaryAnnotationNumberTransactionArr, ...newAnnotationNumberTransactionArr]
+        await prisma.$transaction(transactionArr)
+            .catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction(temporaryAnnotationNumberTransactionArr)', "Couldn't complete annotation number temporary transaction"))
+
+        return 'Annotation numbers updated'
+    }
+    catch (e: any) { return `Error: ${e.message}` }
+}
+
+/**
+ * 
+ * @returns 
+ */
+export const renumberCurrentAnnotations = async () => {
+    try {
+        const uids = await prisma.annotations.findMany({ select: { uid: true }, distinct: ['uid'] })
+
+        for (let i in uids) {
+            const annotations = await prisma.annotations.findMany({ where: { uid: uids[i].uid }, orderBy: { annotation_no: 'asc' } })
+            const annotationNumbers = annotations.map((annotation, index) => ({ id: annotation.annotation_id, no: (index + 2).toString() }))
+
+            await renumberAnnotationsServer(annotationNumbers).catch(e => serverActionErrorHandler(path, e.message, 'renumberAnnotationsServer(annotationNumbers)', "Couldn't renumber annotations"))
+        }
+
+        return "Annotations renumbered"
     }
     catch (e: any) { return `Error: ${e.message}` }
 }

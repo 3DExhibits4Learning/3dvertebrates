@@ -13,11 +13,12 @@ import { fullModel } from "@/interface/interface"
 import { useState, Dispatch, SetStateAction, useEffect } from "react"
 
 // Default imports
-import dynamic from "next/dynamic"
+//import dynamic from "next/dynamic"
 import Select from "@/components/Shared/Form Fields/Select"
+import UpdateModelForm from "../../ModelSubmit/UpdateModelForm"
 
 // Dynamic imports
-const UpdateModelForm = dynamic(() => import("@/components/Admin/ModelSubmit/UpdateModelForm"))
+//const UpdateModelForm = dynamic(() => import("@/components/Admin/ModelSubmit/UpdateModelForm"))
 
 // Main JSX
 export default function UpdateModelContainer(props: UpdateModelFormContainerProps) {
