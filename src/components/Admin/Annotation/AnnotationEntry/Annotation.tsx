@@ -9,7 +9,7 @@
 'use client'
 
 // Typical imports
-import { SetStateAction, Dispatch, useContext, useState, useRef, useEffect, MutableRefObject } from "react"
+import { SetStateAction, Dispatch, useContext, useState, useRef, useEffect, memo } from "react"
 import { AnnotationEntryData } from "./AnnotationEntry"
 import { insertAnnotationHyperlink, toggleLinkComponent } from "@/functions/client/annotationEntry"
 import { Button } from "@nextui-org/react"
@@ -19,6 +19,7 @@ import Image from "next/image"
 
 // Default imports
 import HyperlinkModal from "@/components/Shared/Modals/HyperLink"
+import AnnotationText from "./AnnotationText"
 
 // Main JSX
 export default function Annotation(props: { annotation: string, setAnnotation?: Dispatch<SetStateAction<string>>, field?: string, notRequired?: boolean }) {
@@ -44,7 +45,7 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
     useEffect(() => {
         const textArea = divTextArea.current as HTMLDivElement
         textArea.innerHTML = props.annotation
-    }, [props.annotation])
+    }, [])
 
     // Trigger state update when a hyperlink is added (signaling a change to the annotation thus enabling the save button)
     useEffect(() => {
@@ -67,12 +68,6 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
                 </Button>
             </div>
         </div>
-        <div
-            ref={divTextArea as MutableRefObject<HTMLDivElement>}
-            id='divTextArea'
-            contentEditable
-            className="w-full min-w-[300px] min-h-[400px] rounded-xl mb-4 bg-white dark:bg-[#27272a] dark:hover:bg-[#3E3E47] p-4 text-[14px] outline-[#004C46] text-[#004C46] dark:text-white mr-12"
-            onInput={e => props.setAnnotation ? props.setAnnotation(e.currentTarget.innerHTML) : dispatch ? dispatch({ type: 'setStringValue', field: props.field, string: e.currentTarget.innerHTML }) : null}>
-        </div>
+        <AnnotationText ref={divTextArea} setAnnotation={props.setAnnotation} field={props.field} />
     </>
 }
