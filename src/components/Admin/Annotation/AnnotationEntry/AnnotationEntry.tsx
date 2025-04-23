@@ -12,9 +12,10 @@ import * as aeFn from '@/functions/client/annotationEntry'
 
 // Typical imports
 import { useState, useEffect, useContext, createContext, useReducer } from "react"
-import { AnnotationEntryProps, annotationClientData, annotationEntryContext } from "@/interface/interface"
+import { annotationClientData, annotationEntryContext } from "@/interface/interface"
 import { AnnotationClientData } from "@/components/Admin/Annotation/Annotation Client/AnnotationClient"
 import { getInitialAnnotationEntryData } from "@/interface/initializers"
+import { model } from '@prisma/client'
 
 // Default imports
 import annotationEntryReducer from "@/functions/client/reducers/AnnotationEntryData"
@@ -32,7 +33,7 @@ import AnnotationEntryButtons from "./Buttons"
 export const AnnotationEntryData = createContext<annotationEntryContext | ''>('')
 
 // Main JSX
-export default function AnnotationEntry(props: AnnotationEntryProps) {
+export default function AnnotationEntry(props: { index: number, new: boolean, annotationModels: model[] }) {
 
     // Annotation client context
     const clientData = useContext(AnnotationClientData) as annotationClientData

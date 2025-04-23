@@ -3,7 +3,7 @@
  * 
  * @fileoverview annotation (text) entry component
  * 
- * @todo automate text hyperlink
+ * @todo diagnose stale annotation value on first render (note run count and dependency-less effect)
  */
 
 'use client'
@@ -20,6 +20,7 @@ import Image from "next/image"
 // Default imports
 import HyperlinkModal from "@/components/Shared/Modals/HyperLink"
 import AnnotationText from "./AnnotationText"
+import { run } from "node:test"
 
 // Main JSX
 export default function Annotation(props: { annotation: string, setAnnotation?: Dispatch<SetStateAction<string>>, field?: string, notRequired?: boolean }) {
@@ -27,6 +28,7 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
     // Context
     const context = useContext(AnnotationEntryData)
     const dispatch = context ? context.annotationEntryDataDispatch : null
+    const runCount = useRef(0)
 
     // States
     const [hyperlinkUrl, setHyperlinkUrl] = useState('')
@@ -42,10 +44,13 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
     const annotationHyperlinkInsertionWrapper = () => insertAnnotationHyperlink(selectionRange, hyperlinkUrl, selectionText, dialog, setSelectionText, divTextArea, setLinkAdded, linkAdded)
 
     // Set div text area innerHTML
-    // useEffect(() => {
-    //     const textArea = divTextArea.current as HTMLDivElement
-    //     textArea.innerHTML = props.annotation
-    // }, [])
+    useEffect(() => {
+        if(runCount.current < 2) {
+        const textArea = divTextArea.current as HTMLDivElement
+        textArea.innerHTML = props.annotation
+        runCount.current++
+        }
+    })
 
     // Trigger state update when a hyperlink is added (signaling a change to the annotation thus enabling the save button)
     useEffect(() => {
@@ -54,6 +59,8 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
             props.setAnnotation ? props.setAnnotation(textArea.innerHTML) : dispatch ? dispatch({ type: 'setStringValue', field: props.field, string: textArea.innerHTML }) : null
         }
     }, [linkAdded])
+
+    console.log(props.annotation)
 
     return <>
         <HyperlinkModal ref={dialog} setHyperLinkUrl={setHyperlinkUrl} hyperlinkWrapper={annotationHyperlinkInsertionWrapper} selectionText={selectionText} setSelectionText={setSelectionText} />

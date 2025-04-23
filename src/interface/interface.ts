@@ -407,12 +407,6 @@ export interface modelsAndAssignments extends model {
   assignment: assignment[]
 }
 
-export interface AnnotationEntryProps {
-  index: number,
-  new: boolean,
-  annotationModels: model[]
-}
-
 export interface annotationWithModel extends annotations {
   model_annotation: model_annotation
 }

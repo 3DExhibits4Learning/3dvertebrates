@@ -7,12 +7,6 @@ export const AnnotationText = forwardRef((props: { setAnnotation?: Dispatch<SetS
     const context = useContext(AnnotationEntryData)
     const dispatch = context ? context.annotationEntryDataDispatch : null
 
-    // Set div text area innerHTML
-    useEffect(() => {
-        const textArea = divTextArea.current as HTMLDivElement
-        textArea.innerHTML = props.annotation
-    }, [])
-
     return <div
         ref={divTextArea as MutableRefObject<HTMLDivElement>}
         id='divTextArea'
