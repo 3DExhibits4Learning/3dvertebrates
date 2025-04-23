@@ -25,6 +25,7 @@ import { initialAnnotationsAndPositions, initialSpecimenData } from "@/interface
 import { assignAnnotation, unassignAnnotation, approveAnnotations, unapproveAnnotations } from "@/functions/server/admin/administrator"
 import { AnnotationNumbers } from "@/ts/ts"
 import { renumberAnnotationsServer } from "@/functions/server/admin/annotator"
+import { StudentTransferContext } from "../../Student/StudentClient"
 
 // Default imports
 import BotanistRefWrapper from "../Annotation Model Viwer/AnnotationModelViewerRef"
@@ -34,7 +35,6 @@ import AnnotationEntryWrapper from "./AnnotationEntryWrapper"
 import AdminAnnotation from "./AdminAnnotation"
 import AnnotationButtons from "./AnnotationButtons"
 import ModalWrapper from "@/components/Shared/Modals/ModalWrapper"
-import { StudentTransferContext } from "../../Student/StudentClient"
 
 // Exported context
 export const AnnotationClientData = createContext<annotationClientData | ''>('')
@@ -43,8 +43,10 @@ export const AnnotationClientData = createContext<annotationClientData | ''>('')
 export default function AnnotationClient(props: { modelsToAnnotate: model[], annotationModels: model[], admin: boolean, students?: studentsAssignmentsAndModels[] }) {
 
     // Data transfer contexts
-    const initializeDataTransfer = props.admin? useContext(DataTransferContext).initializeDataTransferHandler : useContext(StudentTransferContext).initializeDataTransferHandler
-    const terminateDataTransfer = props.admin? useContext(DataTransferContext).terminateDataTransferHandler : useContext(StudentTransferContext).terminateDataTransferHandler
+    const managerContext = useContext(DataTransferContext)
+    const studentContext = useContext(StudentTransferContext)
+    const initializeDataTransfer = managerContext? managerContext.initializeDataTransferHandler : studentContext.initializeDataTransferHandler
+    const terminateDataTransfer = managerContext? managerContext.terminateDataTransferHandler : studentContext.terminateDataTransferHandler
 
     // Student states
     const [name, setName] = useState<string | null>()
