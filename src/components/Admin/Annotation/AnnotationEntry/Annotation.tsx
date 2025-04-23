@@ -42,10 +42,10 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
     const annotationHyperlinkInsertionWrapper = () => insertAnnotationHyperlink(selectionRange, hyperlinkUrl, selectionText, dialog, setSelectionText, divTextArea, setLinkAdded, linkAdded)
 
     // Set div text area innerHTML
-    useEffect(() => {
-        const textArea = divTextArea.current as HTMLDivElement
-        textArea.innerHTML = props.annotation
-    }, [])
+    // useEffect(() => {
+    //     const textArea = divTextArea.current as HTMLDivElement
+    //     textArea.innerHTML = props.annotation
+    // }, [])
 
     // Trigger state update when a hyperlink is added (signaling a change to the annotation thus enabling the save button)
     useEffect(() => {
@@ -68,6 +68,6 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
                 </Button>
             </div>
         </div>
-        <AnnotationText ref={divTextArea} setAnnotation={props.setAnnotation} field={props.field} />
+        <AnnotationText ref={divTextArea} setAnnotation={props.setAnnotation} field={props.field} annotation={props.annotation} />
     </>
 }

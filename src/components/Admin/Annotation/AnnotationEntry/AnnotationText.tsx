@@ -1,19 +1,17 @@
 import { Dispatch, forwardRef, MutableRefObject, SetStateAction, useContext, useEffect } from "react"
 import { AnnotationEntryData } from "./AnnotationEntry"
 
-export const AnnotationText = forwardRef((props: { setAnnotation?: Dispatch<SetStateAction<string>>, field?: string }, ref) => {
+export const AnnotationText = forwardRef((props: { setAnnotation?: Dispatch<SetStateAction<string>>, field?: string, annotation:string }, ref) => {
 
     const divTextArea = ref as MutableRefObject<HTMLDivElement>
     const context = useContext(AnnotationEntryData)
     const dispatch = context ? context.annotationEntryDataDispatch : null
 
+    // Set div text area innerHTML
     useEffect(() => {
-        if (divTextArea.current && divTextArea.current.innerHTML.trim() === '') {
-            divTextArea.current.innerHTML = '<br />';
-        }
-    }, []);
-
-    console.log('AnnotationText')
+        const textArea = divTextArea.current as HTMLDivElement
+        textArea.innerHTML = props.annotation
+    }, [])
 
     return <div
         ref={divTextArea as MutableRefObject<HTMLDivElement>}
