@@ -63,7 +63,7 @@ export default function AnnotationReorder(props: { isOpen: boolean, setIsOpen: D
                 </div>
             </div>
 
-            <div className="flex w-full justify-center p-8"><Button isDisabled={saveDisabled} onClick={() => props.renumberAnnotations(annotationNumbers)} className="w-4/5">Save Annotation Numbers</Button></div>
+            <div className="flex w-full justify-center p-8"><Button isDisabled={saveDisabled} onClick={() => props.renumberAnnotations(annotationNumbers)} className="w-4/5 text-white">Save Annotation Numbers</Button></div>
         </ModalContent>
     </Modal>
 }
