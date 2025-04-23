@@ -35,8 +35,9 @@ const AnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetStateAc
             </Button>
         }
         {
-            // New annotation button
+            // Renumber annotations button
             !annotationsAndPositions.newAnnotationEnabled && annotationsAndPositions.activeAnnotationIndex !== 'new' && annotationsAndPositions.firstAnnotationPosition !== undefined &&
+            annotationsAndPositions.annotations && annotationsAndPositions.annotations?.length >= 2 &&
             <>
                 <br></br>
                 <Button
