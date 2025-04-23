@@ -62,7 +62,7 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
                 {props.notRequired == true && <span className="ml-1">(Optional)</span>}
                 </p>
             <div>
-                <Button className='bg-[#004C46]' onClick={() => toggleLinkComponent(dialog, selectionRange, setSelectionText)} size='sm'>
+                <Button className='bg-[#004C46] text-white' onClick={() => toggleLinkComponent(dialog, selectionRange, setSelectionText)} size='sm'>
                     <Image src="/White Link Icon.svg" width={20} height={10} alt="Logo" className="pt-[3px]" />
                 </Button>
             </div>
