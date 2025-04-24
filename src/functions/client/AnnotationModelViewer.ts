@@ -184,7 +184,7 @@ export const instantiateAnnotations = (apData: annotationsAndPositions, api: any
             if (apData.annotations) {
                 for (let i in apData.annotations) {
                     if (apData.annotations[i].position) {
-                        const position = JSON.parse(apData.annotations[i].position)
+                        const position = JSON.parse(apData.annotations[i].position as string)
                         api.createAnnotationFromScenePosition(position[0], position[1], position[2], `${apData.annotations[i].title}`, '', (err: any, index: any) => { })
                     }
                 }

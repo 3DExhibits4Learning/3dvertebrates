@@ -35,6 +35,7 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
     const [hyperlinkUrl, setHyperlinkUrl] = useState('')
     const [selectionText, setSelectionText] = useState('')
     const [linkAdded, setLinkAdded] = useState(0)
+    const [initialAnnotation, setInitialAnnotation] = useState<any>()
 
     // Refs
     const dialog = useRef<HTMLDialogElement>()
@@ -53,14 +54,16 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
         }
     }
 
+    useEffect(() => setInitialAnnotation(props.annotation))
+
         // Set div text area innerHTML
         useEffect(() => {
-            if (runCount.current < 2) {
+            if (initialAnnotation && initialAnnotation != props.annotation) {
                 const textArea = divTextArea.current as HTMLDivElement
                 textArea.innerHTML = props.annotation
                 runCount.current++
             }
-        })
+        }, [props.annotation])
 
         // Trigger state update when a hyperlink is added (signaling a change to the annotation thus enabling the save button)
         useEffect(() => {
