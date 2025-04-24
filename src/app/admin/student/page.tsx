@@ -52,9 +52,7 @@ export default async function Page() {
 
         // Filter assigned models
         const studentAssignmentUids = assignments.filter(assignment => assignment.email === email).map(assignment => assignment.uid)
-        const assignedModels = modelsToAnnotate.filter(model => studentAssignmentUids.includes(model.uid))
-        //const assignedModels = modelsToAnnotate.filter(model => model.uid === 'ee451c036e3d45398f8a1f2ad78367c3')
-        console.log("Env: ", process.env.NODE_ENV)
+        const assignedModels = process.env.LOCAL_ENV === 'beta' ? modelsToAnnotate.filter(model => model.uid === 'ee451c036e3d45398f8a1f2ad78367c3') : modelsToAnnotate.filter(model => studentAssignmentUids.includes(model.uid))
 
         // Typical client
         return <>
