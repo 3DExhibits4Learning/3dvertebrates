@@ -51,7 +51,7 @@ export const getCollectionModels = async () => {
         const isAnnotatedSiteReadyModel = (model: model) => model.annotator && model.annotationsApproved && model.annotated
         const isAnnotationModel = (model: model) => model.site_ready && !model.base_model && model.modelApproved && model.thumbnail
         const isUsedAnnotationModel = (model: model) => modelAnnotations.some(annotationModel => annotationModel.model_annotation.uid === model.uid)
-        const isBetaSiteReadyModel = (model: model) => model.site_ready && (model.base_model && model.modelApproved) || (!model.base_model && isUsedAnnotationModel)
+        const isBetaSiteReadyModel = (model: model) => model.site_ready && (model.base_model && model.modelApproved && model.thumbnail)
 
         // Site ready models - used annotaion models, site ready annotated models or unannotated site ready models
         const siteReadyModels = models.filter(model => isAnnotationModel(model) && isUsedAnnotationModel(model) || isSiteReadyModel(model) && (isAnnotatedSiteReadyModel(model) || isUnannotatedSiteReadyModel(model)))
