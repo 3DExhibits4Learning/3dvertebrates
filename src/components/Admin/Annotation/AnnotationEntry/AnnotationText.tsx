@@ -9,6 +9,7 @@ export const AnnotationText = forwardRef((props: { setAnnotation?: Dispatch<SetS
 
     return <div
         ref={divTextArea as MutableRefObject<HTMLDivElement>}
+        onPaste={e => e.preventDefault()}
         id='divTextArea'
         contentEditable
         className="w-full min-w-[300px] min-h-[400px] rounded-xl mb-4 bg-white dark:bg-[#27272a] dark:hover:bg-[#3E3E47] p-4 text-[14px] outline-[#004C46] text-[#004C46] dark:text-white mr-12"

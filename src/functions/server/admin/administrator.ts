@@ -194,3 +194,15 @@ export const deleteStudent = async (email: string) => {
     // Typical catch
     catch (e: any) { catchMessage(e.message) }
 }
+
+/**
+ * 
+ * @returns 
+ */
+export const getAllPhotoAnnotations = async() => await prisma.model_annotation.findMany()
+
+export const updatePhotoAnnotation = async (annotation_id: string, annotation: string) => {
+        if (!annotation_id || !annotation) throw Error('No annotation provided')
+        await prisma.photo_annotation.update({ where: { annotation_id: annotation_id }, data: { annotation: annotation } })
+}
+

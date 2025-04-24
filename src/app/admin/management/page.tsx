@@ -22,6 +22,7 @@ import Header from "@/components/Header/Header"
 import Foot from "@/components/Shared/Foot"
 import FullPageError from "@/components/Error/FullPageError"
 import { renumberCurrentAnnotations } from "@/functions/server/admin/annotator"
+import prisma from "@/functions/utils/prisma"
 
 // Path
 const path = '/src/app/admin/management/page.tsx'

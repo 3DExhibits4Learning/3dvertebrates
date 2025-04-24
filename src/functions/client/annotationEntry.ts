@@ -10,7 +10,7 @@
 'use client'
 
 // Imports
-import { annotationClientSpecimen, annotationEntry, annotationsAndPositions, UpdateModelFormContainerProps } from "@/interface/interface"
+import { annotationClientSpecimen, annotationEntry, annotationsAndPositions } from "@/interface/interface"
 import { photo_annotation, video_annotation, model_annotation } from "@prisma/client"
 import { SetStateAction, Dispatch, MutableRefObject, MouseEvent } from "react"
 import { v4 as uuidv4 } from 'uuid'
@@ -19,7 +19,31 @@ import { annotationEntryAction } from "@/interface/actions"
 export const allTruthy = (value: any) => value ? true : false
 export const allSame = (originalValues: any[], currentValues: any[]) => JSON.stringify(originalValues) === JSON.stringify(currentValues) ? true : false
 
-const isHyperLinkSelectionValid = (selection: Selection | undefined) => selection && selection.toString().length > 0 && selection.anchorNode?.parentElement?.id === 'divTextArea'
+/**
+ * 
+ * @param selection 
+ * @returns 
+ */
+export const isHyperLinkSelectionValid = (selection: Selection | undefined) => {
+    const divId = 'divTextArea'
+
+    if (selection && selection.toString().length > 0 && selection.anchorNode) {
+        let node: ParentNode | Node | null = selection.anchorNode
+
+        // If the node is a text node, move up to its parent
+        if (node.nodeType === Node.TEXT_NODE) {
+            node = node.parentNode
+        }
+
+        while (node) {
+            // @ts-ignore
+            if (node.id === divId) {
+                return true;
+            }
+            node = node.parentNode
+        }
+    }
+}
 
 /**
  * 
@@ -68,7 +92,7 @@ export const insertAnnotationHyperlink = (
     setSelectionText: Dispatch<SetStateAction<string>>,
     divTextArea: MutableRefObject<HTMLDivElement | undefined>,
     setLinkAdded: Dispatch<SetStateAction<number>>,
-    linkAdded: number
+    linkAdded: number,
 ) => {
     const range = selectionRange.current as Range
     const newHtml = `<span class='hyperlink'><a href="${hyperlinkUrl}" target="_blank" rel="noopener noreferrer">${selectionText}</a></span>`
@@ -82,6 +106,32 @@ export const insertAnnotationHyperlink = (
     setLinkAdded(linkAdded + 1)
     dialog.current?.close()
     setSelectionText('')
+}
+
+/**
+ * 
+ * @param selection 
+ * @param hyperlinkUrl 
+ * @param hyperlinkText 
+ * @param divTextArea 
+ * Dark mode hyperlink hex: #4EA8DE
+ * Light mode hyperlink hex: #0000EE
+ */
+export const annotationItalicization = (
+    selectionRange: MutableRefObject<Range | undefined>,
+    selectionText: string,
+    divTextArea: MutableRefObject<HTMLDivElement | undefined>,
+) => {
+    console.log(selectionText)
+    const range = selectionRange.current as Range
+    const newHtml = `<i>${selectionText}</i>`
+    const tempDiv = document.createElement("div")
+    tempDiv.innerHTML = newHtml
+    const newNode = tempDiv.firstChild
+    range.deleteContents()
+    range.insertNode(newNode as ChildNode)
+    const textArea = divTextArea.current as HTMLDivElement
+    textArea.innerHTML += '&nbsp;'
 }
 
 /**
@@ -507,4 +557,47 @@ export const annotationUpdateData = (aeData: annotationEntry, apData: annotation
     data.set('mediaType', aeData.mediaType as string)
 
     return data
+}
+
+export function sanitizeHtml(htmlString: string): string {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = htmlString;
+
+    const allowedTags = ['SPAN', 'A', 'I'];
+
+    function clean(node: Node) {
+        const children = Array.from(node.childNodes);
+
+        for (let child of children) {
+            if (child.nodeType === 1) { // Element node
+                const element = child as HTMLElement;
+                const tag = element.tagName.toUpperCase();
+                const isAllowed =
+                    allowedTags.includes(tag) &&
+                    (
+                        (tag !== 'SPAN' || element.classList.contains('hyperlink')) || // Allow <span class="hyperlink">
+                        //@ts-ignore
+                        (tag === 'A' && element.closest('span.hyperlink')) // Allow <a> only if inside <span class="hyperlink">
+                    );
+
+                if (!isAllowed) {
+                    // Remove tag but keep contents
+                    clean(child); // Clean nested children before removing the tag
+                    child.replaceWith(...child.childNodes);
+                } else {
+                    clean(child); // Recurse into allowed tags
+                }
+            } else if (child.nodeType === 3) {
+                // Text node, do nothing
+                continue;
+            } else {
+                // Remove non-element and non-text nodes
+                child.remove();
+            }
+        }
+    }
+
+    clean(wrapper);
+
+    return wrapper.innerHTML;
 }

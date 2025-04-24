@@ -11,7 +11,7 @@
 
 // Typical imports
 import { model } from "@prisma/client"
-import { useState, createContext, useMemo } from "react"
+import { useState, createContext, useMemo, useEffect } from "react"
 import { Accordion, AccordionItem } from "@nextui-org/react"
 import { ManagerClientProps, studentsAssignmentsAndModels } from "@/interface/interface"
 import { fullModel } from "@/interface/interface"
@@ -34,12 +34,15 @@ import Assignments from "./Assignments/Assignments"
 import FindModel from "./Model/Find"
 import ApproveModel from "./Model/Approve"
 import Select from "@/components/Shared/Form Fields/Select"
+import { getAllPhotoAnnotations } from "@/functions/server/admin/administrator"
+import { sanitizeHtml } from "@/functions/client/annotationEntry"
+import { updatePhotoAnnotation } from "@/functions/server/admin/administrator"
 
 // Dynamic imports
 const ModelSubmitForm = dynamic(() => import("@/components/Admin/ModelSubmit/Form"))
 
 // Exported context
-export const DataTransferContext = createContext<any>('');
+export const DataTransferContext = createContext<any>('')
 
 // Main JSX component
 export default function ManagerClient(props: ManagerClientProps) {
