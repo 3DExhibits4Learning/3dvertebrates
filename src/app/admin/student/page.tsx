@@ -54,6 +54,7 @@ export default async function Page() {
         const studentAssignmentUids = assignments.filter(assignment => assignment.email === email).map(assignment => assignment.uid)
         const assignedModels = modelsToAnnotate.filter(model => studentAssignmentUids.includes(model.uid))
         //const assignedModels = modelsToAnnotate.filter(model => model.uid === 'ee451c036e3d45398f8a1f2ad78367c3')
+        console.log("Env: ", process.env.NODE_ENV)
 
         // Typical client
         return <>
