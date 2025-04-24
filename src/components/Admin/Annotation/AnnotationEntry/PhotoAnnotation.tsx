@@ -11,7 +11,7 @@
 // Typical imports
 import { useContext } from "react"
 import { AnnotationEntryData } from "./AnnotationEntry"
-import { annotationEntryContext } from "@/interface/interface"
+import { annotationClientData, annotationEntryContext } from "@/interface/interface"
 import { getNfsPath } from "@/functions/client/utils"
 
 // Default imports
@@ -19,11 +19,13 @@ import TextInput from "@/components/Shared/Form Fields/TextInput"
 import License from "@/components/Admin/Annotation/AnnotationFields/License"
 import Annotation from "./Annotation"
 import FileInput from "@/components/Admin/Annotation/AnnotationFields/ImageInput"
+import { AnnotationClientData } from "../Annotation Client/AnnotationClient"
 
 // Main JSX
 export default function PhotoAnnotationEntry() {
 
     const annotationEntryData = (useContext(AnnotationEntryData) as annotationEntryContext).annotationEntryData
+    const apData = useContext(AnnotationClientData) as annotationClientData
     const photoPath = getNfsPath(annotationEntryData.url)
 
     return <>

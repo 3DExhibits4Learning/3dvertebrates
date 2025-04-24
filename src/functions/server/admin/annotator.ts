@@ -115,3 +115,15 @@ export const renumberCurrentAnnotations = async () => {
     }
     catch (e: any) { return `Error: ${e.message}` }
 }
+
+export const getAnnotationText = async (annotationId: string) => {
+    try {
+        const annotation = await prisma.annotations.findUnique({ where: { annotation_id: annotationId } }).then(annotation => annotation?.annotation_type)
+        switch(annotation) {
+            case 'model': return await prisma.model_annotation.findUnique({ where: { annotation_id: annotationId } }).then(annotation => annotation?.annotation)
+            case 'video': return await prisma.video_annotation.findUnique({ where: { annotation_id: annotationId } }).then(annotation => annotation?.annotation)
+            case 'photo': return await prisma.photo_annotation.findUnique({ where: { annotation_id: annotationId } }).then(annotation => annotation?.annotation)
+    }
+}
+    catch (e: any) { return `Error: ${e.message}` }
+}

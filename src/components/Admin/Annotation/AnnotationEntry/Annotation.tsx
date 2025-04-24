@@ -35,7 +35,6 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
     const [hyperlinkUrl, setHyperlinkUrl] = useState('')
     const [selectionText, setSelectionText] = useState('')
     const [linkAdded, setLinkAdded] = useState(0)
-    const [initialAnnotation, setInitialAnnotation] = useState<any>()
 
     // Refs
     const dialog = useRef<HTMLDialogElement>()
@@ -47,6 +46,7 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
 
     const italicWrapper = () => {
         const selection = getSelection() as Selection
+        console.log(selection)
 
         if (isHyperLinkSelectionValid(selection)) {
             selectionRange.current = selection.getRangeAt(0).cloneRange()
@@ -54,11 +54,9 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
         }
     }
 
-    useEffect(() => setInitialAnnotation(props.annotation))
-
         // Set div text area innerHTML
         useEffect(() => {
-            if (initialAnnotation && initialAnnotation != props.annotation) {
+            if (runCount.current < 3) {
                 const textArea = divTextArea.current as HTMLDivElement
                 textArea.innerHTML = props.annotation
                 runCount.current++
