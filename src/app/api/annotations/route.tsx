@@ -302,7 +302,7 @@ export async function PATCH(request: Request) {
                     // Video annotation update
                     const updatedVideoAnnotation = prisma.video_annotation.update({
                         where: { annotation_id: data.get('annotation_id') as string },
-                        data: { url: data.get('url') as string, length: data.get('length') as string }
+                        data: { url: data.get('url') as string, length: data.get('length') as string, annotation: data.get('annotation') as string }
                     })
 
                     await prisma.$transaction([updatedAnnotation, updatedVideoAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, "prisma.transaction([updatedAnnotation, updatedVideoAnnotation])", "Couldn't update annotation"))

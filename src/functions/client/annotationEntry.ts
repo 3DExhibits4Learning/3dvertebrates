@@ -223,8 +223,8 @@ export const enablePhotoAnnotationCreate = (aeData: annotationEntry, setCreateDi
 export const enableVideoAnnotationUpdate = (apData: annotationsAndPositions, aeData: annotationEntry, isNewPosition: boolean, setSaveDisabled: Dispatch<SetStateAction<boolean>>) => {
     // Type assertion, required value arrays
     const caseAnnotation = apData.activeAnnotation as video_annotation
-    const originalValues = [apData.activeAnnotationTitle, caseAnnotation.url, caseAnnotation.length]
-    const currentValues = [aeData.annotationTitle, aeData.videoSource, aeData.length]
+    const originalValues = [apData.activeAnnotationTitle, caseAnnotation.url, caseAnnotation.length, caseAnnotation.annotation]
+    const currentValues = [aeData.annotationTitle, aeData.videoSource, aeData.length, aeData.annotation]
 
     // If all required fields are populated and: they are different from the original, or there is a new position, then enable "save changes"
     if (currentValues.every(allTruthy) && (!allSame(originalValues, currentValues) || isNewPosition)) setSaveDisabled(false)

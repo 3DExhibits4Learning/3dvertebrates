@@ -21,10 +21,9 @@ import Image from "next/image"
 // Default imports
 import HyperlinkModal from "@/components/Shared/Modals/HyperLink"
 import AnnotationText from "./AnnotationText"
-import { run } from "node:test"
 
 // Main JSX
-export default function Annotation(props: { annotation: string, setAnnotation?: Dispatch<SetStateAction<string>>, field?: string, notRequired?: boolean }) {
+export default function  Annotation(props: { annotation: string, setAnnotation?: Dispatch<SetStateAction<string>>, field?: string, notRequired?: boolean }) {
 
     // Context
     const context = useContext(AnnotationEntryData)
@@ -46,7 +45,6 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
 
     const italicWrapper = () => {
         const selection = getSelection() as Selection
-        console.log(selection)
 
         if (isHyperLinkSelectionValid(selection)) {
             selectionRange.current = selection.getRangeAt(0).cloneRange()
