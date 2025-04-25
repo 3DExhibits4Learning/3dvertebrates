@@ -8,7 +8,7 @@
 'use client'
 
 // Import all annotation entry functions (aeFn = Annotation Entry Function)
-import * as aeFn from '@/functions/client/annotationEntry'
+import * as aeFn from '@/functions/client/annotationEntry' //aeFn = Annotation Entry Function
 
 // Typical imports
 import { useState, useEffect, useContext, createContext, useReducer } from "react"
