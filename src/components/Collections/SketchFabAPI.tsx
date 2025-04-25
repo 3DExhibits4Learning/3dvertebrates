@@ -220,7 +220,8 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
                       {s.commonNames.length === 1 && !s.model.comm_name_string && <p>Common Name: {s.commonNames[0]}</p>}
                       {s.model.comm_name_string && <p>Common Names: {s.model.comm_name_string}</p>}
                       {s.profile.extinct !== '' && <p>Extinct: {boolRinse(s.profile.extinct as string)}</p>}
-                      {s.profile.habitat && <p>Habitat: {toUpperFirstLetter(s.profile.habitat)}</p>}
+                      {s.profile.habitat && !s.model.habitat_string && <p>Habitat: {toUpperFirstLetter(s.profile.habitat)}</p>}
+                      {s.model.habitat_string && <p>Habitat: {toUpperFirstLetter(s.model.habitat_string)}</p>}
                       {s.profile.freshwater !== '' && <p>Freshwater: {boolRinse(s.profile.freshwater as string)}</p>}
                       {s.profile.marine !== '' && <p>Marine: {boolRinse(s.profile.marine as string)}</p>}
                     </div>

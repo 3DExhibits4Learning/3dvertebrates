@@ -39,6 +39,10 @@ export const getCollectionMetadata = async (uid: string, usageKey: number, speci
     catch (e: any) { return catchMessage(e.message) }
 }
 
+/**
+ * 
+ * @returns 
+ */
 export const getCollectionModels = async () => {
     try {
         // Get models and annotations
