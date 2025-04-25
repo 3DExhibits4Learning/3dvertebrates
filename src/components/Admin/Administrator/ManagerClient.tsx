@@ -47,6 +47,15 @@ export const DataTransferContext = createContext<any>('')
 // Main JSX component
 export default function ManagerClient(props: ManagerClientProps) {
 
+    const annotation = async() => await getAllPhotoAnnotations('55913b71-6fcf-4607-b82f-2621aea7b7ce')
+    const tempfn = async() => {
+        const a = await annotation()
+        console.log(a[0].annotation)
+        const b = sanitizeHtml(a[0].annotation)
+        console.log(b)
+    }
+    tempfn()
+
     // Variable Declarations 
     const models: fullModel[] = JSON.parse(props.models)
     const modelsNeedingThumbnails: fullModel[] = (JSON.parse(props.modelsNeedingThumbnails) as fullModel[]).filter(model => model.modelApproved)

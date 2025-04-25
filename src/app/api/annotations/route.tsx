@@ -12,7 +12,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { getAuthorizedUsers } from "@/functions/server/queries"
 import { authorized } from "@prisma/client"
-import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/server/error"
+import { nonFatalError, routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/server/error"
 
 // PATH
 const path = 'src/app/api/annotations/route.tsx'
@@ -518,7 +518,7 @@ export async function DELETE(request: Request) {
 
         // Eliminate previous photo uploaded to data storage container if it exists
         if (data.oldUrl) await unlink(`public${data.oldUrl}`)
-            .catch((e) => routeHandlerErrorHandler(route, e.message, 'DELETE unlink()', "Couldn't delete old annotation"))
+            .catch((e) => nonFatalError(route, e.message, 'unlink'))
 
         // Delete the annotation, typical return 
         const deletion = await deleteAnnotation(data.annotation_id, data.uid)

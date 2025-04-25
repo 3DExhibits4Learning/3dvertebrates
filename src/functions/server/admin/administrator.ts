@@ -199,7 +199,7 @@ export const deleteStudent = async (email: string) => {
  * 
  * @returns 
  */
-export const getAllPhotoAnnotations = async() => await prisma.model_annotation.findMany()
+export const getAllPhotoAnnotations = async(id: string) => await prisma.photo_annotation.findMany({where:{annotation_id: id}})
 
 export const updatePhotoAnnotation = async (annotation_id: string, annotation: string) => {
         if (!annotation_id || !annotation) throw Error('No annotation provided')
