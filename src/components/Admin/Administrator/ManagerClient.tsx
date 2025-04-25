@@ -47,12 +47,13 @@ export const DataTransferContext = createContext<any>('')
 // Main JSX component
 export default function ManagerClient(props: ManagerClientProps) {
 
-    const annotation = async() => await getAllPhotoAnnotations('55913b71-6fcf-4607-b82f-2621aea7b7ce')
+    const annotation = async() => await getAllPhotoAnnotations('bf9088e4-b3ab-4818-b9a0-c03dc4bd8cec')
     const tempfn = async() => {
         const a = await annotation()
         console.log(a[0].annotation)
         const b = sanitizeHtml(a[0].annotation)
         console.log(b)
+        //await updatePhotoAnnotation(a[0].annotation_id, b)
     }
     tempfn()
 
