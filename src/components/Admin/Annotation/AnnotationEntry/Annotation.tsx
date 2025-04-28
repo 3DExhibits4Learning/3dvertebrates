@@ -28,7 +28,6 @@ export default function  Annotation(props: { annotation: string, setAnnotation?:
     // Context
     const context = useContext(AnnotationEntryData)
     const dispatch = context ? context.annotationEntryDataDispatch : null
-    const runCount = useRef(0)
 
     // States
     const [hyperlinkUrl, setHyperlinkUrl] = useState('')
@@ -54,11 +53,8 @@ export default function  Annotation(props: { annotation: string, setAnnotation?:
 
         // Set div text area innerHTML
         useEffect(() => {
-            //if (runCount.current < 3) {
                 const textArea = divTextArea.current as HTMLDivElement
                 textArea.innerHTML = props.annotation
-                //runCount.current++
-            //}
         }, [])
 
         // Trigger state update when a hyperlink is added (signaling a change to the annotation thus enabling the save button)
