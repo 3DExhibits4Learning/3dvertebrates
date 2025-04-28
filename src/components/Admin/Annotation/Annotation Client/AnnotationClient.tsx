@@ -93,6 +93,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     useEffect(() => { newAnnotationEnabled.current = false; modelOrAnnotationChangeHandler(specimenData, annotationsAndPositionsDispatch) }, [specimenData.uid, annotationsAndPositions.annotationSavedOrDeleted])
 
     const AnnotationMemo = memo(() => <AnnotationEntryWrapper modelsToAnnotate={props.modelsToAnnotate} admin={props.admin} annotationModels={props.annotationModels} />)
+    AnnotationMemo.displayName = 'AnnotationMemo'
 
     //console.log("Annotations and positions: ", annotationsAndPositions.activeAnnotation?.annotation)
     //console.log("Specimen data: ", specimenData)
