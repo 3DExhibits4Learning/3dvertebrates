@@ -513,19 +513,18 @@ export async function DELETE(request: Request) {
     try {
 
         // Get request data
-        const data = await request.json()
-            .catch((e) => routeHandlerErrorHandler(route, e.message, 'DELETE request.json()', "Couln't get request body json"))
+        const data = await request.json().catch((e) => routeHandlerErrorHandler(route, e.message, 'DELETE request.json()', "Couln't get request body json"))
+
+        if(!(data.annotation_id && data.modelUid)) throw Error('Missing annotation_id or modelUid in request body')
 
         // Eliminate previous photo uploaded to data storage container if it exists
-        if (data.oldUrl) await unlink(`public${data.oldUrl}`)
-            .catch((e) => nonFatalError(route, e.message, 'unlink'))
+        if (data.oldUrl) await unlink(`public${data.oldUrl}`).catch((e) => nonFatalError(route, e.message, 'unlink'))
 
         // Delete the annotation, typical return 
-        const deletion = await deleteAnnotation(data.annotation_id, data.uid)
-            .catch((e) => routeHandlerErrorHandler(route, e.message, 'DELETE deleteAnnotation()', "Couldn't delete annotation"))
+        await deleteAnnotation(data.annotation_id, data.modelUid).catch((e) => routeHandlerErrorHandler(route, e.message, 'deleteAnnotation()', "Couldn't delete annotation"))
 
         // Typical response
-        return routeHandlerTypicalResponse('Annotation deleted', deletion)
+        return routeHandlerTypicalResponse('Annotation deleted', 'Annotation deleted')
 
     }
     // Catch returns 400 status with 3rd party error message as response value; data and statusText are generic error messages

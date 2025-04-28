@@ -36,7 +36,7 @@ export default async function Page() {
         const authorizedUsers = await getAuthorizedUsers().catch(e => serverErrorHandler(path, e.message, "Couldn't get authorized users", 'getAuthorizedUsers()', false)) as authorized[]
  
         // Get email
-        let email = session?.user?.email as string
+        const email = session?.user?.email as string
 
         // Authorized user
         if (!(email || authorizedUsers.some(user => user.email === email))) return <h1>NOT AUTHORIZED</h1>
@@ -52,8 +52,7 @@ export default async function Page() {
 
         // Filter assigned models
         const studentAssignmentUids = assignments.filter(assignment => assignment.email === email).map(assignment => assignment.uid)
-        const assignedModels = modelsToAnnotate.filter(model => studentAssignmentUids.includes(model.uid))
-        // const assignedModels = process.env.LOCAL_ENV === 'beta' || process.env.LOCAL_ENV === 'development' ? modelsToAnnotate.filter(model => model.uid === 'ee451c036e3d45398f8a1f2ad78367c3') : modelsToAnnotate.filter(model => studentAssignmentUids.includes(model.uid))
+        const assignedModels = email === 'ab632@humboldt.edu' ? modelsToAnnotate.filter(model => model.uid === 'ee451c036e3d45398f8a1f2ad78367c3') : modelsToAnnotate.filter(model => studentAssignmentUids.includes(model.uid))
 
         // Typical client
         return <>

@@ -53,7 +53,7 @@ export default function ManagerClient(props: ManagerClientProps) {
         console.log(a[0].annotation)
         const b = sanitizeHtml(a[0].annotation)
         console.log(b)
-        //await updatePhotoAnnotation(a[0].annotation_id, b)
+        // await updatePhotoAnnotation(a[0].annotation_id, b)
     }
     tempfn()
 
