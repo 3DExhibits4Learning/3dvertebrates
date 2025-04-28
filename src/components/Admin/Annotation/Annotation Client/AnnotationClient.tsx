@@ -13,7 +13,7 @@
 
 // Typical imports
 import { Accordion, AccordionItem } from "@nextui-org/react"
-import { useEffect, useState, useRef, useContext, createContext, useReducer } from "react"
+import { useEffect, useState, useRef, useContext, createContext, useReducer, memo } from "react"
 import { model } from "@prisma/client"
 import { studentsAssignmentsAndModels, annotationClientData } from "@/interface/interface"
 import { toUpperFirstLetter } from "@/functions/utils/toUpperFirstLetter"
@@ -92,8 +92,10 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     // Set relevant model data onPress of the Accordion or when an annotation record has been changed in the database
     useEffect(() => { newAnnotationEnabled.current = false; modelOrAnnotationChangeHandler(specimenData, annotationsAndPositionsDispatch) }, [specimenData.uid, annotationsAndPositions.annotationSavedOrDeleted])
 
-    // console.log("Annotations and positions: ", annotationsAndPositions)
-    // console.log("Specimen data: ", specimenData)
+    const AnnotationMemo = memo(() => <AnnotationEntryWrapper modelsToAnnotate={props.modelsToAnnotate} admin={props.admin} annotationModels={props.annotationModels} />)
+
+    console.log("Annotations and positions: ", annotationsAndPositions.activeAnnotation?.annotation)
+    //console.log("Specimen data: ", specimenData)
 
     return <AnnotationClientData.Provider value={annotationClientContext} >
 
@@ -120,7 +122,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
                     </Accordion>
                 </section>
 
-                <AnnotationEntryWrapper modelsToAnnotate={props.modelsToAnnotate} admin={props.admin} annotationModels={props.annotationModels} />
+                <AnnotationMemo />
             </section>
 
         </div>
