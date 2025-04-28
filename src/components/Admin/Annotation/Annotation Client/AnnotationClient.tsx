@@ -92,6 +92,9 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     // Set relevant model data onPress of the Accordion or when an annotation record has been changed in the database
     useEffect(() => { newAnnotationEnabled.current = false; modelOrAnnotationChangeHandler(specimenData, annotationsAndPositionsDispatch) }, [specimenData.uid, annotationsAndPositions.annotationSavedOrDeleted])
 
+    // console.log("Annotations and positions: ", annotationsAndPositions)
+    // console.log("Specimen data: ", specimenData)
+
     return <AnnotationClientData.Provider value={annotationClientContext} >
 
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />

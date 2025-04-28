@@ -95,6 +95,7 @@ export const getFirstAnnotationPosition = async (specimenData: annotationClientS
  * @description get relevant data and dispatch when a either a model is selected or an annotation record is created/updated
  */
 export const modelOrAnnotationChangeHandler = async (specimenData: annotationClientSpecimen, apDispatch: Dispatch<newModelSelectedOrDbUpdate>) => {
+    if(!specimenData.uid) return
     const modelAnnotations = await ModelAnnotations.retrieve(specimenData.uid as string)
     const annotationPosition = await getFirstAnnotationPosition(specimenData)
     apDispatch({ type: 'newModelSelectedOrDbUpdate', modelAnnotations: modelAnnotations, firstAnnotationPosition: annotationPosition })

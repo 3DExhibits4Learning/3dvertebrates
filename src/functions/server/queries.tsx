@@ -571,9 +571,7 @@ export const deleteAnnotation = async (id: string, modelUid: string) => {
   const remainingAnnotations = await prisma.annotations.findMany({
     where: {
       uid: modelUid,
-      annotation_no: {
-        gt: annotationPendingDeletionNumber
-      }
+      annotation_no: {gt: annotationPendingDeletionNumber}
     },
     orderBy:{annotation_no: 'asc'}
   })

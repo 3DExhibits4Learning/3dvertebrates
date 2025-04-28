@@ -91,6 +91,4 @@ export function serverErrorHandler(path: string, errorMessage: string, clientErr
  * @param method HTTP method of the route handler function
  * @description Logs the details of a nonFatal error to the console
  */
-export function nonFatalError(route: string, errorMessage: string, fn: string, method?: string) {
-    console.error(routeHandlerError(route, errorMessage, fn, method, true))
-}
+export const nonFatalError = (route: string, errorMessage: string, fn: string, method?: string) => console.error(routeHandlerError(route, errorMessage, fn, method, true))
