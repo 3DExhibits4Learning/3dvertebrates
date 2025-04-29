@@ -250,7 +250,7 @@ export async function PATCH(request: Request) {
                         if (data.get('previousMedia') === 'photo') {
 
                             // Eliminate previous annotation photo
-                            await unlink(`public${data.get('oldUrl')}`).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH unlink()', "Couldn't delete old annotation"))
+                            await unlink(`public${data.get('oldUrl')}`).catch((e) => nonFatalError(route, e.message, 'unlink'))
                             // Delete photo annotation record
                             deletion = prisma.photo_annotation.delete({ where: { annotation_id: data.get('annotation_id') as string } })
                         }
@@ -327,7 +327,7 @@ export async function PATCH(request: Request) {
                         if (data.get('previousMedia') === 'photo') {
 
                             // Eliminate previous annotation photo
-                            await unlink(`public${data.get('oldUrl')}`).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH unlink()', "Couldn't delete old annotation"))
+                            await unlink(`public${data.get('oldUrl')}`).catch((e) => nonFatalError(route, e.message, 'unlink'))
                             // Delete photo annotation record
                             deletion = prisma.photo_annotation.delete({ where: { annotation_id: data.get('annotation_id') as string } })
                         }
@@ -415,7 +415,7 @@ export async function PATCH(request: Request) {
                     }
 
                     // Eliminate previous photo uploaded to data storage container if it exists
-                    if (data.get('oldUrl') && data.get('file')) await unlink(`public${data.get('oldUrl')}`).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH unlink()', "Couldn't delete old annotation"))
+                    if (data.get('oldUrl') && data.get('file')) await unlink(`public${data.get('oldUrl')}`).catch((e) => nonFatalError(route, e.message, 'unlink'))
 
                     // Remaining optional fields
                     const website = data.get('website') ? data.get('website') : undefined
@@ -458,7 +458,7 @@ export async function PATCH(request: Request) {
                             }
                         }).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH createPhotoAnnotation()', "Couldn't create photo annotation"))
 
-                        const updatedPhotoAnnotationTransaction = await prisma.$transaction([deletion as any, updatedAnnotation, newPhotoAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, "prisma.transaction([updating model annotation])", "Couldn't update model annotation"))
+                        await prisma.$transaction([deletion as any, updatedAnnotation, newPhotoAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, "prisma.transaction([updating model annotation])", "Couldn't update model annotation"))
 
                         // Typical response
                         return routeHandlerTypicalResponse('Annotation updated', { deletion, updatedAnnotation, newPhotoAnnotation })
