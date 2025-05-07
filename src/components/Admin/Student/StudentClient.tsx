@@ -34,6 +34,8 @@ export default function StudentClient(props: { modelsToAnnotate: string, annotat
     // Tailwind variables
     const accordionTitlesCss = 'text-[#004C46] text-2xl dark:text-[#F5F3E7]'
 
+    console.log(JSON.parse(props.annotationModels))
+
     // Data transfer state variables
     const [openModal, setOpenModal] = useState<boolean>(false)
     const [transferring, setTransferring] = useState<boolean>(false)
@@ -65,7 +67,7 @@ export default function StudentClient(props: { modelsToAnnotate: string, annotat
             </AccordionItem>
 
             <AccordionItem key='assignments' aria-label='Assignments' title='Assigned Models' classNames={{ title: accordionTitlesCss }}>
-                <AnnotationClient modelsToAnnotate={modelsToAnnotate} annotationModels={JSON.parse(JSON.parse(props.annotationModels))} admin={false} />
+                <AnnotationClient modelsToAnnotate={modelsToAnnotate} annotationModels={JSON.parse(props.annotationModels)} admin={false} />
             </AccordionItem>
 
             <AccordionItem key='updateModel' aria-label='Update Model' title='Update Model' classNames={{ title: accordionTitlesCss }}>
