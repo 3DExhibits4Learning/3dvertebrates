@@ -34,8 +34,6 @@ export default function StudentClient(props: { modelsToAnnotate: string, annotat
     // Tailwind variables
     const accordionTitlesCss = 'text-[#004C46] text-2xl dark:text-[#F5F3E7]'
 
-    console.log(JSON.parse(props.annotationModels))
-
     // Data transfer state variables
     const [openModal, setOpenModal] = useState<boolean>(false)
     const [transferring, setTransferring] = useState<boolean>(false)

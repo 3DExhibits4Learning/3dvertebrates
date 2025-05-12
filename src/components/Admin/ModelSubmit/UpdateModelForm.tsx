@@ -156,7 +156,7 @@ export default function UpdateModelForm(props: UpdateModelFormProps) {
     }, [species, speciesAcquisitionDate, artist, buildMethod, software, tags, file])
 
     return <>
-        <DataTransferModal open={open} transferring={transferring} result={result} loadingLabel='Uploading 3D Model' href='/admin' modelUpload />
+        <DataTransferModal open={open} transferring={transferring} result={result} loadingLabel='Updating 3D Model' href='/admin' modelUpload />
 
         <form className='w-full lg:w-3/5 lg:border-2 m-auto lg:border-[#004C46] lg:rounded-md bg-[#D5CB9F] dark:bg-[#212121] lg:mb-16'>
 
