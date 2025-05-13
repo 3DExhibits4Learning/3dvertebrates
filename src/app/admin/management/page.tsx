@@ -21,7 +21,7 @@ import createStudentsAssignmentsAndModels from "@/functions/client/managerClient
 import Header from "@/components/Header/Header"
 import Foot from "@/components/Shared/Foot"
 import FullPageError from "@/components/Error/FullPageError"
-import { reMapAnnotations, renumberCurrentAnnotations, tmpPositionData } from "@/functions/server/admin/annotator"
+import { reMapAnnotations, renumberCurrentAnnotations, tmpPositionData, updateAnnotator } from "@/functions/server/admin/annotator"
 import prisma from "@/functions/utils/prisma"
 
 // Path
@@ -34,8 +34,9 @@ export default async function Page() {
 
         // const res = await renumberCurrentAnnotations()
         // console.log(res)
-        //await reMapAnnotations('49730c3069b044e0933a12c831a7b932','cc989b7d8cb147c687add115d21e7314')
-        //await tmpPositionData('cc989b7d8cb147c687add115d21e7314')
+        //await reMapAnnotations('97c882ad93194ed3966d3edf2f36a23f','fc179dbe8e3240ba9307281fbc99eec0')
+        //await tmpPositionData('fc179dbe8e3240ba9307281fbc99eec0')
+        //await updateAnnotator('cc989b7d8cb147c687add115d21e7314', 'Jillian Arcadi')
 
         // Get session
         const session = await getServerSession(authOptions).catch((e) => serverErrorHandler(path, e.message, "Couldn't get session", 'getServerSession()', false))

@@ -135,10 +135,9 @@ export const reMapAnnotations = async (originalUid: string, newUid: string) => {
     try {
         // Get all annotations of originalUid
         console.log('Getting annotations')
-        const firstAnnotationPosition = await prisma.model.findUnique({ where: { uid: originalUid } }).then(model => model?.annotationPosition)
         const annotations = await prisma.annotations.findMany({ where: { uid: originalUid } }) as fullAnnotation[]
 
-        if (!firstAnnotationPosition || !annotations) throw Error('No first annotation/annotations')
+        if (!annotations) throw Error('No first annotation/annotations')
 
         // Iterate through annotations
         for (let i in annotations) {
@@ -157,10 +156,6 @@ export const reMapAnnotations = async (originalUid: string, newUid: string) => {
             annotations[i].annotation_id = annotations[i].annotation.annotation_id = uuidv4()
             console.log(`Created new uuid: ${annotations[i].annotation_id}`)
 
-            await prisma.model.update({
-                where: { uid: newUid },
-                data: { annotationPosition: firstAnnotationPosition }
-            })
             console.log('Remapping first annotation position')
 
             // Create new base annotation for the model of newUid (with new annotation ID)
@@ -222,7 +217,6 @@ export const reMapAnnotations = async (originalUid: string, newUid: string) => {
                     break
             }
         }
-
         console.log(`Annotations successfully mapped from ${originalUid} to ${newUid}`)
     }
     catch (e: any) { console.error(e.message) }
@@ -230,7 +224,7 @@ export const reMapAnnotations = async (originalUid: string, newUid: string) => {
 
 export const tmpPositionData = async (uid: string) => {
     const firstAnnotationPosition = JSON.parse(await prisma.model.findUnique({ where: { uid: uid } }).then(model => model?.annotationPosition) as string)
-    const annotations = await prisma.annotations.findMany({ where: { uid: uid }, orderBy:{annotation_no: 'asc'}})
+    const annotations = await prisma.annotations.findMany({ where: { uid: uid }, orderBy: { annotation_no: 'asc' } })
     // console.log(firstAnnotationPosition)
     // console.log(JSON.parse(annotations[0].position as string))
     // const newPosition = [firstAnnotationPosition[0] - 0.1, firstAnnotationPosition[0] - 0.1, firstAnnotationPosition[0] - 0.1]
@@ -240,8 +234,31 @@ export const tmpPositionData = async (uid: string) => {
         if (annotations[i].position) {
             const position = JSON.parse(annotations[i].position)
             position[2] = firstAnnotationPosition[2]
-            await prisma.annotations.update({where: {annotation_id: annotations[i].annotation_id}, data: {position: JSON.stringify(position)}})
+            await prisma.annotations.update({ where: { annotation_id: annotations[i].annotation_id }, data: { position: JSON.stringify(position) } })
         }
         console.log(`Adjusted target of annotation ${i}`)
+    }
+}
+
+export const updateAnnotator = async (uid: string, annotator: string) => {
+    const annotations = await prisma.annotations.findMany({ where: { uid: uid }, orderBy: { annotation_no: 'asc' } }) 
+
+    for (let i in annotations) {
+        // Create new media annotation based on annotation type
+        switch (annotations[i].annotation_type) {
+            case 'model': await prisma.model_annotation.update({
+                    where: {annotation_id: annotations[i].annotation_id},
+                    data: {annotator: annotator}
+                })
+                break
+
+            case 'video': break
+
+            default: await prisma.photo_annotation.update({
+                where: {annotation_id: annotations[i].annotation_id},
+                data: {annotator: annotator}
+            })
+            break
+        }
     }
 }
