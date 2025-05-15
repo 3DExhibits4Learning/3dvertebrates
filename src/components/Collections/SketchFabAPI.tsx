@@ -21,7 +21,7 @@ import Sketchfab from '@sketchfab/viewer-api'
 import ModelAnnotation from './AnnotationModel'
 import Vertebrates from '@/classes/HerbariumClass'
 
-const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model: model, images: GbifImageResponse[], imageTitle: string }) => {
+export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model: model, images: GbifImageResponse[], imageTitle: string }){
 
   // Variable Declarations
   const gMatch = props.gMatch.data as GbifResponse
@@ -194,7 +194,7 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
             <div id="annotationDiv" ref={annotationDiv as LegacyRef<HTMLDivElement>} style={{ width: "40%", backgroundColor: "black", transition: "width 1.5s", color: "#F5F3E7", zIndex: "1", overflowY: "auto", overflowX: "hidden" }}>
 
               {
-                index == 0 &&
+                index === 0 &&
 
                 <div className="w-full h-[65%]" id="annotationDivMedia" style={{ display: "block" }}>
                   <div className='fade flex w-[99%] mt-[25px]'>
@@ -324,4 +324,3 @@ const SFAPI = (props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model
     </>
   )
 }
-export default SFAPI
