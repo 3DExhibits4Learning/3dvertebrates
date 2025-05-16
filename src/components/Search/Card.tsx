@@ -15,6 +15,7 @@ import { Skeleton } from "@nextui-org/react"
 // Default imports
 import noImage from '../../../public/noImage.png'
 
+// Main JSX
 export default function Card(props: { model: model }) {
     const model = props.model
 
@@ -22,6 +23,7 @@ export default function Card(props: { model: model }) {
     const [src, setSrc] = useState('')
     const thumbnailPath = model.thumbnail ? getNfsPath(model.thumbnail) : ''
 
+    // Photo src fn
     const setPhotoSrc = async () => {
         await fetch(thumbnailPath)
             .then(res => {
@@ -31,17 +33,20 @@ export default function Card(props: { model: model }) {
             .then(blob => setSrc(URL.createObjectURL(blob as Blob)))
     }
 
+    // Photo src effect
     useEffect(() => { setPhotoSrc() }, [])
 
     return <div className='noselect'>
         <article className='rounded-md overflow-hidden mx-1'>
             {
+                // Loading skeleton
                 !src &&
                 <section className='rounded shadow-md mx-auto'>
                     <Skeleton className="w-full h-[calc(100vh-275px)] min-h-[25rem] max-h-[30rem]" />
                 </section>
             }
             {
+                // Img displays once loaded
                 src && <section className='rounded shadow-md mx-auto'>
                     <a href={model.base_model ? "/collections/" + model.spec_name : "/collections/" + model.spec_name + `?annotation=${model.uid}`} tabIndex={-1}>
                         <img
