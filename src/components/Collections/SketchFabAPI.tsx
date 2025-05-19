@@ -10,7 +10,7 @@
 // Typical imports
 import { useEffect, useState, useRef, LegacyRef } from 'react'
 import { toUpperFirstLetter } from '@/functions/utils/toUpperFirstLetter'
-import { model, model_annotation, photo_annotation } from '@prisma/client'
+import { model, model_annotation, photo_annotation, video_annotation } from '@prisma/client'
 import { fullAnnotation, GbifImageResponse, GbifResponse } from '@/interface/interface'
 import { setViewerWidth, annotationControl, boolRinse, addCommas, arrayFromObjects } from './SketchfabDom'
 import { useSearchParams } from 'next/navigation'
@@ -18,11 +18,13 @@ import { useSearchParams } from 'next/navigation'
 // Default imports
 import AnnotationModal from '@/components/Collections/AnnotationModal'
 import Sketchfab from '@sketchfab/viewer-api'
-import ModelAnnotation from './AnnotationModel'
 import Vertebrates from '@/classes/HerbariumClass'
 import FirstAnnotation from './3dExhibit/FirstAnnotation'
+import PhotoAnnotation from './3dExhibit/PhotoAnnotation'
+import VideoAnnotation from './3dExhibit/VideoAnnotation'
+import ModelAnnotation from './3dExhibit/ModelAnnotation'
 
-export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model: model, images: GbifImageResponse[], imageTitle: string }){
+export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model: model, images: GbifImageResponse[], imageTitle: string }) {
 
   // Variable Declarations
   const gMatch = props.gMatch.data as GbifResponse
@@ -33,8 +35,8 @@ export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifRe
   const [s, setS] = useState<Vertebrates>() // s = specimen due to constant repetition
   const [annotations, setAnnotations] = useState<fullAnnotation[]>()
   const [api, setApi] = useState<any>()
-  const [index, setIndex] = useState<number | null>(null);
-  const [mobileIndex, setMobileIndex] = useState<number | null>(null);
+  const [index, setIndex] = useState<number | null>(null)
+  const [mobileIndex, setMobileIndex] = useState<number | null>(null)
   const [imgSrc, setImgSrc] = useState<string>()
   const [annotationTitle, setAnnotationTitle] = useState("")
 
@@ -172,93 +174,30 @@ export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifRe
 
   }, [index]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  return (
-    <>
+  return <>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta>
 
-      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta>
+    {s && <AnnotationModal {...props} title={annotationTitle} index={mobileIndex} specimen={s} />}
 
-      {s && <AnnotationModal {...props} title={annotationTitle} index={mobileIndex} specimen={s} />}
+    <div id="iframeDiv" className="flex bg-black m-auto min-h-[150px]" style={{ height: "100%", width: "100%" }}>
 
-      <div id="iframeDiv" className="flex bg-black m-auto min-h-[150px]" style={{ height: "100%", width: "100%" }}>
-        <iframe src={props.model.uid} frameBorder="0" id="model-viewer" title={"Model Viewer for " + ''}
-          allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking="true"
-          execution-while-out-of-viewport="true" execution-while-not-rendered="true" web-share="true"
-          allowFullScreen
-          style={{ width: "60%", transition: "width 1.5s", zIndex: "2" }}
-          ref={modelViewer as LegacyRef<HTMLIFrameElement>}
-        />
+      <iframe src={props.model.uid} frameBorder="0" id="model-viewer" title={"Model Viewer for " + ''}
+        allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking="true"
+        execution-while-out-of-viewport="true" execution-while-not-rendered="true" web-share="true"
+        allowFullScreen
+        style={{ width: "60%", transition: "width 1.5s", zIndex: "2" }}
+        ref={modelViewer as LegacyRef<HTMLIFrameElement>} />
 
-        {s && annotations &&
-          <>
-            <div id="annotationDiv" ref={annotationDiv as LegacyRef<HTMLDivElement>} style={{ width: "40%", backgroundColor: "black", transition: "width 1.5s", color: "#F5F3E7", zIndex: "1", overflowY: "auto", overflowX: "hidden" }}>
+      {
+        s && annotations &&
+        <div id="annotationDiv" ref={annotationDiv as LegacyRef<HTMLDivElement>} style={{ width: "40%", backgroundColor: "black", transition: "width 1.5s", color: "#F5F3E7", zIndex: "1", overflowY: "auto", overflowX: "hidden" }}>
+          {index === 0 && <FirstAnnotation gMatch={gMatch} s={s} />}
+          {!!index && annotations[index - 1].annotation_type === 'photo' && <PhotoAnnotation annotation={annotations[index - 1]} imgSrc={imgSrc as string} />}
+          {!!index && annotations[index - 1].annotation_type === 'video' && <VideoAnnotation videoAnnotation={annotations[index - 1].annotation as video_annotation} />}
+          {!!index && annotations[index - 1].annotation_type === 'model' && <ModelAnnotation modelAnnotation={annotations[index - 1].annotation as model_annotation} />}
+        </div>
+      }
 
-              {index === 0 && <FirstAnnotation gMatch={gMatch} s={s}/>}
-
-              {
-                !!index && annotations[index - 1].annotation_type === 'photo' &&
-                <>
-                  <div className="w-full h-[65%]" id="annotationDivMedia" style={{ display: "block" }}>
-                    <div className='w-full h-full text-center fade'>
-                      <img key={Math.random()} className='fade center w-[98%] h-full pr-[2%] pt-[1%]'
-                        src={imgSrc}
-                        alt={`Image for annotation number ${annotations[index - 1].annotation_no}`}>
-                      </img>
-                    </div>
-                  </div>
-                  <div id="annotationDivText">
-                    <br></br>
-                    <p dangerouslySetInnerHTML={{ __html: (annotations[index - 1].annotation as photo_annotation).annotation }} className='m-auto pr-[3%] pl-[2%] text-center fade' />
-                  </div>
-                  <div id="annotationDivCitation">
-                    <br></br>
-                    <p className='fade text-center w-[95%]'>Photo by: {(annotations[index - 1].annotation as photo_annotation).author}, licensed under <a href='https://creativecommons.org/share-your-work/cclicenses/' target='_blank'>{(annotations[index - 1].annotation as photo_annotation).license}</a></p>
-                  </div>
-                </>
-              }
-
-              {
-                !!index && annotations[index - 1].annotation_type === 'video' && !annotations[index - 1].annotation.annotation &&
-                <div className="w-full h-full" id="annotationDivVideo">
-                  {/*@ts-ignore - align works on iframe just fine*/}
-                  <iframe align='left' className='fade w-[calc(100%-15px)] h-full' src={annotations[index - 1].url}></iframe>
-                </div>
-              }
-
-              {
-                !!index && annotations[index - 1].annotation_type === 'video' && annotations[index - 1].annotation.annotation &&
-                <>
-                  <div className="w-full h-[65%]" id="annotationDivVideo">
-                    {/*@ts-ignore - align works on iframe just fine*/}
-                    <iframe align='left' className='fade w-[calc(100%-15px)] h-full' src={annotations[index - 1].url}></iframe>
-                  </div>
-                  <div id="annotationDivText">
-                    <br></br>
-                    <p dangerouslySetInnerHTML={{ __html: (annotations[index - 1].annotation as model_annotation).annotation }} className='m-auto pr-[3%] pl-[2%] text-center fade' />
-                  </div>
-                </>
-              }
-
-              {
-                !!index && annotations[index - 1].annotation_type === 'model' &&
-                <>
-                  <div className="w-full h-[65%]" id="annotationDivMedia" style={{ display: "block" }}>
-                    <ModelAnnotation uid={(annotations[index - 1].annotation as model_annotation).uid} />
-                  </div>
-                  <div id="annotationDivText">
-                    <br></br>
-                    <p dangerouslySetInnerHTML={{ __html: (annotations[index - 1].annotation as model_annotation).annotation }} className='m-auto pr-[3%] pl-[2%] text-center fade' />
-                  </div>
-                  <div id="annotationDivCitation">
-                    <br></br>
-                    <p className='fade text-center w-[95%]'>Model by {(annotations[index - 1].annotation as model_annotation).modeler}</p>
-                  </div>
-                </>
-              }
-
-            </div>
-          </>
-        }
-      </div>
-    </>
-  )
+    </div>
+  </>
 }
