@@ -2,17 +2,15 @@
  * @file SketchFabAPI.tsx
  * @fileoverview Client component which renders the 3D models and annotations.
  * 
- * @todo extract jsx sections as individual components
  * @todo extract stand alone functions
  */
 "use client"
 
 // Typical imports
 import { useEffect, useState, useRef, LegacyRef } from 'react'
-import { toUpperFirstLetter } from '@/functions/utils/toUpperFirstLetter'
-import { model, model_annotation, photo_annotation, video_annotation } from '@prisma/client'
+import { model, model_annotation, video_annotation } from '@prisma/client'
 import { fullAnnotation, GbifImageResponse, GbifResponse } from '@/interface/interface'
-import { setViewerWidth, annotationControl, boolRinse, addCommas, arrayFromObjects } from './SketchfabDom'
+import { setViewerWidth, annotationControl } from './SketchfabDom'
 import { useSearchParams } from 'next/navigation'
 
 // Default imports
@@ -23,7 +21,9 @@ import FirstAnnotation from './3dExhibit/FirstAnnotation'
 import PhotoAnnotation from './3dExhibit/PhotoAnnotation'
 import VideoAnnotation from './3dExhibit/VideoAnnotation'
 import ModelAnnotation from './3dExhibit/ModelAnnotation'
+import noImage from '../../../public/noImage.png'
 
+// Main JSX
 export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model: model, images: GbifImageResponse[], imageTitle: string }) {
 
   // Variable Declarations
@@ -39,6 +39,7 @@ export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifRe
   const [mobileIndex, setMobileIndex] = useState<number | null>(null)
   const [imgSrc, setImgSrc] = useState<string>()
   const [annotationTitle, setAnnotationTitle] = useState("")
+  const [imgLoading, setImgLoading] = useState(false)
 
   // Refs
   const sRef = useRef<Vertebrates>()
@@ -83,25 +84,21 @@ export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifRe
 
   // This effect initializes the sketchfab client and instantiates the specimen:Vertebrates object; it also ensures the page begins from the top upon load
   useEffect(() => {
-
     const sketchFabLink = props.model.uid
-    const client = new Sketchfab(modelViewer.current);
+    const client = new Sketchfab(modelViewer.current)
 
     // Choose initialization success object based on screen size
-    if (window.matchMedia('(max-width: 1023.5px)').matches || window.matchMedia('(orientation: portrait)').matches) {
-      client.init(sketchFabLink, successObj)
-    }
+    if (window.matchMedia('(max-width: 1023.5px)').matches || window.matchMedia('(orientation: portrait)').matches) client.init(sketchFabLink, successObj)
     else client.init(sketchFabLink, successObjDesktop)
 
     // Instantiate/set vertebrates and set annotations
-    const instantiateVertebrates = async () => {
+    const instantiateExhibit = async () => {
       sRef.current = await Vertebrates.model(props.gMatch.data?.usageKey as number, props.model, props.images, props.imageTitle)
       setS(sRef.current)
       setAnnotations(sRef.current.annotations.annotations)
     }
 
-    instantiateVertebrates()
-
+    instantiateExhibit()
     document.body.scrollTop = document.documentElement.scrollTop = 0
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -163,13 +160,25 @@ export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifRe
     }
   }, [api, annotations, s])
 
+  const setPhotoUrl = async (path: string) => {
+    setImgLoading(true)
+    
+    await fetch(path)
+      .then(res => {
+        if (!res.ok) setImgSrc('/noImage.png')
+        else return res.blob()
+      })
+      .then(blob => {
+        setImgSrc(URL.createObjectURL(blob as Blob))
+        setImgLoading(false)
+      })
+  }
+
   // This effect sets the imgSrc if necessary upon change of annotation index
   useEffect(() => {
-
     if (!!index && annotations && annotations[index - 1].annotation_type == 'photo') {
-      // const path = photoUrlPrefix(annotations[index - 1].url as string)
       const path = process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? 'X:' + (annotations[index - 1].url as string).slice(5) : 'public' + (annotations[index - 1].url as string)
-      setImgSrc(`/api/nfs?path=${path}`)
+      setPhotoUrl(`/api/nfs?path=${path}`)
     }
 
   }, [index]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -192,7 +201,7 @@ export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifRe
         s && annotations &&
         <div id="annotationDiv" ref={annotationDiv as LegacyRef<HTMLDivElement>} style={{ width: "40%", backgroundColor: "black", transition: "width 1.5s", color: "#F5F3E7", zIndex: "1", overflowY: "auto", overflowX: "hidden" }}>
           {index === 0 && <FirstAnnotation gMatch={gMatch} s={s} />}
-          {!!index && annotations[index - 1].annotation_type === 'photo' && <PhotoAnnotation annotation={annotations[index - 1]} imgSrc={imgSrc as string} />}
+          {!!index && annotations[index - 1].annotation_type === 'photo' && <PhotoAnnotation annotation={annotations[index - 1]} imgSrc={imgSrc as string} imgLoading={imgLoading} />}
           {!!index && annotations[index - 1].annotation_type === 'video' && <VideoAnnotation videoAnnotation={annotations[index - 1].annotation as video_annotation} />}
           {!!index && annotations[index - 1].annotation_type === 'model' && <ModelAnnotation modelAnnotation={annotations[index - 1].annotation as model_annotation} />}
         </div>
