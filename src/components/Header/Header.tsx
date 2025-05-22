@@ -39,6 +39,7 @@ const Header = (props: SearchHeaderProps) => {
   const specimenName: string = (params['specimenName']) as string ?? headerTitle ?? ''
 
   const menuItems: string[] = [
+    "Home",
     "Collections",
     "About",
     "Contribute",
