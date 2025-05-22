@@ -4,6 +4,7 @@
  * 
  * @todo extract stand alone functions
  */
+
 "use client"
 
 // Typical imports
@@ -21,7 +22,6 @@ import FirstAnnotation from './3dExhibit/FirstAnnotation'
 import PhotoAnnotation from './3dExhibit/PhotoAnnotation'
 import VideoAnnotation from './3dExhibit/VideoAnnotation'
 import ModelAnnotation from './3dExhibit/ModelAnnotation'
-import noImage from '../../../public/noImage.png'
 
 // Main JSX
 export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model: model, images: GbifImageResponse[], imageTitle: string }) {
@@ -141,9 +141,7 @@ export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifRe
         const mediaQueryOrientation = window.matchMedia('(orientation: portrait)')
 
         // this event is still triggered even when an annotation is not selected; an index of -1 is returned
-        if (index != -1) {
-          setIndex(index);
-        }
+        if (index != -1) setIndex(index)
 
         // Mobile annotation state management
         if (index != -1 && mediaQueryWidth.matches || index != -1 && mediaQueryOrientation.matches) {
