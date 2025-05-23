@@ -60,7 +60,7 @@ export default function MainWrap(props: {
         <div className="flex flex-col m-auto" style={{ width: "100vw", maxWidth: viewWidthInPx, margin: "0 auto !important" }}>
           <div style={{ height: modelHeight, maxHeight: viewportHeightInPx }}>
             <SketchfabApi
-              model={model[1] ?? model[0]}
+              model={model[0]}
               gMatch={props.gMatch}
               images={props.noModelData.images}
               imageTitle={props.noModelData.title} />
