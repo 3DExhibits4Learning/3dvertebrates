@@ -92,6 +92,20 @@ export async function getModel(species: string) {
   return models
 }
 
+// export async function getModel(species: string) {
+//   const models = await prisma.model.findMany({
+//     where: { 
+//       OR: [
+//         {spec_name: species},
+//         {pref_comm_name: species}  
+//       ],
+//       AND:[{site_ready: true, base_model: true}]
+//     }
+//   })
+
+//   return models
+// }
+
 /**
  * @function getFullModelByUid
  * @description returns a full model (with tags and software) with the corresponding UID
