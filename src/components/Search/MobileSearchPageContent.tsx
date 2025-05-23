@@ -7,7 +7,7 @@
 
 import PageWrapper from "../Shared/PageWrapper";
 import SearchPageModelList from "./SearchPageModelList";
-import { SiteReadyModels } from "@/api/types";
+import { SiteReadyModels } from "@/interface/interface";
 import Foot from "../Shared/Foot";
 import { userSubmittal } from "@prisma/client";
 

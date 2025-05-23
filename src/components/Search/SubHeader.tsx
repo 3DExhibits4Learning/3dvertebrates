@@ -1,74 +1,55 @@
 'use client';
 
-import { Navbar, NavbarContent, Select, SelectItem, NavbarMenuItem, Button } from "@nextui-org/react";
-import { useRouter } from "next/navigation";
+import { Navbar, NavbarContent } from "@nextui-org/react"
+import { Dispatch, SetStateAction } from "react";
 
 type SubHeaderProps = {
-  modeledByList: string[];
-  annotatedByList: string[];
-  handleModelerSelect: (modeler: string | undefined) => void;
-  handleAnnotatorSelect: (annotator: string | undefined) => void;
-};
+  modeledByList: string[]
+  annotatedByList: string[]
+  modeler: string
+  setSelectedModeler: Dispatch<SetStateAction<string>>
+  annotator: string
+  setSelectedAnnotator: Dispatch<SetStateAction<string>>
+}
 
 const SubHeader = (props: SubHeaderProps) => {
 
-  const router = useRouter();
   const modeledByList: string[] = props.modeledByList;
   const annotatedByList: string[] = props.annotatedByList;
-
-  const handleModeledBySelectionChange = (selectionSet: any) => {
-    const namesArray: string[] | undefined = Array.from(selectionSet);
-    const name: string | undefined = namesArray[0];
-    props.handleModelerSelect(name);
-  };
-
-  const handleAnnotatedBySelectionChange = (selectionSet: any) => {
-    const namesArray: string[] | undefined = Array.from(selectionSet);
-    const name: string | undefined = namesArray[0];
-    props.handleAnnotatorSelect(name);
-  };
 
   return (
     <Navbar isBordered className="z-0 w-full bg-[#00856A] dark:bg-[#212121]">
       <NavbarContent>
-      <NavbarMenuItem>
-        <Button color='primary' className="hidden lg:inline-block w-[200px]" onClick={() => router.push('/modelSubmit')}>Contribute a 3D Model</Button>
-      </NavbarMenuItem>
         <div className="flex w-full gap-4 justify-center lg:justify-end">
-          <Select
-            size="sm"
-            label="Modeled By"
-            className="w-[47.5%] lg:w-[25%]"
-            classNames={{
-              mainWrapper: "h-10",
-            }}
-            onSelectionChange={handleModeledBySelectionChange}
+          <select
+            value={props.modeler}
+            onChange={(e) => props.setSelectedModeler(e.target.value)}
+            className={`min-w-[166px] w-fit max-w-[200px] rounded-xl dark:bg-[#27272a] dark:hover:bg-[#3E3E47] h-[40px] text-[14px] px-2 outline-[#004C46]`}
           >
-            {modeledByList.map((modeler: string, index: number) => (
-              <SelectItem key={modeler} value={modeler} >
-                {modeler}
-              </SelectItem>
-            ))}
-          </Select>
-          <Select
-            size="sm"
-            label="Annotated By"
-            className="w-[47.5%] lg:w-[25%] "
-            classNames={{
-              mainWrapper: "h-10",
-            }}
-            onSelectionChange={handleAnnotatedBySelectionChange}
+            <option value="All" disabled selected>Modeled by</option>
+            {
+              modeledByList.map((modeler: string) => (
+                <option key={modeler} value={modeler}>{modeler}</option>
+              ))
+            }
+          </select>
+
+          <select
+            value={props.annotator}
+            onChange={(e) => props.setSelectedAnnotator(e.target.value)}
+            className={`min-w-[166px] w-fit max-w-[200px] rounded-xl dark:bg-[#27272a] dark:hover:bg-[#3E3E47] h-[40px] text-[14px] px-2 outline-[#004C46]`}
           >
-            {annotatedByList.map((modeler: string, index: number) => (
-              <SelectItem key={modeler} value={modeler} >
-                {modeler}
-              </SelectItem>
-            ))}
-          </Select>
+            <option value="All" disabled selected>Annotated by</option>
+            {
+              annotatedByList.map((annotator: string) => (
+                <option key={annotator} value={annotator}>{annotator}</option>
+              ))
+            }
+          </select>
         </div>
       </NavbarContent>
     </Navbar>
-  );
-};
+  )
+}
 
-export default SubHeader;
+export default SubHeader

@@ -8,7 +8,7 @@ export const MobileSearch = forwardRef((props: { autocompleteOptions: any[], fet
 
     return (
         <>
-            <Modal className="lg:hidden bg-[#F5F3E7]" size={'full'} placement="top" isOpen={props.isOpen} scrollBehavior={"inside"} hideCloseButton={true}>
+            <Modal className="lg:hidden bg-[#F5F3E7] dark:bg-[#212121]" size={'full'} placement="top" isOpen={props.isOpen} scrollBehavior={"inside"} hideCloseButton={true}>
                 <ModalContent>
                     {(onClose) => (
                         <>

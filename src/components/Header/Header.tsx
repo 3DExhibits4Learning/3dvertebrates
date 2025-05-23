@@ -12,16 +12,15 @@ import { useSession, } from "next-auth/react"
 import { useParams } from "next/navigation"
 import { useRef, useState } from "react"
 import { Navbar, NavbarContent, NavbarMenuToggle, NavbarBrand, NavbarMenu, NavbarMenuItem, Divider, Switch } from "@nextui-org/react"
-import { toUpperFirstLetter } from "@/utils/toUpperFirstLetter"
+import { toUpperFirstLetter } from "@/functions/utils/toUpperFirstLetter"
 import { SearchIcon } from "./SearchIcon"
 import AutoComplete from "./Autocomplete"
 import Links from "./Links"
-import MobileSessionOptions from "./MobileSessionOptions"
 import MobileModelOptions from "./MobileModelOptions"
 import { MobileSearch } from "./MobileSearch"
 import MobileMenuOptions from "./MobileMenuOptions"
 import windowMethods from "./WindowMethods"
-import { SearchHeaderProps } from "@/api/types"
+import { SearchHeaderProps } from "@/interface/interface"
 
 const Header = (props: SearchHeaderProps) => {
 
@@ -40,17 +39,11 @@ const Header = (props: SearchHeaderProps) => {
   const specimenName: string = (params['specimenName']) as string ?? headerTitle ?? ''
 
   const menuItems: string[] = [
-    "Home",
     "Collections",
-    "Plant.id",
-    "Feed",
-    "Accessibility"
-  ];
-
-  const userItems: string[] = [
-    "Dashboard",
-    "Submit a 3D Model",
-  ];
+    "About",
+    "Contribute",
+    "Contact"
+  ]
 
   // All window methods such as checking for dark mode 
 
@@ -59,7 +52,7 @@ const Header = (props: SearchHeaderProps) => {
   // Fetch autocomplete options and refresh corresponding state
 
   const fetchAutoCompleteOptions = async () => {
-    const autocompleteOptions = await fetch(`https://api.inaturalist.org/v1/taxa/autocomplete?taxon_id=47126&rank=species,genus&q=${searchQuery.current}`)
+    const autocompleteOptions = await fetch(`https://api.inaturalist.org/v1/taxa/autocomplete?taxon_id=1&rank=species,genus&q=${searchQuery.current}`)
       .then(res => res.json()).then(json => json.results)
     setAutocompleteOptions(autocompleteOptions)
   }
@@ -122,17 +115,6 @@ const Header = (props: SearchHeaderProps) => {
 
         <NavbarMenu className="z-20">
 
-          {/* User section header */}
-
-          <NavbarMenuItem>
-            <h1 className="text-center">User</h1>
-            <Divider />
-          </NavbarMenuItem>
-
-          {/* Mobile session-based options */}
-
-          <MobileSessionOptions session={session} userItems={userItems} />
-
           {/* Navigation Section Header */}
 
           <NavbarMenuItem>
@@ -151,7 +133,7 @@ const Header = (props: SearchHeaderProps) => {
         </NavbarMenu>
       </Navbar >
     </>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header

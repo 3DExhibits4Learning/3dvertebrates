@@ -1,10 +1,20 @@
+/**
+ *@file src/components/Collections/AnnotationModal.tsx
+
+ @fileoverview mobile annotation modal
+ */
+
 "use client"
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
-import { boolRinse, addCommas, arrayFromObjects} from './SketchfabDom';
-import { toUpperFirstLetter } from '@/utils/toUpperFirstLetter';
-import Herbarium from "@/utils/HerbariumClass";
-import { GbifResponse } from "@/api/types";
-import { photo_annotation } from "@prisma/client";
+
+// Typical imports
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react"
+import { boolRinse, addCommas, arrayFromObjects} from './SketchfabDom'
+import { toUpperFirstLetter } from '@/functions/utils/toUpperFirstLetter'
+import { GbifResponse } from "@/interface/interface"
+import { photo_annotation } from "@prisma/client"
+
+// Default imports
+import Herbarium from "@/classes/HerbariumClass"
 
 type annotationModalProps = {
   specimen: Herbarium,
@@ -20,8 +30,7 @@ export default function AnnotationModal(props: annotationModalProps) {
   const s = props.specimen
   const annotations = props.specimen.annotations.annotations
 
-  return (
-    <>
+  return <>
       <Button id="annotationButton" className="hidden" onPress={onOpen}></Button>
       <div id='modalDiv'>
         <Modal className="bg-black text-white justify-center" isOpen={isOpen} onOpenChange={onOpenChange} scrollBehavior={"inside"} size="full" placement="top">
@@ -67,7 +76,6 @@ export default function AnnotationModal(props: annotationModalProps) {
                         </div><br></br>
                         <p>Build method: {s.model.build_process}</p>
                         <p>Created with: {arrayFromObjects(s.software)}</p>
-                        <p>Images: {s.image_set[0].no_of_images}</p>
                         <p>Modeler: {s.model.modeled_by}</p>
                         <p>Annotator: {s.getAnnotator()}</p>
                       </div>
@@ -118,5 +126,4 @@ export default function AnnotationModal(props: annotationModalProps) {
         </Modal>
       </div>
     </>
-  );
 }

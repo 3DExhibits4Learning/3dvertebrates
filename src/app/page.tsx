@@ -1,32 +1,19 @@
-'use client';
-import Header from '@/components/Header/Header';
-import Footer from '@/components/Shared/Foot';
-import dynamic from 'next/dynamic';
-import { useIsClient } from "@/utils/isClient";
+/**
+ * @file src/app/page.tsx
+ * 
+ * @fileoverview Site landing page; simply redirects to collections/search. Keeping file structure in place in case of eventual landing page request.
+ */
 
-const HomeModel = dynamic(() => import('@/components/Home/model'),
-  { ssr: false });
+import { redirect } from 'next/navigation';
 
 export default function App() {
 
-  const isClient: boolean = useIsClient();
-  var screenSize: boolean = isClient ? window.matchMedia(("(max-width: 768px)")).matches : false;
-  var txtSize: string = screenSize ? "1rem" : "1.4rem";
-  var modelHeight = "calc(100vh - 177px)"
+  redirect('/collections/search')
 
-  return (
-    <>
+  return <>
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"></meta>
-      <meta name="description" content="Cal Poly Humboldt 3D Digital Herbarium"></meta>
-      <title>3D Digital Herbarium</title>
-      <Header headerTitle='Home' pageRoute='collections' page="home" />
-      <div className='flex flex-col h-auto w-full'>
-        <div className='flex' style={{ height: modelHeight }}>
-          <HomeModel />
-        </div>
-      </div>
-      <Footer />
+      <meta name="description" content="An annotated collection of 3D Models by the Cal Poly Humboldt Vertebrate Museum and its Students"></meta>
+      <title>3D Vertebrate Museum</title>
     </>
-  );
 }
 

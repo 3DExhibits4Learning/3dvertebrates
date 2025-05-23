@@ -6,7 +6,7 @@ import ImageGallery from 'react-image-gallery'
 import "react-image-gallery/styles/css/image-gallery.css";
 import { ReactImageGalleryItem } from "react-image-gallery"
 import Leaderboards from './Leaderboards';
-import { toUpperFirstLetter } from '@/utils/toUpperFirstLetter';
+import { toUpperFirstLetter } from '@/functions/utils/toUpperFirstLetter';
 import dynamic from 'next/dynamic';
 const InatMap = dynamic(() => import('../Map/iNaturalist'), {ssr:false})
 

@@ -8,7 +8,7 @@ import { NavbarContent, Button, Dropdown, DropdownTrigger, DropdownMenu, Dropdow
 import Image from "next/image"
 import { signIn, signOut, useSession, } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import {admin} from "@/utils/devAuthed"
+import { admin } from "@/functions/utils/devAuthed"
 
 export default function LogoAndSignIn() {
     const { data: session } = useSession();
@@ -19,19 +19,18 @@ export default function LogoAndSignIn() {
                 <a href='/'>
                     <Image src="../../../libLogo.svg" width={70} height={70} alt="Logo" className="pt-[3px]" />
                 </a>
-                {!session && <Button variant='ghost' color='secondary' onClick={() => signIn()}>Sign In</Button>}
-                {session &&
+                {
+                    session &&
                     <Dropdown>
                         <DropdownTrigger>
                             <Avatar className="cursor-pointer" isFocusable={true} src={session?.user?.image!} name={session?.user?.name!} />
                         </DropdownTrigger>
                         <DropdownMenu aria-label="Static Actions">
-                            <DropdownItem key="dashboard" onClick={() => router.push('/dashboard')}>Dashboard</DropdownItem>
-                            <DropdownItem key="modelSubmit" onClick={() => router.push('/modelSubmit')}>Submit 3D Model</DropdownItem>
-                            {admin.includes(session.user?.email as string) && <DropdownItem key="modelSubmit" onClick={() => router.push('/admin')}>Admin</DropdownItem>}
+                            <DropdownItem key="Admin" onClick={() => router.push('/admin')}>Admin</DropdownItem>
                             <DropdownItem key="signOut" onClick={() => signOut()}>Sign Out</DropdownItem>
                         </DropdownMenu>
-                    </Dropdown>}
+                    </Dropdown>
+                }
             </NavbarContent>
         </>
     )

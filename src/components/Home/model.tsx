@@ -11,9 +11,9 @@ export default function HomeModel() {
   }
 
   const homeModel = () => {
-    var iframe = document.getElementById('homeModel');
-    var uid = '611560e2f07e436ca7eef747b77968ce';
-    var client = new Sketchfab(iframe);
+    var iframe = document.getElementById('homeModel')
+    var uid = '611560e2f07e436ca7eef747b77968ce'
+    var client = new Sketchfab(iframe)
 
     client.init(uid, {
       success: function onSuccess(api: any) {
@@ -25,73 +25,73 @@ export default function HomeModel() {
             const bark = materials[1]
             const needles = materials[4]
 
-            var slider = document.getElementById('opacitySlider');
+            var slider = document.getElementById('opacitySlider')
 
             var setOpacity = function setOpacity(opacity: any, material: any) {
-              material.channels.Opacity.enable = true;
-              material.channels.Opacity.type = 'alphaBlend';
-              material.channels.Opacity.factor = opacity;
+              material.channels.Opacity.enable = true
+              material.channels.Opacity.type = 'alphaBlend'
+              material.channels.Opacity.factor = opacity
               api.setMaterial(material, function () {
-              });
+              })
             }
 
             if (slider) {
-              var barkSection = document.getElementById('barkSection');
-              var phloemSection = document.getElementById('phloemSection');
-              var xylemSection = document.getElementById('xylemSection');
+              var barkSection = document.getElementById('barkSection')
+              var phloemSection = document.getElementById('phloemSection')
+              var xylemSection = document.getElementById('xylemSection')
 
               slider.addEventListener("input", (event) => {
                 //@ts-ignore
-                const val = event.target.value;
+                const val = event.target.value
 
                 if (val > 200 && barkSection && phloemSection && xylemSection) {
-                  const opacity = (val - 200) / 100;
-                  setOpacity(1, xylem);
-                  setOpacity(1, phloem);
-                  setOpacity(opacity, bark);
-                  setOpacity(opacity, needles);
-                  barkSection.style.opacity = "" + opacity;
-                  phloemSection.style.opacity = "" + (1 - opacity);
+                  const opacity = (val - 200) / 100
+                  setOpacity(1, xylem)
+                  setOpacity(1, phloem)
+                  setOpacity(opacity, bark)
+                  setOpacity(opacity, needles)
+                  barkSection.style.opacity = "" + opacity
+                  phloemSection.style.opacity = "" + (1 - opacity)
                   xylemSection.style.opacity = "0"
                 }
                 else if (val == 200 && barkSection && phloemSection && xylemSection) {
-                  setOpacity(1, xylem);
-                  setOpacity(1, phloem);
-                  setOpacity(0, bark);
-                  setOpacity(0, needles);
-                  barkSection.style.opacity = "0";
-                  phloemSection.style.opacity = "1";
-                  xylemSection.style.opacity = "0";
+                  setOpacity(1, xylem)
+                  setOpacity(1, phloem)
+                  setOpacity(0, bark)
+                  setOpacity(0, needles)
+                  barkSection.style.opacity = "0"
+                  phloemSection.style.opacity = "1"
+                  xylemSection.style.opacity = "0"
                 }
                 else if (val < 200 && val > 100 && barkSection && phloemSection && xylemSection) {
-                  const opacity = (val - 100) / 100;
-                  setOpacity(1, xylem);
-                  setOpacity(opacity, phloem);
-                  setOpacity(0, bark);
-                  setOpacity(0, needles);
-                  barkSection.style.opacity = "0";
-                  phloemSection.style.opacity = "" + opacity;
-                  xylemSection.style.opacity = "" + (1 - opacity);
+                  const opacity = (val - 100) / 100
+                  setOpacity(1, xylem)
+                  setOpacity(opacity, phloem)
+                  setOpacity(0, bark)
+                  setOpacity(0, needles)
+                  barkSection.style.opacity = "0"
+                  phloemSection.style.opacity = "" + opacity
+                  xylemSection.style.opacity = "" + (1 - opacity)
                 }
                 else if (val == 100 && barkSection && phloemSection && xylemSection) {
-                  setOpacity(1, xylem);
-                  setOpacity(0, phloem);
-                  setOpacity(0, bark);
-                  setOpacity(0, needles);
-                  barkSection.style.opacity = "0";
-                  phloemSection.style.opacity = "0";
+                  setOpacity(1, xylem)
+                  setOpacity(0, phloem)
+                  setOpacity(0, bark)
+                  setOpacity(0, needles)
+                  barkSection.style.opacity = "0"
+                  phloemSection.style.opacity = "0"
                   xylemSection.style.opacity = "1"
                 }
                 else {
                   if (barkSection && phloemSection && xylemSection) {
-                    const opacity = val / 100;
-                    setOpacity(opacity, xylem);
-                    setOpacity(0, phloem);
-                    setOpacity(0, bark);
-                    setOpacity(0, needles);
-                    barkSection.style.opacity = "0";
-                    phloemSection.style.opacity = "0";
-                    xylemSection.style.opacity = "" + opacity;
+                    const opacity = val / 100
+                    setOpacity(opacity, xylem)
+                    setOpacity(0, phloem)
+                    setOpacity(0, bark)
+                    setOpacity(0, needles)
+                    barkSection.style.opacity = "0"
+                    phloemSection.style.opacity = "0"
+                    xylemSection.style.opacity = "" + opacity
                   }
                 }
               })
