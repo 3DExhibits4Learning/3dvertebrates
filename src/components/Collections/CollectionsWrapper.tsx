@@ -60,7 +60,7 @@ export default function MainWrap(props: {
         <div className="flex flex-col m-auto" style={{ width: "100vw", maxWidth: viewWidthInPx, margin: "0 auto !important" }}>
           <div style={{ height: modelHeight, maxHeight: viewportHeightInPx }}>
             <SketchfabApi
-              model={model[0]}
+              model={model[1] ?? model[0]}
               gMatch={props.gMatch}
               images={props.noModelData.images}
               imageTitle={props.noModelData.title} />
@@ -69,9 +69,7 @@ export default function MainWrap(props: {
         </div>
       </>
     }
-    {
-      <section className='w-full h-[calc(100vh-176px)]'>No results</section>
-    }
+    {!model.length &&<section className='w-full h-[calc(100vh-176px)]'>No results</section>}
   </>
 }
 

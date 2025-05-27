@@ -182,7 +182,7 @@ export const reMapAnnotations = async (originalUid: string, newUid: string) => {
                             license: modelAnnotation.license,
                             annotator: modelAnnotation.annotator,
                             annotation: modelAnnotation.annotation,
-                            uid: modelAnnotation.uid
+                            uid: '4ffbc46ea8d14bc4b150e3ad0971e311'
                         }
                     })
                     console.log('Remapped model annotation')
