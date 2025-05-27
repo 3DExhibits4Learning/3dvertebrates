@@ -3,7 +3,7 @@
 import Sketchfab from '@sketchfab/viewer-api';
 import { useEffect } from 'react';
 
-const ModelAnnotation = (props: {uid: string}) => {
+export default function AnnotationModel(props:{uid: string}){
     const modelLoad = () => {
         var iframe = document.getElementById('api-frame');
         var uid = props.uid
@@ -35,4 +35,3 @@ const ModelAnnotation = (props: {uid: string}) => {
         <iframe height='100%' width='100%' id='api-frame' allow='autoplay; fullscreen; xr-spatial-tracking' xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share allowfullscreen mozallowfullscreen='true' webkitallowfullscreen='true'></iframe>
     )
 }
-export default ModelAnnotation;

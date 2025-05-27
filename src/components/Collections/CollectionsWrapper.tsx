@@ -38,8 +38,6 @@ export default function MainWrap(props: {
   // Variable heights based on window
   const [viewWidthInPx, setViewWidthInPx] = useState(window.outerWidth)
   const [viewportHeightInPx, setViewportHeightInPx] = useState(window.outerHeight + 200)
-  const [swiperHeight, setSwiperHeight] = useState(window.outerHeight - 96)
-  const [imgHeight, setImageHeight] = useState(window.outerHeight - 208)
 
   // Annotations selected state
   const [isSelected, setIsSelected] = useState<boolean>(true)
@@ -48,30 +46,31 @@ export default function MainWrap(props: {
   window.onresize = () => {
     setViewportHeightInPx(window.outerHeight + 200)
     setViewWidthInPx(window.outerWidth)
-    setSwiperHeight(window.outerHeight)
-    setImageHeight(window.outerHeight - 112)
   }
 
   return <>
-      {!!model.length && props.gMatch.hasInfo &&
-        <>
-          <div className="hidden lg:flex h-10 bg-[#00856A] dark:bg-[#212121] text-white items-center justify-end">
-              <Switch style={{ paddingRight: "2.5%" }} defaultSelected id="annotationSwitch" isSelected={isSelected} color='secondary' onValueChange={setIsSelected}>
-                <span className="text-white">Annotations</span>
-              </Switch>
+    {
+      !!model.length && 
+      <>
+        <div className="hidden lg:flex h-10 bg-[#00856A] dark:bg-[#212121] text-white items-center justify-end">
+          <Switch style={{ paddingRight: "2.5%" }} defaultSelected id="annotationSwitch" isSelected={isSelected} color='secondary' onValueChange={setIsSelected}>
+            <span className="text-white">Annotations</span>
+          </Switch>
+        </div>
+        <div className="flex flex-col m-auto" style={{ width: "100vw", maxWidth: viewWidthInPx, margin: "0 auto !important" }}>
+          <div style={{ height: modelHeight, maxHeight: viewportHeightInPx }}>
+            <SketchfabApi
+              model={model[1] ?? model[0]}
+              gMatch={props.gMatch}
+              images={props.noModelData.images}
+              imageTitle={props.noModelData.title} />
           </div>
-          <div className="flex flex-col m-auto" style={{ width: "100vw", maxWidth: viewWidthInPx, margin: "0 auto !important" }}>
-            <div style={{ height: modelHeight, maxHeight: viewportHeightInPx }}>
-              <SketchfabApi
-                model={model[1] ?? model[0]}
-                gMatch={props.gMatch}
-                images={props.noModelData.images}
-                imageTitle={props.noModelData.title}/>
-            </div>
-            <Foot />
-          </div>
-        </>}
-    </>
+          <Foot />
+        </div>
+      </>
+    }
+    {!model.length &&<section className='w-full h-[calc(100vh-176px)]'>No results</section>}
+  </>
 }
 
 
