@@ -184,7 +184,7 @@ export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifRe
   return <>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta>
 
-    {s && <AnnotationModal {...props} title={annotationTitle} index={mobileIndex} specimen={s} />}
+    {s && <AnnotationModal {...props} title={annotationTitle} index={mobileIndex} specimen={s} imgLoading={imgLoading} imgSrc={imgSrc}/>}
 
     <div id="iframeDiv" className="flex bg-black m-auto min-h-[150px]" style={{ height: "100%", width: "100%" }}>
 
