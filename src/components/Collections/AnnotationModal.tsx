@@ -16,10 +16,11 @@ import { model_annotation, photo_annotation } from "@prisma/client"
 // Default imports
 import Herbarium from "@/classes/HerbariumClass"
 import dynamic from "next/dynamic"
-//import ModelViewer from "../Shared/ModelViewer"
 
+// Dynamic imports
 const ModelViewer = dynamic(() => import('../Shared/ModelViewer'), {ssr: false})
 
+// Type of props
 type annotationModalProps = {
   specimen: Herbarium,
   gMatch: { hasInfo: boolean, data?: GbifResponse }
@@ -29,9 +30,11 @@ type annotationModalProps = {
   imgLoading: boolean
 }
 
+// Main JSX
 export default function AnnotationModal(props: annotationModalProps) {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure()
 
+  // Declarations
   const gMatch = props.gMatch.data as GbifResponse
   const s = props.specimen
   const annotations = props.specimen.annotations.annotations
@@ -136,21 +139,17 @@ export default function AnnotationModal(props: annotationModalProps) {
                 {
                   !!props.index && annotations[props.index - 1].annotation_type === 'model' &&
                   <>
-                    <p>
-                      <div className="fade w-full h-full text-center">
+                      <section className="fade w-full h-full text-center">
                         <ModelViewer uid={(annotations[props.index - 1].annotation as model_annotation).uid} minHeight="50vh"/>
-                      </div>
-                    </p>
-                    <span>
-                      <p id="modalText">
+                      </section>
+                      <section id="modalText">
                         <br></br>
                         <p dangerouslySetInnerHTML={{ __html: annotations[props.index - 1].annotation.annotation as string }} className="m-auto text-center fade"></p>
-                      </p>
-                      <p id="modalCitation">
+                      </section>
+                      <section id="modalCitation">
                         <br></br>
                         <p className="fade text-center w-[95%]"> Photo by: {(annotations[props.index - 1].annotation as photo_annotation).author}, licensed under <a href='https://creativecommons.org/share-your-work/cclicenses/' target='_blank'>{(annotations[props.index - 1].annotation as photo_annotation).license}</a></p>
-                      </p>
-                    </span>
+                      </section>
                   </>
                 }
               </ModalBody>
