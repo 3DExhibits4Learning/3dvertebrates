@@ -1,6 +1,9 @@
 "use client"
 
+// Default imports
 import Sketchfab from '@sketchfab/viewer-api'
+
+// Typical imports
 import { MutableRefObject, useEffect, useRef } from 'react'
 
 export default function ModelViewer(props: { uid: string, minHeight?: string, noAutoStart?: boolean }) {
