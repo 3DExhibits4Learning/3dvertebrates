@@ -17,6 +17,6 @@ const ModelViewer = dynamic(() => import('@/components/Shared/ModelViewer'), { s
 
 // Main JSX
 export default function HomeModel() {
-  const mainSize = isMobileOrTablet() ? 'h-[calc(100vh-193px)]' : 'h-[calc(100vh-176px)]'
-  return <main className={`w-full ${mainSize}`}><ModelViewer uid={'ee451c036e3d45398f8a1f2ad78367c3'} /></main>
+  const mainSize = isMobileOrTablet() ? 'calc(100vh - 193px)' : 'calc(100vh - 176px)'
+  return <main className={`w-full ${mainSize}`}><ModelViewer uid={'ee451c036e3d45398f8a1f2ad78367c3'} minHeight={mainSize} /></main>
 }
