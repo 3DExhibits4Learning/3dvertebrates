@@ -88,7 +88,6 @@ const BotanistModelViewer = forwardRef((props: { minHeight?: string }, ref: Forw
     return <div className={`flex bg-black m-auto min-h-[${minHeight}]`} style={{ height: "100%", width: "100%" }}>
         <iframe
             ref={modelViewer as MutableRefObject<HTMLIFrameElement>}
-            src=""
             frameBorder="0"
             title={"Model Viewer for " + ''}
             allow="autoplay; fullscreen; xr-spatial-tracking"
