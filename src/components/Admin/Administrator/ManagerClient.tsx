@@ -21,7 +21,6 @@ import { isMobileOrTablet } from "@/functions/utils/isMobile"
 import AnnotationClient from "@/components/Admin/Annotation/Annotation Client/AnnotationClient"
 import initializeDataTransfer from "@/functions/client/dataTransfer/initializeDataTransfer"
 import terminateDataTransfer from "@/functions/client/dataTransfer/terminateDataTransfer"
-import RemoveStudent from "./Students/RemoveStudent"
 import AddStudent from "./Students/AddStudent"
 import dynamic from "next/dynamic"
 import DeleteModel from "./Model/DeleteModel"
@@ -111,10 +110,6 @@ export default function ManagerClient(props: ManagerClientProps) {
                             {/* Add student form */}
                             <AccordionItem key='addStudent' aria-label='addStudent' title='Add' classNames={{ title: accordionTitlesCss }}>
                                 <AddStudent />
-                            </AccordionItem>
-                            {/* Remove student form*/}
-                            <AccordionItem key='removeStudent' aria-label='removeStudent' title='Remove' classNames={{ title: accordionTitlesCss }}>
-                                <RemoveStudent />
                             </AccordionItem>
                         </Accordion>
                     </AccordionItem>

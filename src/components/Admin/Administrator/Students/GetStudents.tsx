@@ -18,6 +18,7 @@ import { DataTransferContext } from "../ManagerClient"
 // Default imports
 import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler"
 
+// Main JSX
 export default function StudentTable(props: { studentsAssignmentsAndModels: studentsAssignmentsAndModels[] }) {
     // Data transfer contexts
     const initializeDataTransfer = useContext(DataTransferContext).initializeDataTransferHandler
@@ -26,6 +27,7 @@ export default function StudentTable(props: { studentsAssignmentsAndModels: stud
     // Remove student handler
     const removeStudentHandler = async (studentEmail: string) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, deleteStudent, [studentEmail], 'Removing student')
 
+    // Abbreviating prop
     const sam = props.studentsAssignmentsAndModels
 
     return <section className="flex w-full items-center flex-col">
