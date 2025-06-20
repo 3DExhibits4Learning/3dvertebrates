@@ -28,7 +28,6 @@ const getUniqueAnnotators = (models: model[]): string[] => {
 }
 
 // Main Component
-
 const SearchPageContent = () => {
 
   const siteReadyModels = useRef<model[]>()

@@ -95,9 +95,6 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     const AnnotationMemo = memo(() => <AnnotationEntryWrapper modelsToAnnotate={props.modelsToAnnotate} admin={props.admin} annotationModels={props.annotationModels} />)
     AnnotationMemo.displayName = 'AnnotationMemo'
 
-    //console.log("Annotations and positions: ", annotationsAndPositions.activeAnnotation?.annotation)
-    //console.log("Specimen data: ", specimenData)
-
     return <AnnotationClientData.Provider value={annotationClientContext} >
 
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />
