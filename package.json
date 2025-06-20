@@ -29,7 +29,7 @@
     "jszip": "^3.10.1",
     "leaflet": "^1.9.4",
     "next": "15.3.4",
-    "next-auth": "^4.24.7",
+    "next-auth": "^4.24.11",
     "next-ssl-redirect-middleware": "^0.1.5",
     "nodemailer": "^6.9.13",
     "npm": "^11.4.2",
