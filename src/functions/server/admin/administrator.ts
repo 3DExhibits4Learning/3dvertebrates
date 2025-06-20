@@ -189,7 +189,7 @@ export const deleteStudent = async (email: string) => {
         await prisma.authorized.delete({ where: { email: email } }).catch((e) => serverActionErrorHandler(path, e.message, 'removeStudent()', "Couldn't remove student"))
 
         // Typical success response
-        'Student deleted'
+        return 'Student deactivated'
     }
     // Typical catch
     catch (e: any) { catchMessage(e.message) }

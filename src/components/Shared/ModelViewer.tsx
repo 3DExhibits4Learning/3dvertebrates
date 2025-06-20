@@ -4,7 +4,7 @@
 import Sketchfab from '@sketchfab/viewer-api'
 
 // Typical imports
-import { MutableRefObject, useEffect, useRef } from 'react'
+import { RefObject, useEffect, useRef } from 'react'
 
 export default function ModelViewer(props: { uid: string, minHeight?: string, noAutoStart?: boolean }) {
 
@@ -13,7 +13,7 @@ export default function ModelViewer(props: { uid: string, minHeight?: string, no
 
     const successObj = {
         success: function onSuccess(api: any) {
-            if(props.noAutoStart){}
+            if (props.noAutoStart) { }
             else api.start()
         },
         error: function onError() { },
@@ -34,20 +34,17 @@ export default function ModelViewer(props: { uid: string, minHeight?: string, no
         client.init(props.uid, successObj)
     }, [props.uid]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    return <>
-            <div className={`flex bg-black m-auto`} style={{ minHeight: minHeight, width: "100%", height: minHeight }}>
-                <iframe
-                    ref={modelViewer as MutableRefObject<HTMLIFrameElement>}
-                    src=""
-                    frameBorder="0"
-                    title={"Model Viewer for " + ''}
-                    allow="autoplay; fullscreen; xr-spatial-tracking"
-                    xr-spatial-tracking="true"
-                    execution-while-out-of-viewport="true"
-                    execution-while-not-rendered="true"
-                    web-share="true"
-                    allowFullScreen
-                    style={{ width: "100%" }}/>
-            </div>
-        </>
+    return <div className={`flex bg-black m-auto`} style={{ minHeight: minHeight, width: "100%", height: minHeight }}>
+        <iframe
+            ref={modelViewer as RefObject<HTMLIFrameElement>}
+            frameBorder="0"
+            title={"Model Viewer for " + ''}
+            allow="autoplay; fullscreen; xr-spatial-tracking"
+            xr-spatial-tracking="true"
+            execution-while-out-of-viewport="true"
+            execution-while-not-rendered="true"
+            web-share="true"
+            allowFullScreen
+            style={{ width: "100%" }} />
+    </div>
 }
