@@ -16,8 +16,8 @@ import dynamic from "next/dynamic"
 import NoDataFound from "@/components/Collections/NoDataFound"
 
 // Dynamic Imports
-const Header = dynamic(() => import('@/components/Header/Header'), { ssr: false })
-const CollectionsWrapper = dynamic(() => import('@/components/Collections/CollectionsWrapper'), { ssr: false })
+const Header = dynamic(() => import('@/components/Header/Header'))
+const CollectionsWrapper = dynamic(() => import('@/components/Collections/CollectionsWrapper'))
 
 // Main JSX
 export default async function Page(props: { params: Promise<{ specimenName: string }> }) {

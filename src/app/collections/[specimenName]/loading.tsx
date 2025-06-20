@@ -1,13 +1,15 @@
+'use client'
+
 /**
  * @file /app/collections/[specimenName]/loading.tsx
  * @fileoverview the loading component for when users visit /collections/[specimenName]
  */
 
-import React from 'react';
+import React from 'react'
 
-import Header from '@/components/Header/Header';
-import { Spinner } from "@heroui/react";
-import Foot from '@/components/Shared/Foot';
+import Header from '@/components/Header/Header'
+import { Spinner } from "@heroui/react"
+import Foot from '@/components/Shared/Foot'
 
 const Loading = () => {
   return (
@@ -21,4 +23,4 @@ const Loading = () => {
   )
 }
 
-export default Loading;
+export default Loading

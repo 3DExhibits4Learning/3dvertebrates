@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * @file /app/collections/search/loading.tsx
  * @fileoverview the loading component for when users visit /collections/search

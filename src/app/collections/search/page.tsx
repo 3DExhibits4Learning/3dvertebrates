@@ -5,9 +5,9 @@
  */
 
 // Default imports
-import Header from "@/components/Header/Header";
-import SearchPageContent from "@/components/Search/SearchPageContent";
-import Foot from "@/components/Shared/Foot";
+import Header from "@/components/Header/Header"
+import SearchPageContent from "@/components/Search/SearchPageContent"
+import Foot from "@/components/Shared/Foot"
 
 export default async function SearchPage() {
   return <>
