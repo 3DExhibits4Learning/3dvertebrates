@@ -1,7 +1,7 @@
 'use client'
 
 import PhotoInput from "@/components/Shared/Form Fields/PhotoInput";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import { SetStateAction, Dispatch } from "react";
 
 export default function UpdateThumbnail(props: { setFile: Dispatch<SetStateAction<File>>, file: File | undefined, updateThumbnail: Function, uid: string }) {

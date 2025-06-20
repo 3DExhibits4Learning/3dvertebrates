@@ -10,7 +10,7 @@
 
 // Typical Imports
 import { useState } from 'react'
-import { Switch } from "@nextui-org/react"
+import { Switch } from "@heroui/react"
 import { isMobileOrTablet } from '../../functions/utils/isMobile'
 import { GbifResponse, GbifImageResponse } from '@/interface/interface'
 

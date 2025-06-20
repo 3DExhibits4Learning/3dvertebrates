@@ -4,7 +4,7 @@ import { model } from "@prisma/client"
 import PhotoInput from "@/components/Shared/Form Fields/PhotoInput";
 import dynamic from "next/dynamic";
 const ModelViewer = dynamic(() => import('@/components/Shared/ModelViewer'))
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import { SetStateAction, Dispatch, useState } from "react";
 import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler";
 import addThumbnail from "@/functions/client/managerClient/addThumbnail";

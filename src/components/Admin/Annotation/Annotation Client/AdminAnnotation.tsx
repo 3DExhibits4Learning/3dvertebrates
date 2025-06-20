@@ -6,7 +6,7 @@
 
 // Typical imports
 import { annotationClientData, studentsAssignmentsAndModels } from "@/interface/interface"
-import { Button } from "@nextui-org/react"
+import { Button } from "@heroui/react"
 import { useContext } from "react"
 import { AnnotationClientData } from "./AnnotationClient"
 

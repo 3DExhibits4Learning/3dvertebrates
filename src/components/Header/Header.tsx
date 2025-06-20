@@ -12,7 +12,7 @@
 import { useSession, } from "next-auth/react"
 import { useParams } from "next/navigation"
 import { useRef, useState } from "react"
-import { Navbar, NavbarContent, NavbarMenuToggle, NavbarBrand, NavbarMenu, NavbarMenuItem, Divider, Switch } from "@nextui-org/react"
+import { Navbar, NavbarContent, NavbarMenuToggle, NavbarBrand, NavbarMenu, NavbarMenuItem, Divider, Switch } from "@heroui/react"
 import { toUpperFirstLetter } from "@/functions/utils/toUpperFirstLetter"
 import { SearchIcon } from "./SearchIcon"
 import { MobileSearch } from "./MobileSearch"

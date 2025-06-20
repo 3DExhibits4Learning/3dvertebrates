@@ -9,7 +9,7 @@
 // Typcial imports
 import { useState, useEffect, useContext } from "react"
 import { addStudent } from "@/functions/server/admin/administrator"
-import { Button } from "@nextui-org/react"
+import { Button } from "@heroui/react"
 import { DataTransferContext } from "../ManagerClient"
 
 // Default imports

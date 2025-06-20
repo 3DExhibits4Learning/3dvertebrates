@@ -7,7 +7,7 @@
  */
 
 // Typical imports
-import { Button } from "@nextui-org/react"
+import { Button } from "@heroui/react"
 import { AnnotationClientData } from "./AnnotationClient"
 import { forwardRef, MutableRefObject, SetStateAction, useContext, Dispatch } from "react"
 import { annotationClientData } from "@/interface/interface"

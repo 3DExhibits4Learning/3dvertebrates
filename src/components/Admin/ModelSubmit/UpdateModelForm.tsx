@@ -10,8 +10,8 @@
 
 // Typical imports
 import { useState, useEffect } from 'react'
-import { Button } from "@nextui-org/react"
-import { Divider } from '@nextui-org/react'
+import { Button } from "@heroui/react"
+import { Divider } from '@heroui/react'
 import { UpdateModelFormProps } from '@/interface/interface'
 import { v4 as uuidv4 } from 'uuid'
 import { chunkFileToTmp } from '@/functions/client/modelSubmit'

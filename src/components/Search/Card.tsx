@@ -10,7 +10,7 @@ import { model } from "@prisma/client"
 import { getNfsPath } from "@/functions/client/utils"
 import { SyntheticEvent, useState, useEffect } from "react"
 import { toUpperFirstLetter } from "@/functions/utils/toUpperFirstLetter"
-import { Skeleton } from "@nextui-org/react"
+import { Skeleton } from "@heroui/react"
 
 // Default imports
 import noImage from '../../../public/noImage.png'

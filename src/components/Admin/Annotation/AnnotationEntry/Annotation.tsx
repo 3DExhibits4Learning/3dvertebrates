@@ -12,7 +12,7 @@
 import { SetStateAction, Dispatch, useContext, useState, useRef, useEffect, memo } from "react"
 import { AnnotationEntryData } from "./AnnotationEntry"
 import { annotationItalicization, insertAnnotationHyperlink, toggleLinkComponent } from "@/functions/client/annotationEntry"
-import { Button } from "@nextui-org/react"
+import { Button } from "@heroui/react"
 import { isHyperLinkSelectionValid } from "@/functions/client/annotationEntry"
 
 // Default imports

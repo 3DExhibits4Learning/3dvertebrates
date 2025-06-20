@@ -1,6 +1,6 @@
 'use client'
 
-import { NavbarItem } from "@nextui-org/react"
+import { NavbarItem } from "@heroui/react"
 import Autocomplete from "../Shared/Form Fields/AutoCompleteRef"
 import { forwardRef, MutableRefObject } from "react"
 import { useRouter } from "next/navigation"

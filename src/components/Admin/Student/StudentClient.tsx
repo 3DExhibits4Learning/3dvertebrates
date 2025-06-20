@@ -10,7 +10,7 @@
 'use client'
 
 // Typical imports
-import { Accordion, AccordionItem } from "@nextui-org/react"
+import { Accordion, AccordionItem } from "@heroui/react"
 import { isMobileOrTablet } from "@/functions/utils/isMobile"
 import { model } from "@prisma/client"
 import { fullModel } from "@/interface/interface"

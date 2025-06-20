@@ -6,7 +6,7 @@
 
 import { fullAnnotation } from "@/interface/interface"
 import { photo_annotation } from "@prisma/client"
-import { Skeleton } from "@nextui-org/react"
+import { Skeleton } from "@heroui/react"
 
 export default function PhotoAnnotation(props: { annotation: fullAnnotation, imgSrc: string, imgLoading: boolean }) {
     const annotation = props.annotation

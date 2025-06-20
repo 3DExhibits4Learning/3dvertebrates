@@ -1,7 +1,7 @@
 'use client'
 
 import AnnotationReposition from "../AnnotationFields/AnnotationReposition"
-import { Button } from "@nextui-org/react"
+import { Button } from "@heroui/react"
 
 
 export default function FirstAnnotationEntry(props:{new: boolean, updateAnnotation: Function, createAnnotation: Function, saveDisabled: boolean, createDisabled: boolean }) {

@@ -7,7 +7,7 @@
 'use client'
 
 // Default imports
-import { Modal, ModalContent, ModalBody, ModalFooter, Spinner, Button } from "@nextui-org/react"
+import { Modal, ModalContent, ModalBody, ModalFooter, Spinner, Button } from "@heroui/react"
 import { useContext } from "react";
 import { AnnotationEntryData } from "./AnnotationEntry";
 import { annotationClientData, annotationEntryContext } from "@/interface/interface";

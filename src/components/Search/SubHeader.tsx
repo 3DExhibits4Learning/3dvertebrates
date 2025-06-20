@@ -1,6 +1,6 @@
 'use client';
 
-import { Navbar, NavbarContent } from "@nextui-org/react"
+import { Navbar, NavbarContent } from "@heroui/react"
 import { Dispatch, SetStateAction } from "react";
 
 type SubHeaderProps = {

@@ -9,7 +9,7 @@
 'use client'
 
 // Typical imports
-import { Button } from "@nextui-org/react"
+import { Button } from "@heroui/react"
 import { deleteModel } from "@/functions/server/admin/administrator"
 import { useState } from "react"
 import { fullModel } from "@/interface/interface"

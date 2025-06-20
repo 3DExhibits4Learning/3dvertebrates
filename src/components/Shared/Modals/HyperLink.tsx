@@ -1,5 +1,5 @@
 import { forwardRef, LegacyRef, SetStateAction, Dispatch } from "react"
-import { Button } from "@nextui-org/react"
+import { Button } from "@heroui/react"
 
 const HyperlinkModal = forwardRef((props: { selectionText?: string, setHyperLinkUrl: Dispatch<SetStateAction<string>>, hyperlinkWrapper: Function, setSelectionText: Dispatch<SetStateAction<string>> }, ref) => {
 

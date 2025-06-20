@@ -1,6 +1,6 @@
 'use client'
 
-import { NavbarItem } from "@nextui-org/react"
+import { NavbarItem } from "@heroui/react"
 
 export default function Links(props: {page?: string}) {
     return(

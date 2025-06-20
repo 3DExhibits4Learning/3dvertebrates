@@ -3,7 +3,7 @@
 import { model } from "@prisma/client"
 import { useState, useEffect, useContext } from "react"
 import { DataTransferContext } from "../ManagerClient"
-import { Button } from "@nextui-org/react"
+import { Button } from "@heroui/react"
 import { approveModel, deleteModel } from "@/functions/server/admin/administrator"
 
 import AdminItemContainer from "../ItemContainer"

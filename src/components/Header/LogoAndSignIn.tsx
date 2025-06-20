@@ -4,7 +4,7 @@
 // Consider turning off ts-nocheck when coding/debugging.
 // The only line that expects an error is the conditional line in the DropdownMenu as its type doesn't allow for conditional rendering (or ts-ignore)
 
-import { NavbarContent, Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar } from "@nextui-org/react"
+import { NavbarContent, Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar } from "@heroui/react"
 import Image from "next/image"
 import { signIn, signOut, useSession, } from "next-auth/react"
 import { useRouter } from "next/navigation"

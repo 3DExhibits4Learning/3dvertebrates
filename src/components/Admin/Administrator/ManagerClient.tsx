@@ -12,7 +12,7 @@
 // Typical imports
 import { model } from "@prisma/client"
 import { useState, createContext, useMemo, useEffect } from "react"
-import { Accordion, AccordionItem } from "@nextui-org/react"
+import { Accordion, AccordionItem } from "@heroui/react"
 import { ManagerClientProps, studentsAssignmentsAndModels } from "@/interface/interface"
 import { fullModel } from "@/interface/interface"
 import { isMobileOrTablet } from "@/functions/utils/isMobile"

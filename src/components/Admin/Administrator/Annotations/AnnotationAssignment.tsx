@@ -14,7 +14,7 @@
 // Imports
 import { fullModel, studentsAssignmentsAndModels } from "@/interface/interface";
 import { useState, useEffect, useContext } from "react";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import { DataTransferContext } from "../ManagerClient";
 import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler";
 import assignAnnotation from "@/functions/client/managerClient/assignAnnotation";
