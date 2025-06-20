@@ -12,52 +12,43 @@ import { studentsAssignmentsAndModels } from "@/interface/interface"
 import { Fragment } from "react"
 
 export default function Assignments(props: { studentsAssignmentsAndModels: studentsAssignmentsAndModels[] }) {
-
     const sam = props.studentsAssignmentsAndModels // sam = students, assignments and models
 
-    return (
-        <section className="flex w-full items-center flex-col mb-16">
-            <div className="flex w-3/4 rounded-lg overflow-auto">
-                <table className="w-full bg-[#D5CB9F] dark:bg-[#212121] min-w-[800px]">
-                    <thead>
-                        <tr>
-                            <th className="text-xl border-b border-[#004C46] border-r py-4">Name</th>
-                            <th className="text-xl border-b border-[#004C46] border-r py-4">Species</th>
-                            <th className="text-xl border-b border-[#004C46] border-r py-4">Annotated</th>
-                            <th className="text-xl border-b border-[#004C46] border-r py-4">Admin approved</th>
-                            <th className="text-xl border-b border-[#004C46] py-4">Assignment Uid</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            sam.map((student, index) =>
-                                <Fragment key={student.email}>
-                                    <tr key={Math.random()}>
-                                        <td className={index === sam.length - 1 && sam[index].assignment.length <= 1 ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-[#004C46] border-r py-2 pl-2"} key={Math.random()}>{student.name}</td>
-                                        <td className={index === sam.length - 1 && sam[index].assignment.length <= 1 ? "py-2 pl-2 border-r border-[#004C46]" : "border-b border-[#004C46] border-r py-2 pl-2"} key={Math.random()}>{student.assignment.length ? student.models[0].spec_name : 'N/A'}</td>
-                                        <td className={index === sam.length - 1 && sam[index].assignment.length <= 1 ? "py-2 pl-2 border-r border-[#004C46]" : "border-b border-[#004C46] border-r py-2 pl-2"} key={Math.random()}>{student.assignment.length ? student.models[0].annotated ? 'Yes' : 'No' : ''}</td>
-                                        <td className={index === sam.length - 1 && sam[index].assignment.length <= 1 ? "py-2 pl-2 border-r border-[#004C46]" : "border-b border-[#004C46] border-r py-2 pl-2"} key={Math.random()}>{student.assignment.length ? student.models[0].annotationsApproved ? 'Yes' : 'No' : ''}</td>
-                                        <td className={index === sam.length - 1 && sam[index].assignment.length <= 1 ? "py-2 pl-2" : "border-b border-[#004C46] py-2 pl-2"} key={Math.random()}>{student.assignment.length ? student.assignment[0].uid : ''}</td>
+    return <section className="flex w-full items-center flex-col mb-16">
+        <div className="flex w-3/4 rounded-lg overflow-auto">
+            <table className="w-full bg-[#D5CB9F] dark:bg-[#212121] min-w-[800px] text-center">
+                <thead>
+                    <tr>
+                        <th className="text-xl border-b border-[#004C46] border-r py-4">Name</th>
+                        <th className="text-xl border-b border-[#004C46] border-r py-4">Species</th>
+                        <th className="text-xl border-b border-[#004C46] border-r py-4">Annotated</th>
+                        <th className="text-xl border-b border-[#004C46] py-4">Assignment Uid</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        sam.map((student, index) =>
+                            <Fragment key={student.email}>
+                                <tr>
+                                    <td className={index === sam.length - 1 && sam[index].assignment.length <= 1 ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-[#004C46] border-r py-2 pl-2"}>{student.name}</td>
+                                    <td className={index === sam.length - 1 && sam[index].assignment.length <= 1 ? "py-2 pl-2 border-r border-[#004C46]" : "border-b border-[#004C46] border-r py-2 pl-2"}>{student.assignment.length ? student.models[0].spec_name : 'N/A'}</td>
+                                    <td className={index === sam.length - 1 && sam[index].assignment.length <= 1 ? "py-2 pl-2 border-r border-[#004C46]" : "border-b border-[#004C46] border-r py-2 pl-2"}>{student.assignment.length ? student.models[0].annotated ? 'Yes' : 'No' : ''}</td>
+                                    <td className={index === sam.length - 1 && sam[index].assignment.length <= 1 ? "py-2 pl-2" : "border-b border-[#004C46] py-2 pl-2"}>{student.assignment.length ? student.assignment[0].uid : ''}</td>
+                                </tr>
+                                {
+                                    student.assignment.length > 1 && student.assignment.slice(1).map((assignment, index) => <tr key={student.email}>
+                                        <td className={index === student.assignment.slice(1).length - 1 ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-r border-[#004C46] py-2 pl-2"} >{student.name}</td>
+                                        <td className={index === student.assignment.slice(1).length - 1 ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-r border-[#004C46] py-2 pl-2"} >{student.models[index + 1].spec_name}</td>
+                                        <td className={index === student.assignment.slice(1).length - 1 ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-r border-[#004C46] py-2 pl-2"} >{student.models[index + 1].annotated ? 'Yes' : 'No'}</td>
+                                        <td className={index === student.assignment.slice(1).length - 1 ? "py-2 pl-2" : "border-b border-[#004C46] py-2 pl-2"} >{assignment.uid}</td>
                                     </tr>
-
-                                    {
-                                        student.assignment.length > 1 &&
-                                        student.assignment.slice(1).map((assignment, index) =>
-                                            <tr key={Math.random()}>
-                                                <td className={index === student.assignment.slice(1).length - 1 ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-r border-[#004C46] py-2 pl-2"} key={Math.random()}>{student.name}</td>
-                                                <td className={index === student.assignment.slice(1).length - 1 ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-r border-[#004C46] py-2 pl-2"} key={Math.random()}>{student.models[index + 1].spec_name}</td>
-                                                <td className={index === student.assignment.slice(1).length - 1 ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-r border-[#004C46] py-2 pl-2"} key={Math.random()}>{student.models[index + 1].annotated ? 'Yes' : 'No'}</td>
-                                                <td className={index === student.assignment.slice(1).length - 1 ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-r border-[#004C46] py-2 pl-2"} key={Math.random()}>{student.models[index + 1].annotationsApproved ? 'Yes' : 'No'}</td>
-                                                <td className={index === student.assignment.slice(1).length - 1 ? "py-2 pl-2" : "border-b border-[#004C46] py-2 pl-2"} key={Math.random()}>{assignment.uid}</td>
-                                            </tr>
-                                        )
-                                    }
-                                </Fragment>
-                            )
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    )
+                                    )
+                                }
+                            </Fragment>
+                        )
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
 }

@@ -160,7 +160,7 @@ export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifRe
 
   const setPhotoUrl = async (path: string) => {
     setImgLoading(true)
-    
+
     await fetch(path)
       .then(res => {
         if (!res.ok) setImgSrc('/noImage.png')
@@ -185,13 +185,20 @@ export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifRe
     <>
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta>
 
-      {s && <AnnotationModal {...props} title={annotationTitle} index={mobileIndex} specimen={s} imgLoading={imgLoading} imgSrc={imgSrc}/>}
+      {s && <AnnotationModal {...props} title={annotationTitle} index={mobileIndex} specimen={s} imgLoading={imgLoading} imgSrc={imgSrc} />}
 
       <div id="iframeDiv" className="flex bg-black m-auto min-h-[150px]" style={{ height: "100%", width: "100%" }}>
 
-        <iframe src={props.model.uid} frameBorder="0" id="model-viewer" title={"Model Viewer for " + ''}
-          allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking="true"
-          execution-while-out-of-viewport="true" execution-while-not-rendered="true" web-share="true"
+        <iframe
+          src={props.model.uid}
+          frameBorder="0"
+          id="model-viewer"
+          title={"Model Viewer for " + ''}
+          allow="autoplay; fullscreen; xr-spatial-tracking"
+          xr-spatial-tracking="true"
+          execution-while-out-of-viewport="true"
+          execution-while-not-rendered="true"
+          web-share="true"
           allowFullScreen
           style={{ width: "60%", transition: "width 1.5s", zIndex: "2" }}
           ref={modelViewer as Ref<HTMLIFrameElement>} />
