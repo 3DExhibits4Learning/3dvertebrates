@@ -26,9 +26,9 @@ const BotanistModelViewer = forwardRef((props: { minHeight?: string }, ref: Forw
 
     // Refs
     const newAnnotationEnabled = ref as MutableRefObject<boolean>
-    const modelViewer = useRef<HTMLIFrameElement>()
-    const temporaryAnnotationIndex = useRef<number>()
-    const apiRef = useRef<any>()
+    const modelViewer = useRef<HTMLIFrameElement>(undefined)
+    const temporaryAnnotationIndex = useRef<number>(undefined)
+    const apiRef = useRef<any>(undefined)
 
     // States
     const [sketchfabApi, setSketchfabApi] = useState<any>()

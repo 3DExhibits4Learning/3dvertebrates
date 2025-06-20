@@ -30,7 +30,7 @@ const getUniqueAnnotators = (models: model[]): string[] => {
 // Main Component
 const SearchPageContent = () => {
 
-  const siteReadyModels = useRef<model[]>()
+  const siteReadyModels = useRef<model[]>(undefined)
 
   const [modeledByList, setModeledByList] = useState<string[]>()
   const [annotatedByList, setAnnotatedByList] = useState<string[]>()

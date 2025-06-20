@@ -20,7 +20,8 @@ const Header = dynamic(() => import('@/components/Header/Header'), { ssr: false 
 const CollectionsWrapper = dynamic(() => import('@/components/Collections/CollectionsWrapper'), { ssr: false })
 
 // Main JSX
-export default async function Page({ params }: { params: { specimenName: string } }) {
+export default async function Page(props: { params: Promise<{ specimenName: string }> }) {
+  const params = await props.params;
 
   // Variable declarations
   var promises = []

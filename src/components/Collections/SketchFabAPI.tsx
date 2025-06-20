@@ -8,7 +8,7 @@
 "use client"
 
 // Typical imports
-import { useEffect, useState, useRef, LegacyRef } from 'react'
+import { useEffect, useState, useRef, Ref } from 'react'
 import { model, model_annotation, video_annotation } from '@prisma/client'
 import { fullAnnotation, GbifImageResponse, GbifResponse } from '@/interface/interface'
 import { setViewerWidth, annotationControl } from './SketchfabDom'
@@ -42,9 +42,9 @@ export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifRe
   const [imgLoading, setImgLoading] = useState(false)
 
   // Refs
-  const sRef = useRef<Vertebrates>()
-  const modelViewer = useRef<HTMLIFrameElement>()
-  const annotationDiv = useRef<HTMLDivElement>()
+  const sRef = useRef<Vertebrates>(undefined)
+  const modelViewer = useRef<HTMLIFrameElement>(undefined)
+  const annotationDiv = useRef<HTMLDivElement>(undefined)
 
   // Get switches - should probably update this to refs
   const annotationSwitch = document.getElementById("annotationSwitch")
@@ -181,30 +181,32 @@ export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifRe
 
   }, [index]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  return <>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta>
+  return (
+    <>
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta>
 
-    {s && <AnnotationModal {...props} title={annotationTitle} index={mobileIndex} specimen={s} imgLoading={imgLoading} imgSrc={imgSrc}/>}
+      {s && <AnnotationModal {...props} title={annotationTitle} index={mobileIndex} specimen={s} imgLoading={imgLoading} imgSrc={imgSrc}/>}
 
-    <div id="iframeDiv" className="flex bg-black m-auto min-h-[150px]" style={{ height: "100%", width: "100%" }}>
+      <div id="iframeDiv" className="flex bg-black m-auto min-h-[150px]" style={{ height: "100%", width: "100%" }}>
 
-      <iframe src={props.model.uid} frameBorder="0" id="model-viewer" title={"Model Viewer for " + ''}
-        allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking="true"
-        execution-while-out-of-viewport="true" execution-while-not-rendered="true" web-share="true"
-        allowFullScreen
-        style={{ width: "60%", transition: "width 1.5s", zIndex: "2" }}
-        ref={modelViewer as LegacyRef<HTMLIFrameElement>} />
+        <iframe src={props.model.uid} frameBorder="0" id="model-viewer" title={"Model Viewer for " + ''}
+          allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking="true"
+          execution-while-out-of-viewport="true" execution-while-not-rendered="true" web-share="true"
+          allowFullScreen
+          style={{ width: "60%", transition: "width 1.5s", zIndex: "2" }}
+          ref={modelViewer as Ref<HTMLIFrameElement>} />
 
-      {
-        s && annotations &&
-        <div id="annotationDiv" ref={annotationDiv as LegacyRef<HTMLDivElement>} style={{ width: "40%", backgroundColor: "black", transition: "width 1.5s", color: "#F5F3E7", zIndex: "1", overflowY: "auto", overflowX: "hidden" }}>
-          {index === 0 && <FirstAnnotation gMatch={gMatch} s={s} />}
-          {!!index && annotations[index - 1].annotation_type === 'photo' && <PhotoAnnotation annotation={annotations[index - 1]} imgSrc={imgSrc as string} imgLoading={imgLoading} />}
-          {!!index && annotations[index - 1].annotation_type === 'video' && <VideoAnnotation videoAnnotation={annotations[index - 1].annotation as video_annotation} />}
-          {!!index && annotations[index - 1].annotation_type === 'model' && <ModelAnnotation modelAnnotation={annotations[index - 1].annotation as model_annotation} />}
-        </div>
-      }
+        {
+          s && annotations &&
+          <div id="annotationDiv" ref={annotationDiv as Ref<HTMLDivElement>} style={{ width: "40%", backgroundColor: "black", transition: "width 1.5s", color: "#F5F3E7", zIndex: "1", overflowY: "auto", overflowX: "hidden" }}>
+            {index === 0 && <FirstAnnotation gMatch={gMatch} s={s} />}
+            {!!index && annotations[index - 1].annotation_type === 'photo' && <PhotoAnnotation annotation={annotations[index - 1]} imgSrc={imgSrc as string} imgLoading={imgLoading} />}
+            {!!index && annotations[index - 1].annotation_type === 'video' && <VideoAnnotation videoAnnotation={annotations[index - 1].annotation as video_annotation} />}
+            {!!index && annotations[index - 1].annotation_type === 'model' && <ModelAnnotation modelAnnotation={annotations[index - 1].annotation as model_annotation} />}
+          </div>
+        }
 
-    </div>
-  </>
+      </div>
+    </>
+  );
 }

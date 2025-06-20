@@ -8,7 +8,7 @@ import { MutableRefObject, useEffect, useRef } from 'react'
 
 export default function ModelViewer(props: { uid: string, minHeight?: string, noAutoStart?: boolean }) {
 
-    const modelViewer = useRef<HTMLIFrameElement>()
+    const modelViewer = useRef<HTMLIFrameElement>(undefined)
     const minHeight = props.minHeight ? props.minHeight : '150px'
 
     const successObj = {

@@ -17,7 +17,8 @@ import Foot from "@/components/Shared/Foot"
 import PageWrapper from "@/components/Shared/PageWrapper"
 
 // Main component
-export default async function CommonNameSearchPage({ params }: { params: { specimenName: string } }){
+export default async function CommonNameSearchPage(props: { params: Promise<{ specimenName: string }> }) {
+  const params = await props.params;
 
   // Variables
   const specimenName: string = params.specimenName || ''

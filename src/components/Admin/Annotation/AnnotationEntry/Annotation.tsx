@@ -35,9 +35,9 @@ export default function  Annotation(props: { annotation: string, setAnnotation?:
     const [linkAdded, setLinkAdded] = useState(0)
 
     // Refs
-    const dialog = useRef<HTMLDialogElement>()
-    const divTextArea = useRef<HTMLDivElement>()
-    const selectionRange = useRef<Range>()
+    const dialog = useRef<HTMLDialogElement>(undefined)
+    const divTextArea = useRef<HTMLDivElement>(undefined)
+    const selectionRange = useRef<Range>(undefined)
 
     // Hyperlink wrapper
     const annotationHyperlinkInsertionWrapper = () => insertAnnotationHyperlink(selectionRange, hyperlinkUrl, selectionText, dialog, setSelectionText, divTextArea, setLinkAdded, linkAdded)

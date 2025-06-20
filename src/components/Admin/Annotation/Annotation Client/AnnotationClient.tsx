@@ -59,7 +59,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     const [isOpen, setIsOpen] = useState(false)
 
     // Refs
-    const modelClicked = useRef<boolean>()
+    const modelClicked = useRef<boolean>(undefined)
     const newAnnotationEnabled = useRef<boolean>(false)
 
     // Reducers

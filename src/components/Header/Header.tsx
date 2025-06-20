@@ -38,7 +38,7 @@ const Header = (props: SearchHeaderProps) => {
   const [mobileSearchOpen, setMobileSearchOpen] = useState<boolean>(false)
 
   // Ref
-  const searchQuery = useRef<string>()
+  const searchQuery = useRef<string>(undefined)
 
   const headerTitle: string = props.headerTitle;
   const specimenName: string = (params['specimenName']) as string ?? headerTitle ?? ''
