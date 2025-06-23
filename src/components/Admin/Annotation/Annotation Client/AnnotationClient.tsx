@@ -45,8 +45,8 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     // Data transfer contexts
     const managerContext = useContext(DataTransferContext)
     const studentContext = useContext(StudentTransferContext)
-    const initializeDataTransfer = managerContext? managerContext.initializeDataTransferHandler : studentContext.initializeDataTransferHandler
-    const terminateDataTransfer = managerContext? managerContext.terminateDataTransferHandler : studentContext.terminateDataTransferHandler
+    const initializeDataTransfer = managerContext ? managerContext.initializeDataTransferHandler : studentContext.initializeDataTransferHandler
+    const terminateDataTransfer = managerContext ? managerContext.terminateDataTransferHandler : studentContext.terminateDataTransferHandler
 
     // Student states
     const [name, setName] = useState<string | null>()
@@ -72,7 +72,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     // Approve, Unapprove and renumber annotation handlers
     const approveAnnotationsHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, approveAnnotations, [specimenData.uid], 'Approving annotations')
     const unapproveAnnotationsHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unapproveAnnotations, [specimenData.uid], 'Unapproving annotations')
-    const renumberAnnotations = async(annotationNumbers: AnnotationNumbers) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, renumberAnnotationsServer, [annotationNumbers], 'Renumbering annotations')
+    const renumberAnnotations = async (annotationNumbers: AnnotationNumbers) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, renumberAnnotationsServer, [annotationNumbers], 'Renumbering annotations')
 
     // Annotation assign and unassign handlers
     const assignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, assignAnnotation, [name, email, specimenData.uid], 'Assigning annotation of model')
@@ -92,19 +92,19 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     // Set relevant model data onPress of the Accordion or when an annotation record has been changed in the database
     useEffect(() => { newAnnotationEnabled.current = false; modelOrAnnotationChangeHandler(specimenData, annotationsAndPositionsDispatch) }, [specimenData.uid, annotationsAndPositions.annotationSavedOrDeleted])
 
-    const AnnotationMemo = memo(() => <AnnotationEntryWrapper modelsToAnnotate={props.modelsToAnnotate} admin={props.admin} annotationModels={props.annotationModels} />)
-    AnnotationMemo.displayName = 'AnnotationMemo'
+    // Simulate a press of the accrodion for the admin portal; only one model is passed from admin via a select ()
+    useEffect(() => { if (props.admin) { annotationsAndPositionsDispatch({ type: 'newModelClicked' }); specimenDataDispatch({ type: 'newModelClicked', model: props.modelsToAnnotate[0] }) } }, [props.modelsToAnnotate])
 
     return <AnnotationClientData.Provider value={annotationClientContext} >
 
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />
-        {annotationsAndPositions.annotations && annotationsAndPositions.annotations.length >=2 && specimenData.uid && <ModalWrapper isOpen={isOpen} setIsOpen={setIsOpen} renumberAnnotations={renumberAnnotations}/>}
+        {annotationsAndPositions.annotations && annotationsAndPositions.annotations.length >= 2 && specimenData.uid && <ModalWrapper isOpen={isOpen} setIsOpen={setIsOpen} renumberAnnotations={renumberAnnotations} />}
 
         <div className="flex flex-col w-full h-full text-[#004C46 dark:text-white]">
 
             <section className="flex">
                 <section className="h-full w-1/5 min-w-[325px]">
-                    <Accordion className="h-full" onSelectionChange={(keys: any) => modelClicked.current = keys.size ? true : false}>
+                    <Accordion className="h-full" onSelectionChange={(keys: any) => modelClicked.current = keys.size ? true : false} defaultExpandedKeys={[props.admin ? '0' : '']}>
                         {props.modelsToAnnotate.map((model, i) =>
                             <AccordionItem
                                 key={i}
@@ -114,13 +114,12 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
                                 onPress={() => modelClickHandler(modelClicked.current as boolean, model, annotationsAndPositionsDispatch, specimenDataDispatch)}>
                                 {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px]"><BotanistRefWrapper ref={newAnnotationEnabled} /></div>}
                                 <AdminAnnotation admin={props.admin} students={props.students as studentsAssignmentsAndModels[]} />
-                                <AnnotationButtons setModalOpen={setModalOpen} ref={newAnnotationEnabled} setReorderOpen={setIsOpen}/>
+                                <AnnotationButtons setModalOpen={setModalOpen} ref={newAnnotationEnabled} setReorderOpen={setIsOpen} />
                             </AccordionItem>
                         )}
                     </Accordion>
                 </section>
-
-                <AnnotationMemo />
+                <AnnotationEntryWrapper modelsToAnnotate={props.modelsToAnnotate} admin={props.admin} annotationModels={props.annotationModels} />
             </section>
 
         </div>
