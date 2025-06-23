@@ -94,7 +94,13 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     useEffect(() => { newAnnotationEnabled.current = false; modelOrAnnotationChangeHandler(specimenData, annotationsAndPositionsDispatch) }, [specimenData.uid, annotationsAndPositions.annotationSavedOrDeleted])
 
     // Simulate a press of the accrodion for the admin portal; only one model is passed from admin via a select ()
-    useEffect(() => { if (props.admin) { annotationsAndPositionsDispatch({ type: 'newModelClicked' }); specimenDataDispatch({ type: 'newModelClicked', model: props.modelsToAnnotate[0] }) } }, [props.modelsToAnnotate])
+    useEffect(() => {
+        if (props.admin) {
+            setViewerLoaded(false)
+            annotationsAndPositionsDispatch({ type: 'newModelClicked' })
+            specimenDataDispatch({ type: 'newModelClicked', model: props.modelsToAnnotate[0] })
+        }
+    }, [props.modelsToAnnotate])
 
     return <AnnotationClientData.Provider value={annotationClientContext} >
 
@@ -105,14 +111,14 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
 
             <section className="flex">
                 <section className="h-full w-1/5 min-w-[325px]">
-                    <Accordion className="h-full" onSelectionChange={(keys: any) => modelClicked.current = keys.size ? true : false} defaultExpandedKeys={[props.admin ? '0' : '']}>
+                    <Accordion className="h-full" onSelectionChange={(keys: any) => modelClicked.current = keys.size ? true : false} selectedKeys={[props.admin ? '0' : '']}>
                         {props.modelsToAnnotate.map((model, i) =>
                             <AccordionItem
                                 key={i}
                                 aria-label={'Specimen to model'}
                                 title={toUpperFirstLetter(model.spec_name)}
                                 classNames={{ title: 'text-[ #004C46] text-2xl' }}
-                                onPress={() => modelClickHandler(modelClicked.current as boolean, model, annotationsAndPositionsDispatch, specimenDataDispatch)}>
+                                onPress={() => modelClickHandler(modelClicked.current as boolean, model, annotationsAndPositionsDispatch, specimenDataDispatch, props.admin)}>
                                 <div className="relative h-[400px] w-full">
                                     {!viewerLoaded && <div className="absolute h-full w-full flex justify-center items-center"><Spinner label="Loading Model Viewer" /></div>}
                                     {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px] w-full absolute"><BotanistRefWrapper ref={newAnnotationEnabled} setViewerLoaded={setViewerLoaded} /></div>}

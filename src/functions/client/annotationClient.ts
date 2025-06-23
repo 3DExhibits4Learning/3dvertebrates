@@ -108,7 +108,8 @@ export const modelOrAnnotationChangeHandler = async (specimenData: annotationCli
  * @param apDispatch annotationsAndPositionsDispatch
  * @param sdDispatch specimenDataDispatch
  */
-export const modelClickHandler = (modelClicked: boolean, model: model, apDispatch: Dispatch<dispatch>, sdDispatch: Dispatch<newModelClicked | dispatch>, ) => {
+export const modelClickHandler = (modelClicked: boolean, model: model, apDispatch: Dispatch<dispatch>, sdDispatch: Dispatch<newModelClicked | dispatch>, admin: boolean) => {
+    if(admin) return
     if (modelClicked) {
         // First annotation position MUST be loaded before BotanistRefWrapper, so it is set to undefined while model data is set
         apDispatch({ type: 'newModelClicked' })
