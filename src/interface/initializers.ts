@@ -36,9 +36,9 @@ export const initialSpecimenData: annotationClientSpecimen = {
 // Initial annotation entry data
 export const getInitialAnnotationEntryData = (apData: annotationsAndPositions, newAnnotation?: boolean): annotationEntry => {
     return ({
-        photoChecked: undefined,
-        videoChecked: undefined,
-        modelChecked: undefined,
+        photoChecked: false,
+        videoChecked: false,
+        modelChecked: false,
         annotationType: '',
         mediaType: undefined,
         imageVisible: undefined,

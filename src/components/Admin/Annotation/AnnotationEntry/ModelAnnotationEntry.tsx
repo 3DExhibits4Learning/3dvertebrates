@@ -23,7 +23,6 @@ const ModelViewer = dynamic(() => import('@/components/Shared/ModelViewer'), { s
 
 // Main JSX
 export default function ModelAnnotationEntry(props: { annotationModels: model[] }) {
-
     const annotationEntryData = (useContext(AnnotationEntryData) as annotationEntryContext).annotationEntryData
 
     return <>
@@ -37,9 +36,7 @@ export default function ModelAnnotationEntry(props: { annotationModels: model[] 
                 </div>
                 {
                     annotationEntryData.modelAnnotationUid && annotationEntryData.modelAnnotationUid !== 'select' &&
-                    <div className="w-full mr-12">
-                        <ModelViewer uid={annotationEntryData.modelAnnotationUid} />
-                    </div>
+                    <div className="w-full mr-12"><ModelViewer uid={annotationEntryData.modelAnnotationUid} minHeight="100%" /></div>
                 }
             </section>
         }

@@ -122,7 +122,6 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
                                 <div className="relative h-[400px] w-full">
                                     {!viewerLoaded && <div className="absolute h-full w-full flex justify-center items-center"><Spinner label="Loading Model Viewer" /></div>}
                                     {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px] w-full absolute"><BotanistRefWrapper ref={newAnnotationEnabled} setViewerLoaded={setViewerLoaded} /></div>}
-
                                 </div>
                                 {/* {!viewerLoaded && <div className="h-[400px] w-full flex justify-center items-center"><Spinner label="Loading Model Viewer" /></div>}
                                 {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px]"><BotanistRefWrapper ref={newAnnotationEnabled} setViewerLoaded={setViewerLoaded} /></div>} */}
