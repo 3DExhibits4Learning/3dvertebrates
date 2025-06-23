@@ -8,7 +8,7 @@
 
 // Typical imports
 import { annotationsAndPositions } from "@/interface/interface"
-import { MutableRefObject, Dispatch } from "react"
+import { MutableRefObject, Dispatch, SetStateAction } from "react"
 import { fullAnnotation } from "@/interface/interface"
 
 // Default imports
@@ -89,7 +89,8 @@ export const annotationSelectHandler = (index: any, newAnnotationEnabled: Mutabl
  * @param uid 
  * @param successObj 
  */
-export const initializeViewer = (iframe: HTMLIFrameElement, uid: string, successObj: any) => {
+export const initializeViewer = (iframe: HTMLIFrameElement, uid: string, successObj: any, setViewerLoaded: Dispatch<SetStateAction<boolean>>) => {
+    setViewerLoaded(true)
     iframe.src = uid
     const client = new Sketchfab(iframe)
     client.init(uid, successObj)

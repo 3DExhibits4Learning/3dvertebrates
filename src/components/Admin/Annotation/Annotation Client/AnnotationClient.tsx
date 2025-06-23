@@ -12,7 +12,7 @@
 'use client'
 
 // Typical imports
-import { Accordion, AccordionItem } from "@heroui/react"
+import { Accordion, AccordionItem, Spinner } from "@heroui/react"
 import { useEffect, useState, useRef, useContext, createContext, useReducer, memo } from "react"
 import { model } from "@prisma/client"
 import { studentsAssignmentsAndModels, annotationClientData } from "@/interface/interface"
@@ -53,14 +53,15 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     const [email, setEmail] = useState<string | null>()
 
     // Data transfer state (for 'Are you sure' modal)
-    const [modalOpen, setModalOpen] = useState<boolean>(false)
+    const [modalOpen, setModalOpen] = useState(false)
+    const [viewerLoaded, setViewerLoaded] = useState(false)
 
     // Reorder annotations states
     const [isOpen, setIsOpen] = useState(false)
 
     // Refs
-    const modelClicked = useRef<boolean>(undefined)
-    const newAnnotationEnabled = useRef<boolean>(false)
+    const modelClicked = useRef(false)
+    const newAnnotationEnabled = useRef(false)
 
     // Reducers
     const [annotationsAndPositions, annotationsAndPositionsDispatch] = useReducer(annotationsAndPositionsReducer, initialAnnotationsAndPositions)
@@ -112,7 +113,8 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
                                 title={toUpperFirstLetter(model.spec_name)}
                                 classNames={{ title: 'text-[ #004C46] text-2xl' }}
                                 onPress={() => modelClickHandler(modelClicked.current as boolean, model, annotationsAndPositionsDispatch, specimenDataDispatch)}>
-                                {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px]"><BotanistRefWrapper ref={newAnnotationEnabled} /></div>}
+                                {!viewerLoaded && <div className="h-[400px] w-full flex justify-center items-center"><Spinner label="Loading Model Viewer"/></div>}
+                                {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px]"><BotanistRefWrapper ref={newAnnotationEnabled} setViewerLoaded={setViewerLoaded} /></div>}
                                 <AdminAnnotation admin={props.admin} students={props.students as studentsAssignmentsAndModels[]} />
                                 <AnnotationButtons setModalOpen={setModalOpen} ref={newAnnotationEnabled} setReorderOpen={setIsOpen} />
                             </AccordionItem>

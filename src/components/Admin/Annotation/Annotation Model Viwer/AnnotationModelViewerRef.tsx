@@ -7,13 +7,13 @@
 'use client'
 
 // Typical import
-import { forwardRef, lazy, Suspense } from "react"
+import { Dispatch, forwardRef, lazy, SetStateAction, Suspense } from "react"
 
 // Lazy import
 const BotanistModelViewer = lazy(() => import("./AnnotationModelViewer"))
 
 // Forward ref to botanist model viewer
-const BotanistRefWrapper = forwardRef((props: { minHeight?: string }, ref: any) => <Suspense fallback={<div>Loading...</div>}>
+const BotanistRefWrapper = forwardRef((props: { minHeight?: string, setViewerLoaded: Dispatch<SetStateAction<boolean>> }, ref: any) => <Suspense>
     <BotanistModelViewer {...props} ref={ref} />
 </Suspense>)
 

@@ -8,7 +8,7 @@
 "use client"
 
 // Typical imports
-import { MutableRefObject, useEffect, useRef, forwardRef, ForwardedRef, useState, useContext } from 'react'
+import { MutableRefObject, useEffect, useRef, forwardRef, ForwardedRef, useState, useContext, Dispatch, SetStateAction } from 'react'
 import { AnnotationClientData } from '../Annotation Client/AnnotationClient'
 import { annotationClientData } from '@/interface/interface'
 
@@ -16,7 +16,7 @@ import { annotationClientData } from '@/interface/interface'
 import * as fn from '@/functions/client/AnnotationModelViewer'
 
 // Main JSX
-const BotanistModelViewer = forwardRef((props: { minHeight?: string }, ref: ForwardedRef<boolean>) => {
+const BotanistModelViewer = forwardRef((props: { minHeight?: string, setViewerLoaded: Dispatch<SetStateAction<boolean>> }, ref: ForwardedRef<boolean>) => {
 
     // Annotation client context
     const clientData = useContext(AnnotationClientData) as annotationClientData
@@ -57,7 +57,7 @@ const BotanistModelViewer = forwardRef((props: { minHeight?: string }, ref: Forw
     }
 
     // Initialize the viewer
-    useEffect(() => fn.initializeViewer(modelViewer.current as HTMLIFrameElement, specimen.uid as string, successObj), [specimen.uid, apData.annotations]) // eslint-disable-line react-hooks/exhaustive-deps
+    useEffect(() => fn.initializeViewer(modelViewer.current as HTMLIFrameElement, specimen.uid as string, successObj, props.setViewerLoaded), [specimen.uid, apData.annotations]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // Remove a temporary annotation when its cancelled
     useEffect(() => fn.cancelAnnotation(sketchfabApi, temporaryAnnotationIndex, apDataDispatch), [apData.cancelledAnnotation]) // eslint-disable-line react-hooks/exhaustive-deps
