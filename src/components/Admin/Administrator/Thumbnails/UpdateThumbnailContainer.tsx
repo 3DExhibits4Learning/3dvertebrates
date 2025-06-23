@@ -49,7 +49,7 @@ export default function UpdateThumbnailContainer(props: { modelsWithThumbnails: 
                             <div className="my-4">
                                 <div className="flex w-full h-[600px] mb-12 justify-center">
                                     <div className="h-full w-[600px]">
-                                        <ModelViewer uid={uid} />
+                                        <ModelViewer uid={uid} minHeight="100%"/>
                                     </div>
                                 </div>
                                 <UpdateThumbnail uid={uid} file={file} setFile={setFile as Dispatch<SetStateAction<File>>} updateThumbnail={updateThumbnailHandler} />

@@ -14,7 +14,7 @@ import { AnnotationClientData } from "./AnnotationClient"
 import StudentSelect from "../../Administrator/Students/SelectStudents"
 
 // Main JSX
-export default function AdminAnnotation(props: {admin: boolean, students: studentsAssignmentsAndModels[]}) {
+export default function AdminAnnotation(props: { admin: boolean, students: studentsAssignmentsAndModels[] }) {
 
     // Context, variables
     const context = useContext(AnnotationClientData) as annotationClientData
@@ -45,18 +45,22 @@ export default function AdminAnnotation(props: {admin: boolean, students: studen
             <>
                 <div className="w-full mb-2">
                     <table className="w-full overflow-hidden rounded-b-lg bg-[#D5CB9F] dark:bg-[#212121] text-center">
-                        <tr>
-                            <td className="py-1 border-b border-[#004C46] border-r">Assigned to</td>
-                            <td className="py-1 border-b border-[#004C46]">{specimenData.annotator}</td>
-                        </tr>
-                        <tr>
-                            <td className="py-1 border-b border-[#004C46] border-r">Student Approved</td>
-                            <td className="py-1 border-b border-[#004C46]">{specimenData.annotated ? 'Yes' : 'No'}</td>
-                        </tr>
-                        <tr>
-                            <td className="py-1 border-[#004C46] border-r">Admin Approved</td>
-                            <td className="py-1 border-[#004C46]">{specimenData.annotationsApproved ? 'Yes' : 'No'}</td>
-                        </tr>
+                        <thead>
+                            <tr>
+                                <td className="py-1 border-b border-[#004C46] border-r">Assigned to</td>
+                                <td className="py-1 border-b border-[#004C46]">{specimenData.annotator}</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="py-1 border-b border-[#004C46] border-r">Student Approved</td>
+                                <td className="py-1 border-b border-[#004C46]">{specimenData.annotated ? 'Yes' : 'No'}</td>
+                            </tr>
+                            <tr>
+                                <td className="py-1 border-[#004C46] border-r">Admin Approved</td>
+                                <td className="py-1 border-[#004C46]">{specimenData.annotationsApproved ? 'Yes' : 'No'}</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
                 {

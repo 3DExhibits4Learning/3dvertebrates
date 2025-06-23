@@ -26,7 +26,7 @@ export default function FindModel(props: { models: model[] }) {
     return <AdminItemContainer>
         <Select models={props.models} value={uid} setValue={setUid} />
         <div className="flex w-full">
-            {uid && <div className="w-full h-full"><ModelViewer uid={uid} minHeight="h-full"/></div>}
+            {uid && <div className="w-full h-full"><ModelViewer uid={uid} minHeight="100%"/></div>}
             {model && <ModelDataTable model={model} />}
         </div>
     </AdminItemContainer>

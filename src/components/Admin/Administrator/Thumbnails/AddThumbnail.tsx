@@ -34,7 +34,7 @@ export default function AddThumbnail(props: { modelsNeedingThumbnails: model[] |
                                     <p>Species Name: {model.spec_name}</p>
                                     <p className="mb-8">UID: {model.uid}</p>
                                     <div className="w-[500px] h-[500px] mb-8">
-                                        <ModelViewer uid={model.uid} noAutoStart/>
+                                        <ModelViewer uid={model.uid} noAutoStart minHeight="100%"/>
                                     </div>
                                     <p className="text-center mb-8 text-xl">Upload Thumbnail:</p>
                                     <div className="flex justify-between">

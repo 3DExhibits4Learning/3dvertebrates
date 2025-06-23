@@ -28,38 +28,36 @@ export default function ApproveModel(props: { unapprovedModels: model[] }) {
 
     useEffect(() => { if (uid) setModelHandler() }, [uid])
 
-    return (
-        <AdminItemContainer>
-            <Select value={uid} setValue={setUid} models={props.unapprovedModels} />
-            <div className="flex w-full">
-                {
-                    uid &&
-                    <div className="w-full h-full">
-                        <ModelViewer uid={uid} />
-                    </div>
-                }
-                {
-                    model &&
-                    <>
-                        <ApproveModelData model={model} />
-                    </>
-                }
-            </div>
+    return <AdminItemContainer>
+        <Select value={uid} setValue={setUid} models={props.unapprovedModels} />
+        <div className="flex w-full">
+            {
+                uid &&
+                <div className="w-full h-full">
+                    <ModelViewer uid={uid} minHeight="100%"/>
+                </div>
+            }
             {
                 model &&
-                <section className="flex">
-                    <div className="mt-12 mr-12">
-                        <Button className="text-white" onPress={() => approveModelHandler(uid)}>
-                            Approve 3D Model
-                        </Button>
-                    </div>
-                    <div className="mt-12">
-                        <Button className="text-red-600" variant="light" onPress={() => rejectModelHandler(uid)}>
-                            Reject 3D Model
-                        </Button>
-                    </div>
-                </section>
+                <>
+                    <ApproveModelData model={model} />
+                </>
             }
-        </AdminItemContainer>
-    )
+        </div>
+        {
+            model &&
+            <section className="flex">
+                <div className="mt-12 mr-12">
+                    <Button className="text-white" onPress={() => approveModelHandler(uid)}>
+                        Approve 3D Model
+                    </Button>
+                </div>
+                <div className="mt-12">
+                    <Button className="text-red-600" variant="light" onPress={() => rejectModelHandler(uid)}>
+                        Reject 3D Model
+                    </Button>
+                </div>
+            </section>
+        }
+    </AdminItemContainer>
 }
