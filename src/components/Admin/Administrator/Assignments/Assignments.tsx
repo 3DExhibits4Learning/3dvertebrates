@@ -3,7 +3,6 @@
  * 
  * @fileoverview admin client display table of students and their assignments
  * 
- * @todo add species name of assigned 3d model to the table
  */
 
 'use client'
@@ -13,6 +12,7 @@ import { Fragment } from "react"
 
 export default function Assignments(props: { studentsAssignmentsAndModels: studentsAssignmentsAndModels[] }) {
     const sam = props.studentsAssignmentsAndModels // sam = students, assignments and models
+    console.log(sam)
 
     return <section className="flex w-full items-center flex-col mb-16">
         <div className="flex w-3/4 rounded-lg overflow-auto">
@@ -37,10 +37,10 @@ export default function Assignments(props: { studentsAssignmentsAndModels: stude
                                 </tr>
                                 {
                                     student.assignment.length > 1 && student.assignment.slice(1).map((assignment, index) => <tr key={student.email}>
-                                        <td className={index === student.assignment.slice(1).length - 1 ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-r border-[#004C46] py-2 pl-2"} >{student.name}</td>
-                                        <td className={index === student.assignment.slice(1).length - 1 ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-r border-[#004C46] py-2 pl-2"} >{student.models[index + 1].spec_name}</td>
-                                        <td className={index === student.assignment.slice(1).length - 1 ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-r border-[#004C46] py-2 pl-2"} >{student.models[index + 1].annotated ? 'Yes' : 'No'}</td>
-                                        <td className={index === student.assignment.slice(1).length - 1 ? "py-2 pl-2" : "border-b border-[#004C46] py-2 pl-2"} >{assignment.uid}</td>
+                                        <td className={!(index === student.assignment.slice(1).length - 1) ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-r border-[#004C46] py-2 pl-2"} >{student.name}</td>
+                                        <td className={!(index === student.assignment.slice(1).length - 1) ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-r border-[#004C46] py-2 pl-2"} >{student.models[index + 1].spec_name}</td>
+                                        <td className={!(index === student.assignment.slice(1).length - 1) ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-r border-[#004C46] py-2 pl-2"} >{student.models[index + 1].annotated ? 'Yes' : 'No'}</td>
+                                        <td className={!(index === student.assignment.slice(1).length - 1) ? "py-2 pl-2" : "border-b border-[#004C46] py-2 pl-2"} >{assignment.uid}</td>
                                     </tr>
                                     )
                                 }

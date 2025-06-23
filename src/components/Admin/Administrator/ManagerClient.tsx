@@ -90,87 +90,86 @@ export default function ManagerClient(props: ManagerClientProps) {
     }
 
     return <>
-            {/* Data transfer (fetch or query) modal */}
-            <DataTransferModal open={openModal} setOpen={setOpenModal} transferring={transferring} loadingLabel={loadingLabel as string} result={result} href='/admin/management' />
+        {/* Data transfer (fetch or query) modal */}
+        <DataTransferModal open={openModal} setOpen={setOpenModal} transferring={transferring} loadingLabel={loadingLabel as string} result={result} href='/admin/management' />
 
-            {/* Data transfer handlers context provider */}
-            <DataTransferContext.Provider value={{ initializeDataTransferHandler, terminateDataTransferHandler }}>
+        {/* Data transfer handlers context provider */}
+        <DataTransferContext.Provider value={{ initializeDataTransferHandler, terminateDataTransferHandler }}>
 
-                {/* Main admin Accordion */}
-                <Accordion className="text-[#004C46] dark:text-[#F5F3E7]">
+            {/* Main admin Accordion */}
+            <Accordion className="text-[#004C46] dark:text-[#F5F3E7]">
 
-                    {/* AccordionItem holds nested "Students" accordion */}
-                    <AccordionItem key='adminStudents' aria-label='adminStudents' title='Students' classNames={{ title: accordionTitlesCss }}>
-                        {/* "Students" nested accordion */}
-                        <Accordion>
-                            {/* Active students table */}
-                            <AccordionItem key='activeStudents' aria-label='activeStudents' title='Active' classNames={{ title: accordionTitlesCss }}>
-                                <StudentTable studentsAssignmentsAndModels={studentsAssignmentsAndModels} />
-                            </AccordionItem>
-                            {/* Add student form */}
-                            <AccordionItem key='addStudent' aria-label='addStudent' title='Add' classNames={{ title: accordionTitlesCss }}>
-                                <AddStudent />
-                            </AccordionItem>
-                        </Accordion>
-                    </AccordionItem>
+                {/* AccordionItem holds nested "Students" accordion */}
+                <AccordionItem key='adminStudents' aria-label='adminStudents' title='Students and Assignments' classNames={{ title: accordionTitlesCss }}>
+                    {/* "Students" nested accordion */}
+                    <Accordion>
+                        {/* AccordionItem holds nested "Assignments" accordion */}
+                        <AccordionItem key={'assignments'} aria-label={'assignments'} title='Assignments' classNames={{ title: accordionTitlesCss }}>
+                            <Assignments studentsAssignmentsAndModels={studentsAssignmentsAndModels} />
+                        </AccordionItem>
+                        {/* Active students table */}
+                        <AccordionItem key='activeStudents' aria-label='activeStudents' title='Active Students' classNames={{ title: accordionTitlesCss }}>
+                            <StudentTable studentsAssignmentsAndModels={studentsAssignmentsAndModels} />
+                        </AccordionItem>
+                        {/* Add student form */}
+                        <AccordionItem key='addStudent' aria-label='addStudent' title='Add Student' classNames={{ title: accordionTitlesCss }}>
+                            <AddStudent />
+                        </AccordionItem>
+                    </Accordion>
+                </AccordionItem>
 
-                    {/* AccordionItem holds nested "Assignments" accordion */}
-                    <AccordionItem key={'assignments'} aria-label={'assignments'} title='Assignments' classNames={{ title: accordionTitlesCss }}>
-                        <Assignments studentsAssignmentsAndModels={studentsAssignmentsAndModels} />
-                    </AccordionItem>
+                {/* AccordionItem holds nested "Models" accordion */}
+                <AccordionItem key={'adminModels'} aria-label={'adminModels'} title='Models' classNames={{ title: accordionTitlesCss }}>
+                    {/* "Models" nested accordion */}
+                    <Accordion>
+                        {/* Model submit form */}
+                        <AccordionItem key='findModel' aria-label={'findModel'} title='Find' classNames={{ title: accordionTitlesCss }}>
+                            <FindModel models={approvedModels} />
+                        </AccordionItem>
+                        <AccordionItem key='approveModel' aria-label={'approveModel'} title='Approve' classNames={{ title: accordionTitlesCss }}>
+                            <ApproveModel unapprovedModels={unapprovedModels} />
+                        </AccordionItem>
+                        {/* Model submit form */}
+                        <AccordionItem key='uploadModel' aria-label={'uploadModel'} title='Upload' classNames={{ title: accordionTitlesCss }}>
+                            <ModelSubmitForm />
+                        </AccordionItem>
+                        {/* Model update form*/}
+                        <AccordionItem key='updateModel' aria-label={'updateModel'} title='Update' classNames={{ title: accordionTitlesCss }}>
+                            <UpdateModelContainer models={approvedModels} />
+                        </AccordionItem>
+                        {/* Model delete form*/}
+                        <AccordionItem key='deleteModel' aria-label={'deleteModel'} title='Delete' classNames={{ title: accordionTitlesCss }}>
+                            <DeleteModel models={approvedModels} />
+                        </AccordionItem>
+                    </Accordion>
+                </AccordionItem>
 
-                    {/* AccordionItem holds nested "Models" accordion */}
-                    <AccordionItem key={'adminModels'} aria-label={'adminModels'} title='Models' classNames={{ title: accordionTitlesCss }}>
-                        {/* "Models" nested accordion */}
-                        <Accordion>
-                            {/* Model submit form */}
-                            <AccordionItem key='findModel' aria-label={'findModel'} title='Find' classNames={{ title: accordionTitlesCss }}>
-                                <FindModel models={approvedModels} />
-                            </AccordionItem>
-                            <AccordionItem key='approveModel' aria-label={'approveModel'} title='Approve' classNames={{ title: accordionTitlesCss }}>
-                                <ApproveModel unapprovedModels={unapprovedModels} />
-                            </AccordionItem>
-                            {/* Model submit form */}
-                            <AccordionItem key='uploadModel' aria-label={'uploadModel'} title='Upload' classNames={{ title: accordionTitlesCss }}>
-                                <ModelSubmitForm />
-                            </AccordionItem>
-                            {/* Model update form*/}
-                            <AccordionItem key='updateModel' aria-label={'updateModel'} title='Update' classNames={{ title: accordionTitlesCss }}>
-                                <UpdateModelContainer models={approvedModels} />
-                            </AccordionItem>
-                            {/* Model delete form*/}
-                            <AccordionItem key='deleteModel' aria-label={'deleteModel'} title='Delete' classNames={{ title: accordionTitlesCss }}>
-                                <DeleteModel models={approvedModels} />
-                            </AccordionItem>
-                        </Accordion>
-                    </AccordionItem>
+                {/* AccordionItem holds nested "Thumbnails" accordion */}
+                <AccordionItem key={'adminThumbnails'} aria-label={'New Specimen'} title='Thumbnails' classNames={{ title: accordionTitlesCss }}>
+                    {/* "Thumbnails" nested accordion */}
+                    <Accordion>
+                        {/* Add thumbnail form */}
+                        <AccordionItem key='modelsWithoutThumbnails' aria-label={'modelsWithoutThumbnails'} title='Models' classNames={{ title: accordionTitlesCss }}>
+                            <AddThumbnail modelsNeedingThumbnails={modelsNeedingThumbnails as model[] | undefined} />
+                        </AccordionItem>
+                        {/* Update thumbnail form */}
+                        <AccordionItem key='updateThumbnail' aria-label={'updateThumbnail'} title='Update' classNames={{ title: accordionTitlesCss }}>
+                            <UpdateThumbnailContainer modelsWithThumbnails={approvedModels} />
+                        </AccordionItem>
+                    </Accordion>
+                </AccordionItem>
 
-                    {/* AccordionItem holds nested "Thumbnails" accordion */}
-                    <AccordionItem key={'adminThumbnails'} aria-label={'New Specimen'} title='Thumbnails' classNames={{ title: accordionTitlesCss }}>
-                        {/* "Thumbnails" nested accordion */}
-                        <Accordion>
-                            {/* Add thumbnail form */}
-                            <AccordionItem key='modelsWithoutThumbnails' aria-label={'modelsWithoutThumbnails'} title='Models' classNames={{ title: accordionTitlesCss }}>
-                                <AddThumbnail modelsNeedingThumbnails={modelsNeedingThumbnails as model[] | undefined} />
-                            </AccordionItem>
-                            {/* Update thumbnail form */}
-                            <AccordionItem key='updateThumbnail' aria-label={'updateThumbnail'} title='Update' classNames={{ title: accordionTitlesCss }}>
-                                <UpdateThumbnailContainer modelsWithThumbnails={approvedModels} />
-                            </AccordionItem>
-                        </Accordion>
-                    </AccordionItem>
+                {/* AccordionItem holds nested "Annotations" accordion */}
+                <AccordionItem key={'adminAnnotations'} aria-label={'New Image Set'} title={"Annotations"} classNames={{ title: 'text-[ #004C46] text-2xl' }}>
+                    <Select value={annotationModelUid} setValue={setAnnotationModelUid} models={approvedModels.filter(model => model.base_model)} />
+                    {annotationModelUid && <AnnotationClient
+                        modelsToAnnotate={approvedModels.filter(model => model.uid === annotationModelUid)}
+                        annotationModels={unusedModelAnnotations}
+                        admin={props.admin}
+                        students={studentsAssignmentsAndModels} />}
+                </AccordionItem>
 
-                    {/* AccordionItem holds nested "Annotations" accordion */}
-                    <AccordionItem key={'adminAnnotations'} aria-label={'New Image Set'} title={"Annotations"} classNames={{ title: 'text-[ #004C46] text-2xl' }}>
-                        <Select value={annotationModelUid} setValue={setAnnotationModelUid} models={approvedModels.filter(model => model.base_model)}/>
-                        {annotationModelUid && <AnnotationClient
-                            modelsToAnnotate={approvedModels.filter(model => model.uid === annotationModelUid)}
-                            annotationModels={unusedModelAnnotations}
-                            admin={props.admin}
-                            students={studentsAssignmentsAndModels}/>}
-                    </AccordionItem>
-
-                </Accordion>
-            </DataTransferContext.Provider>
-        </>
+            </Accordion>
+        </DataTransferContext.Provider>
+    </>
 }
