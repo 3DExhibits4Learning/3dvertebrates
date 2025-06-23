@@ -76,7 +76,7 @@ export const getAssignmentLabel = (specimenData: annotationClientSpecimen) => sp
  * @description dispatch based on active annotation index
  */
 export const activeAnnotationChangeHandler = (apData: annotationsAndPositions, apDispatch: Dispatch<dispatch>) => {
-    if (apData.activeAnnotationIndex == 1) apDispatch({ type: 'activeAnnotationIndex=1' })
+    if (apData.activeAnnotationIndex === 1) apDispatch({ type: 'activeAnnotationIndex=1' })
     else if (typeof (apData.activeAnnotationIndex) === 'number' && apData.annotations) apDispatch({ type: 'activeAnnotationIndex>1' })
 }
 

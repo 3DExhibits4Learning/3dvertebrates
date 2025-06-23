@@ -102,6 +102,8 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
         }
     }, [props.modelsToAnnotate])
 
+    console.log(annotationsAndPositions?.activeAnnotation)
+
     return <AnnotationClientData.Provider value={annotationClientContext} >
 
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />

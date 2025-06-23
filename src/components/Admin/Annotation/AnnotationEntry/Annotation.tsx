@@ -23,7 +23,7 @@ import HyperlinkModal from "@/components/Shared/Modals/HyperLink"
 import AnnotationText from "./AnnotationText"
 
 // Main JSX
-export default function  Annotation(props: { annotation: string, setAnnotation?: Dispatch<SetStateAction<string>>, field?: string, notRequired?: boolean }) {
+export default function Annotation(props: { annotation: string, setAnnotation?: Dispatch<SetStateAction<string>>, field?: string, notRequired?: boolean }) {
 
     // Context
     const context = useContext(AnnotationEntryData)
@@ -55,7 +55,8 @@ export default function  Annotation(props: { annotation: string, setAnnotation?:
         useEffect(() => {
                 const textArea = divTextArea.current as HTMLDivElement
                 textArea.innerHTML = props.annotation
-        }, [])
+                console.log('Effect Ran')
+        }, [props.annotation])
 
         // Trigger state update when a hyperlink is added (signaling a change to the annotation thus enabling the save button)
         useEffect(() => {
@@ -64,6 +65,8 @@ export default function  Annotation(props: { annotation: string, setAnnotation?:
                 props.setAnnotation ? props.setAnnotation(textArea.innerHTML) : dispatch ? dispatch({ type: 'setStringValue', field: props.field, string: textArea.innerHTML }) : null
             }
         }, [linkAdded])
+
+        console.log(props.annotation)
 
         return <>
             <HyperlinkModal ref={dialog} setHyperLinkUrl={setHyperlinkUrl} hyperlinkWrapper={annotationHyperlinkInsertionWrapper} selectionText={selectionText} setSelectionText={setSelectionText} />
@@ -81,6 +84,6 @@ export default function  Annotation(props: { annotation: string, setAnnotation?:
                     </Button>
                 </div>
             </div>
-            <AnnotationText ref={divTextArea} setAnnotation={props.setAnnotation} field={props.field} annotation={props.annotation} />
+            <AnnotationText ref={divTextArea} setAnnotation={props.setAnnotation} field={props.field} />
         </>
     }

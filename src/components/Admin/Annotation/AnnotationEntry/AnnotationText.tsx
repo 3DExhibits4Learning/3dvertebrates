@@ -1,7 +1,7 @@
 import { Dispatch, forwardRef, RefObject, SetStateAction, useContext, useEffect } from "react"
 import { AnnotationEntryData } from "./AnnotationEntry"
 
-export const AnnotationText = forwardRef((props: { setAnnotation?: Dispatch<SetStateAction<string>>, field?: string, annotation:string }, ref) => {
+export const AnnotationText = forwardRef((props: { setAnnotation?: Dispatch<SetStateAction<string>>, field?: string }, ref) => {
 
     const divTextArea = ref as RefObject<HTMLDivElement>
     const context = useContext(AnnotationEntryData)

@@ -24,9 +24,9 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
             if (!newAnnotationAction.apData) throw Error('Missing annotations and positions')
 
             return {
-                photoChecked: undefined,
-                videoChecked: undefined,
-                modelChecked: undefined,
+                photoChecked: false,
+                videoChecked: false,
+                modelChecked: false,
                 annotationType: '',
                 mediaType: undefined,
                 imageVisible: undefined,
