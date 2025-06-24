@@ -1,4 +1,4 @@
-import { Dispatch, forwardRef, RefObject, SetStateAction, useContext, useEffect } from "react"
+import { ClipboardEvent, Dispatch, forwardRef, RefObject, SetStateAction, useContext, useEffect } from "react"
 import { AnnotationEntryData } from "./AnnotationEntry"
 
 export const AnnotationText = forwardRef((props: { setAnnotation?: Dispatch<SetStateAction<string>>, field?: string }, ref) => {
@@ -7,9 +7,15 @@ export const AnnotationText = forwardRef((props: { setAnnotation?: Dispatch<SetS
     const context = useContext(AnnotationEntryData)
     const dispatch = context ? context.annotationEntryDataDispatch : null
 
+    const paste = (e: ClipboardEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        const text = e.clipboardData.getData('text')
+        if( typeof window !== 'undefined') document.execCommand('insertText', false, text)
+    }
+
     return <div
         ref={divTextArea as RefObject<HTMLDivElement>}
-        onPaste={e => e.preventDefault()}
+        onPaste={paste}
         id='divTextArea'
         contentEditable
         suppressContentEditableWarning

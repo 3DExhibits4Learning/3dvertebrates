@@ -39,13 +39,9 @@ export default function PhotoAnnotationEntry() {
 
                     <div className="flex flex-col w-1/2 max-w-[700px]">
 
-                        <div className="ml-12">
-                            <TextInput value={annotationEntryData.annotationTitle as string} field={'annotationTitle'} title='Annotation Title' required />
-                        </div>
+                        <div className="ml-12"><TextInput value={annotationEntryData.annotationTitle as string} field={'annotationTitle'} title='Annotation Title' required /></div>
 
-                        <div className="ml-12 mb-4">
-                            <FileInput />
-                        </div>
+                        <div className="ml-12 mb-4"><FileInput /></div>
 
                         <div className="ml-12">
                             <TextInput value={annotationEntryData.author as string} field={'author'} title='Author' required />
@@ -67,9 +63,7 @@ export default function PhotoAnnotationEntry() {
 
                 </div>
 
-                <div className="mx-12">
-                    <Annotation annotation={(apData.annotationsAndPositions.activeAnnotation as photo_annotation).annotation} field='annotation' />
-                </div>
+                <div className="mx-12"><Annotation annotation={(apData.annotationsAndPositions.activeAnnotation as photo_annotation).annotation} field='annotation' /></div>
 
             </section>
         }
