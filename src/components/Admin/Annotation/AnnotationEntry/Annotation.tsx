@@ -51,39 +51,36 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
         }
     }
 
-        // Set div text area innerHTML
-        useEffect(() => {
-                const textArea = divTextArea.current as HTMLDivElement
-                textArea.innerHTML = props.annotation
-                console.log('Effect Ran')
-        }, [props.annotation])
+    // Set div text area innerHTML
+    useEffect(() => {
+        const textArea = divTextArea.current as HTMLDivElement
+        textArea.innerHTML = props.annotation
+    }, [props.annotation])
 
-        // Trigger state update when a hyperlink is added (signaling a change to the annotation thus enabling the save button)
-        useEffect(() => {
-            if (linkAdded) {
-                const textArea = divTextArea.current as HTMLDivElement
-                props.setAnnotation ? props.setAnnotation(textArea.innerHTML) : dispatch ? dispatch({ type: 'setStringValue', field: props.field, string: textArea.innerHTML }) : null
-            }
-        }, [linkAdded])
+    // Trigger state update when a hyperlink is added (signaling a change to the annotation thus enabling the save button)
+    useEffect(() => {
+        if (linkAdded) {
+            const textArea = divTextArea.current as HTMLDivElement
+            props.setAnnotation ? props.setAnnotation(textArea.innerHTML) : dispatch ? dispatch({ type: 'setStringValue', field: props.field, string: textArea.innerHTML }) : null
+        }
+    }, [linkAdded])
 
-        console.log(props.annotation)
-
-        return <>
-            <HyperlinkModal ref={dialog} setHyperLinkUrl={setHyperlinkUrl} hyperlinkWrapper={annotationHyperlinkInsertionWrapper} selectionText={selectionText} setSelectionText={setSelectionText} />
-            <div className="flex justify-between w-full">
-                <p className="text-xl mb-1">Annotation
-                    {props.notRequired !== true && <span className="text-red-600 ml-1">*</span>}
-                    {props.notRequired == true && <span className="ml-1">(Optional)</span>}
-                </p>
-                <div className="flex pb-1">
-                    <Button className='bg-[#004C46] text-white mr-1' title="Italic" onClick={() => italicWrapper()} size='sm'>
-                        <i>I</i>
-                    </Button>
-                    <Button className='bg-[#004C46] text-white' title="Hyperlink" onClick={() => toggleLinkComponent(dialog, selectionRange, setSelectionText)} size='sm'>
-                        <Image src="/White Link Icon.svg" width={20} height={10} alt="Logo" className="pt-[3px]" />
-                    </Button>
-                </div>
+    return <>
+        <HyperlinkModal ref={dialog} setHyperLinkUrl={setHyperlinkUrl} hyperlinkWrapper={annotationHyperlinkInsertionWrapper} selectionText={selectionText} setSelectionText={setSelectionText} />
+        <div className="flex justify-between w-full">
+            <p className="text-xl mb-1">Annotation
+                {props.notRequired !== true && <span className="text-red-600 ml-1">*</span>}
+                {props.notRequired == true && <span className="ml-1">(Optional)</span>}
+            </p>
+            <div className="flex pb-1">
+                <Button className='bg-[#004C46] text-white mr-1' title="Italic" onClick={() => italicWrapper()} size='sm'>
+                    <i>I</i>
+                </Button>
+                <Button className='bg-[#004C46] text-white' title="Hyperlink" onClick={() => toggleLinkComponent(dialog, selectionRange, setSelectionText)} size='sm'>
+                    <Image src="/White Link Icon.svg" width={20} height={10} alt="Logo" className="pt-[3px]" />
+                </Button>
             </div>
-            <AnnotationText ref={divTextArea} setAnnotation={props.setAnnotation} field={props.field} />
-        </>
-    }
+        </div>
+        <AnnotationText ref={divTextArea} setAnnotation={props.setAnnotation} field={props.field} />
+    </>
+}

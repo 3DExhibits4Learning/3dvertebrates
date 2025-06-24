@@ -20,6 +20,7 @@ import License from "@/components/Admin/Annotation/AnnotationFields/License"
 import Annotation from "./Annotation"
 import FileInput from "@/components/Admin/Annotation/AnnotationFields/ImageInput"
 import { AnnotationClientData } from "../Annotation Client/AnnotationClient"
+import { photo_annotation } from "@prisma/client"
 
 // Main JSX
 export default function PhotoAnnotationEntry() {
@@ -67,7 +68,7 @@ export default function PhotoAnnotationEntry() {
                 </div>
 
                 <div className="mx-12">
-                    <Annotation annotation={annotationEntryData.annotation} field='annotation' />
+                    <Annotation annotation={(apData.annotationsAndPositions.activeAnnotation as photo_annotation).annotation} field='annotation' />
                 </div>
 
             </section>

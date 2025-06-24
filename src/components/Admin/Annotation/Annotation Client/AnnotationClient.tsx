@@ -102,7 +102,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
         }
     }, [props.modelsToAnnotate])
 
-    console.log(annotationsAndPositions?.activeAnnotation)
+    // console.log(annotationsAndPositions?.activeAnnotation)
 
     return <AnnotationClientData.Provider value={annotationClientContext} >
 
