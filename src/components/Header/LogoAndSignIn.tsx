@@ -9,6 +9,7 @@ import Image from "next/image"
 import { signIn, signOut, useSession, } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { admin } from "@/functions/utils/devAuthed"
+import Link from "next/link"
 
 export default function LogoAndSignIn() {
     const { data: session } = useSession();
@@ -16,9 +17,7 @@ export default function LogoAndSignIn() {
     return (
         <>
             <NavbarContent className="hidden lg:flex pl-[0.5vw]" justify="end">
-                <a href='/'>
-                    <Image src="../../../libLogo.svg" width={70} height={70} alt="Logo" className="pt-[3px]" />
-                </a>
+                <Link href='/'><Image src="../../../libLogo.svg" width={70} height={70} alt="Logo" className="pt-[3px]" /></Link>
                 {
                     session &&
                     <Dropdown>

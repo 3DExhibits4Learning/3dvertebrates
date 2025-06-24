@@ -17,7 +17,7 @@ import { getIndex } from "@/functions/client/annotationClient"
 import AnnotationEntry from "../AnnotationEntry/AnnotationEntry"
 
 // Main JSX
-export default function AnnotationEntryWrapper(props: {modelsToAnnotate: model[], admin: boolean, annotationModels: model[]}) {
+export default function AnnotationEntryWrapper(props: {modelsToAnnotate: model[], admin: boolean, annotationModels: model[], viewerLoaded: boolean}) {
 
     const context = useContext(AnnotationClientData) as annotationClientData
     const specimenData = context.specimenData
@@ -27,14 +27,14 @@ export default function AnnotationEntryWrapper(props: {modelsToAnnotate: model[]
         <section className="flex w-full h-full flex-col">
             {
                 // 'Select a 3d model' banner
-                !specimenData.uid && !annotationsAndPositions.activeAnnotation &&
+                !specimenData.uid && !annotationsAndPositions.activeAnnotation && props.viewerLoaded &&
                 <div className="flex items-center justify-center text-xl h-full w-full">
                     <p className="mr-[10%] text-lg lg:text-3xl mb-12">{props.modelsToAnnotate.length ? props.admin ? 'Select a 3D model' : 'Select an annotation, or click New Annotation' : "No models assigned"}</p>
                 </div>
             }
             {
                 // 'Select an annotation' banner
-                specimenData.uid && !annotationsAndPositions.activeAnnotation && annotationsAndPositions.activeAnnotationIndex !== 1 && !annotationsAndPositions.newAnnotationEnabled &&
+                specimenData.uid && !annotationsAndPositions.activeAnnotation && annotationsAndPositions.activeAnnotationIndex !== 1 && !annotationsAndPositions.newAnnotationEnabled && props.viewerLoaded &&
                 <div className="flex items-center justify-center text-xl h-full w-full">
                     <p className="mr-[10%] text-lg lg:text-3xl">Select an annotation, or click New Annotation</p>
                 </div>

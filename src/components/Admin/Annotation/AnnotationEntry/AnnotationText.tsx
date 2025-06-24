@@ -1,4 +1,4 @@
-import { ClipboardEvent, Dispatch, forwardRef, RefObject, SetStateAction, useContext, useEffect } from "react"
+import { ClipboardEvent, Dispatch, forwardRef, RefObject, SetStateAction, useContext } from "react"
 import { AnnotationEntryData } from "./AnnotationEntry"
 
 export const AnnotationText = forwardRef((props: { setAnnotation?: Dispatch<SetStateAction<string>>, field?: string }, ref) => {
