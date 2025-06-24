@@ -31,8 +31,9 @@ export default function AdminAnnotation(props: { admin: boolean, students: stude
                 <StudentSelect students={props.students} setNameAndEmailStates={handlers.setNameAndEmailStates} />
                 <div className="flex">
                     <Button
+                        size='sm'
                         onPress={() => handlers.assignAnnotationHandler()}
-                        className="text-white mt-2 text-lg"
+                        className="text-white mt-2 text-md"
                         isDisabled={!(student.name && student.email)}>
                         Assign
                     </Button>
@@ -65,13 +66,13 @@ export default function AdminAnnotation(props: { admin: boolean, students: stude
                 </div>
                 {
                     specimenData.annotated && !specimenData.annotationsApproved &&
-                    <div className="flex"><Button onPress={() => handlers.approveAnnotationsHandler()} className="text-white mt-2 text-lg">Approve</Button></div>
+                    <div className="flex"><Button onPress={() => handlers.approveAnnotationsHandler()} className="text-white mt-2 text-md" size='sm'>Approve</Button></div>
                 }
                 {
                     specimenData.annotated && specimenData.annotationsApproved &&
-                    <div className="flex"><Button onPress={() => handlers.unapproveAnnotationsHandler()} className="text-white mt-2 text-lg">Unapprove</Button></div>
+                    <div className="flex"><Button onPress={() => handlers.unapproveAnnotationsHandler()} className="text-white mt-2 text-md" size='sm'>Unapprove</Button></div>
                 }
-                <div className="flex"><Button onPress={() => handlers.unassignAnnotationHandler()} className="text-white mt-2 text-lg">Unassign</Button></div>
+                <div className="flex"><Button onPress={() => handlers.unassignAnnotationHandler()} size='sm' className="text-white mt-2 text-md">Unassign</Button></div>
             </>
         }
     </>

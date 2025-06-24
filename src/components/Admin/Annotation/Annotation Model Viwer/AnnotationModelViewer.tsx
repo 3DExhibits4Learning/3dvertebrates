@@ -57,7 +57,11 @@ const BotanistModelViewer = forwardRef((props: { minHeight?: string, setViewerLo
     }
 
     // Initialize the viewer
-    useEffect(() => fn.initializeViewer(modelViewer.current as HTMLIFrameElement, specimen.uid as string, successObj, props.setViewerLoaded), [specimen.uid, apData.annotations]) // eslint-disable-line react-hooks/exhaustive-deps
+    useEffect(() => {
+        fn.initializeViewer(modelViewer.current as HTMLIFrameElement, specimen.uid as string, successObj, props.setViewerLoaded)
+        return () => props.setViewerLoaded(false)
+    }, 
+    [specimen.uid, apData.annotations]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // Remove a temporary annotation when its cancelled
     useEffect(() => fn.cancelAnnotation(sketchfabApi, temporaryAnnotationIndex, apDataDispatch), [apData.cancelledAnnotation]) // eslint-disable-line react-hooks/exhaustive-deps
