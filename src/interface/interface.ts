@@ -78,6 +78,7 @@ export interface annotationClientData {
   annotationsAndPositionsDispatch: Dispatch<any>,
   specimenData: annotationClientSpecimen,
   specimenDataDispatch: Dispatch<any>,
+  admin: boolean
   handlers: {
     approveAnnotationsHandler: Function,
     unapproveAnnotationsHandler: Function,

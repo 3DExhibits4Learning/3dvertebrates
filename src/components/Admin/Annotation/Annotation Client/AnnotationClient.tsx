@@ -33,6 +33,7 @@ import AnnotationEntryWrapper from "./AnnotationEntryWrapper"
 import AdminAnnotation from "./AdminAnnotation"
 import AnnotationButtons from "./AnnotationButtons"
 import ModalWrapper from "@/components/Shared/Modals/ModalWrapper"
+import AdminAnnotationButtons from "./AdminAnnotationButtons"
 
 // Exported context
 export const AnnotationClientData = createContext<annotationClientData | ''>('')
@@ -81,9 +82,10 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     // Handler object for context; student context object
     const handlers = { approveAnnotationsHandler, unapproveAnnotationsHandler, assignAnnotationHandler, unassignAnnotationHandler, setNameAndEmailStates }
     const student = { name: name, email: email }
+    const admin = props.admin
 
     // Context 
-    const annotationClientContext: annotationClientData = { annotationsAndPositions, annotationsAndPositionsDispatch, specimenData, specimenDataDispatch, handlers, student }
+    const annotationClientContext: annotationClientData = { annotationsAndPositions, annotationsAndPositionsDispatch, specimenData, specimenDataDispatch, admin, handlers, student, }
 
     // Set the activeAnnotation when its dependency is changed from the BotanistModelViewer, either via clicking an annotation or creating a new one
     useEffect(() => activeAnnotationChangeHandler(annotationsAndPositions, annotationsAndPositionsDispatch), [annotationsAndPositions.activeAnnotationIndex]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -123,7 +125,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
                                     {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px] w-full absolute"><BotanistRefWrapper ref={newAnnotationEnabled} setViewerLoaded={setViewerLoaded} /></div>}
                                 </div>
                                 {viewerLoaded && <AdminAnnotation admin={props.admin} students={props.students as studentsAssignmentsAndModels[]} />}
-                                {viewerLoaded && <AnnotationButtons setModalOpen={setModalOpen} ref={newAnnotationEnabled} setReorderOpen={setIsOpen} />}
+                                {viewerLoaded && <AdminAnnotationButtons setModalOpen={setModalOpen} ref={newAnnotationEnabled} setReorderOpen={setIsOpen} />}
                             </AccordionItem>
                             )}
                         </Accordion>
