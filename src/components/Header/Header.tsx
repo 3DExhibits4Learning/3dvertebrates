@@ -84,7 +84,7 @@ const Header = (props: SearchHeaderProps) => {
     {/* Large screen link section */}
 
     <NavbarContent className="hidden lg:flex gap-4" justify="center">
-      <Links page={props.page} />
+      <Links/>
     </NavbarContent>
 
     {/* Mobile search button/icon */}

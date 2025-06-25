@@ -2,12 +2,12 @@
 
 import { NavbarItem } from "@heroui/react"
 import Autocomplete from "../Shared/Form Fields/AutoCompleteRef"
-import { forwardRef, MutableRefObject } from "react"
+import { forwardRef, RefObject } from "react"
 import { useRouter } from "next/navigation"
 import { SearchIcon } from "./SearchIcon"
 
-const AutoComplete = forwardRef((props:{autocompleteOptions: any[], fetchAutoCompleteOptions: Function, width?: string, listWidth?: string}, ref) => {
-    const searchQuery = ref as MutableRefObject<string>
+const AutoComplete = forwardRef((props: { autocompleteOptions: any[], fetchAutoCompleteOptions: Function, width?: string, listWidth?: string }, ref) => {
+    const searchQuery = ref as RefObject<string>
     const router = useRouter()
     return (
         <>
@@ -24,6 +24,7 @@ const AutoComplete = forwardRef((props:{autocompleteOptions: any[], fetchAutoCom
                                  dark:hover:bg-[#3E3E47] px-4 text-[15px] outline-[#004C46] text-[#004C46] dark:text-white"
                     />
                     <button
+                        aria-label='Search Button'
                         className="ml-0 text-white bg-gray-100 hover:bg-gray-200 transition duration-300 ease-in-out px-4 rounded-r-lg h-[42px]"
                         onClick={() => {
                             if (searchQuery.current) {

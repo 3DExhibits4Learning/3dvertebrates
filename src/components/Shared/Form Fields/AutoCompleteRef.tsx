@@ -110,7 +110,7 @@ const Autocomplete = forwardRef((props: { options: any[], changeFn: Function, wi
             if (optionsVisible) document.addEventListener('click', handleOutsideClick);
             else document.removeEventListener('click', handleOutsideClick)
         }
-    }, [optionsVisible]) 
+    }, [optionsVisible])
 
     // If options have become less than highlighted index onChange, reset index
 
@@ -121,30 +121,26 @@ const Autocomplete = forwardRef((props: { options: any[], changeFn: Function, wi
     }, [props.options]) // eslint-disable-line react-hooks/exhaustive-deps
 
 
-    return (
-        <>
-            <div className="flex">
-                <input
-                    ref={selectedValue as Ref<HTMLInputElement>}
-                    type='text'
-                    className={`${props.className} ${props.width}`}
-                    onChange={(e) => changeHandler(e)}
-                    onKeyDown={autocompleteKeyHandler}
-                    defaultValue={props.defaultValue}
-                >
-                </input>
-                {
-                    props.options.length > 0 && optionsVisible &&
-                    <ul ref={options as Ref<HTMLUListElement>} className={`absolute ${props.listWidth} z-50 bg-white dark:bg-[#27272a] rounded-xl mt-[42px] text-[#004C46]`}>
-                        {props.options.map((option, index) => {
-                            if (index == highlightedIndex) return <li onClick={() => listSelect(option.name)} className={`hover:cursor-pointer px-4 bg-[#00856A] rounded-lg text-white`} key={option.name}>{option.name}</li>
-                            else return <li onClick={() => listSelect(option.name)} className={`hover:bg-[#00856A] hover:text-white dark:hover:bg-[#00856A] dark:text-white hover:cursor-pointer px-4 rounded-lg`} key={option.name}>{option.name}</li>
-                        })}
-                    </ul>
-                }
-            </div>
-        </>
-    );
+    return <div className="flex">
+        <input
+            aria-label="Search Input"
+            ref={selectedValue as Ref<HTMLInputElement>}
+            type='text'
+            className={`${props.className} ${props.width}`}
+            onChange={(e) => changeHandler(e)}
+            onKeyDown={autocompleteKeyHandler}
+            defaultValue={props.defaultValue}>
+        </input>
+        {
+            props.options.length > 0 && optionsVisible &&
+            <ul ref={options as Ref<HTMLUListElement>} className={`absolute ${props.listWidth} z-50 bg-white dark:bg-[#27272a] rounded-xl mt-[42px] text-[#004C46]`}>
+                {props.options.map((option, index) => {
+                    if (index == highlightedIndex) return <li onClick={() => listSelect(option.name)} className={`hover:cursor-pointer px-4 bg-[#00856A] rounded-lg text-white`} key={option.name}>{option.name}</li>
+                    else return <li onClick={() => listSelect(option.name)} className={`hover:bg-[#00856A] hover:text-white dark:hover:bg-[#00856A] dark:text-white hover:cursor-pointer px-4 rounded-lg`} key={option.name}>{option.name}</li>
+                })}
+            </ul>
+        }
+    </div>
 })
 Autocomplete.displayName = 'Autocomplete'
 export default Autocomplete
