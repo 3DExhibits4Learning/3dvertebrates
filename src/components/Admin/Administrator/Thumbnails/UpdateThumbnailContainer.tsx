@@ -8,8 +8,10 @@
 
 // Typical imports
 import { model } from "@prisma/client"
-import { SetStateAction, Dispatch, useContext, useState } from "react"
-import { DataTransferContext } from "../ManagerClient"
+import { SetStateAction, Dispatch, useContext, useState, } from "react"
+import { StudentTransferContext } from "@/components/Admin/Student/StudentClient"
+import { DataTransferContext } from "@/components/Admin/Administrator/ManagerClient"
+
 
 // Default imports
 import Select from "@/components/Shared/Form Fields/Select"
@@ -25,8 +27,10 @@ const ModelViewer = dynamic(() => import('@/components/Shared/ModelViewer'))
 export default function UpdateThumbnailContainer(props: { modelsWithThumbnails: model[] | undefined }) {
 
     // Context
-    const initializeDataTransfer = useContext(DataTransferContext).initializeDataTransferHandler
-    const terminateDataTransfer = useContext(DataTransferContext).terminateDataTransferHandler
+    const dataTransferContext = useContext(DataTransferContext)
+    const studentTransferContext = useContext(StudentTransferContext)
+    const initializeDataTransfer = dataTransferContext ? dataTransferContext.initializeDataTransferHandler : studentTransferContext.initializeDataTransferHandler
+    const terminateDataTransfer = dataTransferContext ? dataTransferContext.terminateDataTransferHandler : studentTransferContext.terminateDataTransferHandler
 
     // States
     const [file, setFile] = useState<File>()
@@ -40,9 +44,7 @@ export default function UpdateThumbnailContainer(props: { modelsWithThumbnails: 
                 {
                     props.modelsWithThumbnails && props.modelsWithThumbnails.length > 0 &&
                     <>
-                        <div className="mb-6">
-                            <Select value={uid} setValue={setUid} models={props.modelsWithThumbnails} title='Select Model' />
-                        </div>
+                        <div className="mb-6"><Select value={uid} setValue={setUid} models={props.modelsWithThumbnails} title='Select Model' /></div>
                         
                         {
                             uid &&

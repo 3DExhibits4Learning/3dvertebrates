@@ -12,7 +12,6 @@ import { Fragment } from "react"
 
 export default function Assignments(props: { studentsAssignmentsAndModels: studentsAssignmentsAndModels[] }) {
     const sam = props.studentsAssignmentsAndModels // sam = students, assignments and models
-    console.log(sam)
 
     return <section className="flex w-full items-center flex-col mb-16">
         <div className="flex w-3/4 rounded-lg overflow-auto">

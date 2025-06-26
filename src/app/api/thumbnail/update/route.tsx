@@ -3,7 +3,7 @@
  * 
  * @fileoverview route handler to update model thumbnails
  * 
- * @todo move to /api/thumnail as PATCH method
+ * @todo move to /api/thumbnail as PATCH method
  */
 
 // Typical imports
@@ -22,9 +22,7 @@ const path = 'src/app/api/thumbnail/update/route.tsx'
 
 // Main JSX
 export async function POST(request: Request) {
-
     try {
-
         // Get form data and variables
         const formData = await request.formData().catch(e => routeHandlerErrorHandler(e.message, path, 'request.formData()', "Couldn't get form data")) as FormData
         const file = formData.get('file') as File
@@ -55,7 +53,7 @@ export async function POST(request: Request) {
         const update = await prisma.model.update({ where: { uid: uid }, data: { thumbnail: dbUrl.replaceAll('/', '\\') } }).catch(e => routeHandlerErrorHandler(e.message, path, 'prisma.model.update()', "Couldn't update thumbnail in database"))
 
         // Delete old thumbnail
-        await unlink('public/' + oldThumbnailObject?.thumbnail).catch(e => console.log(routeHandlerError(path, e.message, 'unlink', 'POST', true)))
+        await unlink(process.env.LOCAL_ENV === 'development' ? `X:${oldThumbnailObject?.thumbnail?.slice(4)}` : 'public/' + oldThumbnailObject?.thumbnail).catch(e => console.log(routeHandlerError(path, e.message, 'unlink', 'POST', true)))
 
         //Return Successful
         return routeHandlerTypicalResponse('Thumbnail Updated', update)
