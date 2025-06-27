@@ -6,38 +6,29 @@
  * @todo write fileoverview
  * @todo adjust auth logic
  */
-import { Providers } from "./providers";
+import { Providers } from "./providers"
 import { cookies } from 'next/headers'
 import { getServerSession } from 'next-auth'
-import SessionProvider from '@/components/Shared/SessionProvider'
 import { redirect } from 'next/navigation'
-import { getAuthorizedUsers } from "@/functions/server/queries";
+import { getAuthorizedUsers } from "@/functions/server/queries"
 
-import './globals.css';
+import SessionProvider from '@/components/Shared/SessionProvider'
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+import './globals.css'
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
 
   const session = await getServerSession()
   const authorizedUsers = await getAuthorizedUsers()
   const authorizedUsersMapped = authorizedUsers.map(user => user.email)
 
-  if (session) {
-    if (!session.user?.email || !authorizedUsersMapped.includes(session.user?.email)) return <h1>NOT AUTHORIZED</h1>
-  }
+  if (session) { if (!session.user?.email || !authorizedUsersMapped.includes(session.user?.email)) return <h1>NOT AUTHORIZED</h1> }
 
   if (process.env.AUTH === 'true') {
-    if (!session || !session.user) {
-      redirect('/api/auth/signin')
-    }
+    if (!session || !session.user) redirect('/api/auth/signin')
     else {
       let email = session.user.email as string
-      if (!authorizedUsersMapped.includes(email)) {
-        return <h1>NOT AUTHORIZED</h1>
-      }
+      if (!authorizedUsersMapped.includes(email)) return <h1>NOT AUTHORIZED</h1>
     }
   }
 

@@ -9,8 +9,10 @@
 // Typical imports
 import { Button } from "@heroui/react"
 import { AnnotationClientData } from "./AnnotationClient"
-import { forwardRef, RefObject, SetStateAction, useContext, Dispatch } from "react"
+import { forwardRef, RefObject, SetStateAction, useContext, Dispatch, useEffect, useState } from "react"
 import { annotationClientData } from "@/interface/interface"
+import { useSession } from "next-auth/react"
+import { getAssignmentEmail } from "@/functions/server/admin/administrator"
 
 // Main JSX
 const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetStateAction<boolean>>, setReorderOpen: Dispatch<SetStateAction<boolean>> }, ref) => {
@@ -19,70 +21,69 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
     const context = useContext(AnnotationClientData) as annotationClientData
     const annotationsAndPositions = context.annotationsAndPositions
     const annotationsAndPositionsDispatch = context.annotationsAndPositionsDispatch
-    const isAssigned = context.specimenData.annotator ? true : false
+    const specimenData = context.specimenData
 
     // Ref
     const newAnnotationEnabled = ref as RefObject<boolean>
 
     return <>
-            <section className="grid grid-cols-2 mt-3 rounded-md w-full">
-                {
-                    // New annotation button
-                    !annotationsAndPositions.newAnnotationEnabled && annotationsAndPositions.activeAnnotationIndex !== 'new' && annotationsAndPositions.firstAnnotationPosition !== undefined &&
-                    <div className="flex justify-start items-center border-r border-b pb-2">
-                        <Button
-                            size='sm'
-                            onPress={() => { newAnnotationEnabled.current = true; annotationsAndPositionsDispatch({ type: 'newAnnotation' }) }}
-                            className="text-white text-md min-w-[171px] rounded-md"
-                            isDisabled={annotationsAndPositions.repositionEnabled || isAssigned}>
-                            New Annotation
-                        </Button>
-                    </div>
-                }
-                {
-                    annotationsAndPositions.activeAnnotationIndex != 'new' &&
-                    <div className="flex justify-end items-center border-b pb-2">
-                        <br></br>
-                        <Button
-                            onPress={() => console.log('Preview Model Clicked')}
-                            size='sm'
-                            className="text-white text-md min-w-[171px] rounded-md"
-                            isDisabled={annotationsAndPositions.repositionEnabled}>
-                            Preview Annotations
-                        </Button>
-                    </div>
-                }
-                {
-                    // Renumber annotations button
-                    !annotationsAndPositions.newAnnotationEnabled && annotationsAndPositions.activeAnnotationIndex !== 'new' && annotationsAndPositions.firstAnnotationPosition !== undefined &&
-                    annotationsAndPositions.annotations && annotationsAndPositions.annotations?.length >= 2 &&
-                    <div className="flex justify-start items-center border-r pt-2">
-                        <br></br>
-                        <Button
-                            size='sm'
-                            onPress={() => { props.setReorderOpen(true) }}
-                            className="text-white text-md min-w-[171px] rounded-md"
-                            isDisabled={annotationsAndPositions.repositionEnabled || isAssigned}>
-                            Reorder Annotations
-                        </Button>
-                    </div>
-                }
-                {
-                    // 'Mark as annotated' button
-                    annotationsAndPositions.annotations && annotationsAndPositions.annotations?.length >= 4 && annotationsAndPositions.activeAnnotationIndex != 'new' &&
-                    <div className="flex justify-end items-center pt-2">
-                        <br></br>
-                        <Button
-                            onPress={() => props.setModalOpen(true)}
-                            size='sm'
-                            className="text-white text-md min-w-[171px] rounded-md"
-                            isDisabled={annotationsAndPositions.repositionEnabled || !context.specimenData.annotated}>
-                            Publish Model
-                        </Button>
-                    </div>
-                }
-
-            </section>
+        <section className="grid grid-cols-2 mt-3 rounded-md w-full">
+            {
+                // New annotation button
+                !annotationsAndPositions.newAnnotationEnabled && annotationsAndPositions.activeAnnotationIndex !== 'new' && annotationsAndPositions.firstAnnotationPosition !== undefined &&
+                <div className="flex justify-start items-center border-r border-b pb-2">
+                    <Button
+                        size='sm'
+                        onPress={() => { newAnnotationEnabled.current = true; annotationsAndPositionsDispatch({ type: 'newAnnotation' }) }}
+                        className="text-white text-md min-w-[171px] rounded-md"
+                        isDisabled={annotationsAndPositions.repositionEnabled || !context.adminAssigned}>
+                        New Annotation
+                    </Button>
+                </div>
+            }
+            {
+                annotationsAndPositions.activeAnnotationIndex != 'new' &&
+                <div className="flex justify-end items-center border-b pb-2">
+                    <br></br>
+                    <Button
+                        onPress={() => console.log('Preview Model Clicked')}
+                        size='sm'
+                        className="text-white text-md min-w-[171px] rounded-md"
+                        isDisabled={annotationsAndPositions.repositionEnabled}>
+                        Preview Annotations
+                    </Button>
+                </div>
+            }
+            {
+                // Renumber annotations button
+                !annotationsAndPositions.newAnnotationEnabled && annotationsAndPositions.activeAnnotationIndex !== 'new' && annotationsAndPositions.firstAnnotationPosition !== undefined &&
+                annotationsAndPositions.annotations && annotationsAndPositions.annotations?.length >= 2 &&
+                <div className="flex justify-start items-center border-r pt-2">
+                    <br></br>
+                    <Button
+                        size='sm'
+                        onPress={() => { props.setReorderOpen(true) }}
+                        className="text-white text-md min-w-[171px] rounded-md"
+                        isDisabled={annotationsAndPositions.repositionEnabled || !context.adminAssigned}>
+                        Reorder Annotations
+                    </Button>
+                </div>
+            }
+            {
+                // 'Mark as annotated' button
+                annotationsAndPositions.annotations && annotationsAndPositions.annotations?.length >= 4 && annotationsAndPositions.activeAnnotationIndex != 'new' &&
+                <div className="flex justify-end items-center pt-2">
+                    <br></br>
+                    <Button
+                        onPress={() => props.setModalOpen(true)}
+                        size='sm'
+                        className="text-white text-md min-w-[171px] rounded-md"
+                        isDisabled={annotationsAndPositions.repositionEnabled || !context.specimenData.annotated}>
+                        Publish Model
+                    </Button>
+                </div>
+            }
+        </section>
         {
             // Click to place annotation or cancel
             annotationsAndPositions.newAnnotationEnabled &&

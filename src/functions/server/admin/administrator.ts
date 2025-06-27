@@ -174,6 +174,11 @@ export const addStudent = async (email: string, name: string) => {
     catch (e: any) { catchMessage(e.message) }
 }
 
+/**
+ * 
+ * @param email 
+ * @returns 
+ */
 export const deleteStudent = async (email: string) => {
     try {
         if (!email) throw Error('No email provided')
@@ -197,10 +202,22 @@ export const deleteStudent = async (email: string) => {
 
 /**
  * 
+ * @param uid 
+ * @returns 
+ */
+export const getAssignmentEmail = async(uid: string) => await prisma.assignment.findUnique({where: {uid: uid}, select:{email: true}}).then(assignment => assignment?.email)
+
+/**
+ * 
  * @returns 
  */
 export const getAllPhotoAnnotations = async(id: string) => await prisma.photo_annotation.findMany({where:{annotation_id: id}})
 
+/**
+ * 
+ * @param annotation_id 
+ * @param annotation 
+ */
 export const updatePhotoAnnotation = async (annotation_id: string, annotation: string) => {
         if (!annotation_id || !annotation) throw Error('No annotation provided')
         await prisma.photo_annotation.update({ where: { annotation_id: annotation_id }, data: { annotation: annotation } })

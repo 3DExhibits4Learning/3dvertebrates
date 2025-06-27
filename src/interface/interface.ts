@@ -74,11 +74,12 @@ export interface annotationClientSpecimen {
 }
 
 export interface annotationClientData {
-  annotationsAndPositions: annotationsAndPositions,
-  annotationsAndPositionsDispatch: Dispatch<any>,
-  specimenData: annotationClientSpecimen,
-  specimenDataDispatch: Dispatch<any>,
+  annotationsAndPositions: annotationsAndPositions
+  annotationsAndPositionsDispatch: Dispatch<any>
+  specimenData: annotationClientSpecimen
+  specimenDataDispatch: Dispatch<any>
   admin: boolean
+  adminAssigned: boolean
   handlers: {
     approveAnnotationsHandler: Function,
     unapproveAnnotationsHandler: Function,
@@ -382,6 +383,7 @@ export interface ManagerClientProps {
   studentsAssignmentsAndModels: string
   admin: boolean
   modelAnnotations: string
+  authorizedUsers: authorized[]
 }
 
 export interface UpdateModelFormContainerProps {

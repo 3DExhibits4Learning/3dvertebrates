@@ -12,14 +12,14 @@
 'use client'
 
 // Imports
-import { fullModel, studentsAssignmentsAndModels } from "@/interface/interface";
-import { useState, useEffect, useContext } from "react";
-import { Button } from "@heroui/react";
-import { DataTransferContext } from "../ManagerClient";
-import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler";
-import assignAnnotation from "@/functions/client/managerClient/assignAnnotation";
-import Select from "@/components/Shared/Form Fields/Select";
-import StudentSelect from "../Students/SelectStudents";
+import { fullModel, studentsAssignmentsAndModels } from "@/interface/interface"
+import { useState, useEffect, useContext } from "react"
+import { Button } from "@heroui/react"
+import { DataTransferContext } from "../ManagerClient"
+import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler"
+import { assignAnnotation } from "@/functions/server/admin/administrator"
+import Select from "@/components/Shared/Form Fields/Select"
+import StudentSelect from "../Students/SelectStudents"
 
 // Main component
 export default function AnnotationAssignment(props: { students: studentsAssignmentsAndModels[], unannotatedModels: fullModel[] }) {
@@ -41,9 +41,6 @@ export default function AnnotationAssignment(props: { students: studentsAssignme
         setStudent(name)
         setEmail(email)
     }
-
-    console.log(student)
-    console.log(email)
 
     // Annotation assign (or unassign) handler
     const assignAnnotationHandler = async () => {

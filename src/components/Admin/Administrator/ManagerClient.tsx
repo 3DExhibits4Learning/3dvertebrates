@@ -166,7 +166,8 @@ export default function ManagerClient(props: ManagerClientProps) {
                         modelsToAnnotate={approvedModels.filter(model => model.uid === annotationModelUid)}
                         annotationModels={unusedModelAnnotations}
                         admin={props.admin}
-                        students={studentsAssignmentsAndModels} />}
+                        students={studentsAssignmentsAndModels} 
+                        authorizedUsers={props.authorizedUsers}/>}
                 </AccordionItem>
 
             </Accordion>

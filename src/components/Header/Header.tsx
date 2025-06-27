@@ -103,9 +103,7 @@ const Header = (props: SearchHeaderProps) => {
 
     <LogoAndSignIn />
 
-
     {/***** MOBILE NAVBAR MENU *****/}
-
 
     <NavbarMenu className="z-20">
 

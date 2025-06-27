@@ -5,16 +5,17 @@
  */
 
 // Typical imports
-import { annotationClientData, studentsAssignmentsAndModels } from "@/interface/interface"
+import { annotationClientData } from "@/interface/interface"
 import { Button } from "@heroui/react"
 import { useContext } from "react"
 import { AnnotationClientData } from "./AnnotationClient"
+import { authorized } from "@prisma/client"
 
 // Default imports
 import StudentSelect from "../../Administrator/Students/SelectStudents"
 
 // Main JSX
-export default function AdminAnnotation(props: { admin: boolean, students: studentsAssignmentsAndModels[] }) {
+export default function AdminAnnotation(props: { admin: boolean, authorizedUsers: authorized[] }) {
 
     // Context, variables
     const context = useContext(AnnotationClientData) as annotationClientData
@@ -22,20 +23,21 @@ export default function AdminAnnotation(props: { admin: boolean, students: stude
     const specimenData = context.specimenData
     const annotationsAndPositions = context.annotationsAndPositions
     const student = context.student
+    const authorizedUsers = props.authorizedUsers.filter(user => ['admin', 'student'].includes(user.role))
 
     return <>
         {
             // Student select and assign
             props.admin && !specimenData.annotator && !annotationsAndPositions.newAnnotationEnabled &&
             <>
-                <div className="flex flex-col justify-start items-center mt-2 mb-8">
-                    <p className="text-xl font-medium mb-1 text-left w-full">Select student for assignment</p>
-                    <div className="flex w-full items-center">
-                    <StudentSelect students={props.students} setNameAndEmailStates={handlers.setNameAndEmailStates} />
+                <div className="flex flex-col justify-start items-center mt-2 mb-8 w-full">
+                    <p className="text-xl font-medium mb-1 w-full text-center">Select an annotator for assignment</p>
+                    <div className="flex w-full items-center justify-center">
+                    <StudentSelect authorizedUsers={authorizedUsers} setNameAndEmailStates={handlers.setNameAndEmailStates} />
                     <Button
                         size='sm'
                         onPress={() => handlers.assignAnnotationHandler()}
-                        className="text-white text-md m-auto rounded-md"
+                        className="text-white text-md rounded-md ml-4"
                         isDisabled={!(student.name && student.email)}>
                         Assign
                     </Button>

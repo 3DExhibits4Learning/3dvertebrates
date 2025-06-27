@@ -12,7 +12,7 @@
 // Typical imports
 import { Accordion, AccordionItem, Spinner } from "@heroui/react"
 import { useEffect, useState, useRef, useContext, createContext, useReducer, memo } from "react"
-import { model } from "@prisma/client"
+import { authorized, model } from "@prisma/client"
 import { studentsAssignmentsAndModels, annotationClientData } from "@/interface/interface"
 import { toUpperFirstLetter } from "@/functions/utils/toUpperFirstLetter"
 import { DataTransferContext } from "@/components/Admin/Administrator/ManagerClient"
@@ -20,7 +20,7 @@ import { annotationsAndPositionsReducer } from "@/functions/client/reducers/anno
 import { annotationClientSpecimenReducer } from "@/functions/client/reducers/annotationClientSpecimen"
 import { activeAnnotationChangeHandler, modelOrAnnotationChangeHandler, modelClickHandler } from "@/functions/client/annotationClient"
 import { initialAnnotationsAndPositions, initialSpecimenData } from "@/interface/initializers"
-import { assignAnnotation, unassignAnnotation, approveAnnotations, unapproveAnnotations } from "@/functions/server/admin/administrator"
+import { assignAnnotation, unassignAnnotation, approveAnnotations, unapproveAnnotations, getAssignmentEmail } from "@/functions/server/admin/administrator"
 import { AnnotationNumbers } from "@/ts/ts"
 import { renumberAnnotationsServer } from "@/functions/server/admin/annotator"
 import { StudentTransferContext } from "../../Student/StudentClient"
@@ -34,12 +34,16 @@ import AdminAnnotation from "./AdminAnnotation"
 import AnnotationButtons from "./AnnotationButtons"
 import ModalWrapper from "@/components/Shared/Modals/ModalWrapper"
 import AdminAnnotationButtons from "./AdminAnnotationButtons"
+import { useSession } from "next-auth/react"
 
 // Exported context
 export const AnnotationClientData = createContext<annotationClientData | ''>('')
 
 // Main JSX
-export default function AnnotationClient(props: { modelsToAnnotate: model[], annotationModels: model[], admin: boolean, students?: studentsAssignmentsAndModels[] }) {
+export default function AnnotationClient(props: { modelsToAnnotate: model[], annotationModels: model[], admin: boolean, students?: studentsAssignmentsAndModels[], authorizedUsers?: authorized[] }) {
+
+    const { data: session } = useSession()
+    const userEmail = session?.user?.email
 
     // Data transfer contexts
     const managerContext = useContext(DataTransferContext)
@@ -83,9 +87,11 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     const handlers = { approveAnnotationsHandler, unapproveAnnotationsHandler, assignAnnotationHandler, unassignAnnotationHandler, setNameAndEmailStates }
     const student = { name: name, email: email }
     const admin = props.admin
+    const [adminAssigned, setAdminAssigned] = useState(false)
+    const setAdminAssignedFn = async () => setAdminAssigned(await getAssignmentEmail(specimenData.uid as string) === userEmail)
 
     // Context 
-    const annotationClientContext: annotationClientData = { annotationsAndPositions, annotationsAndPositionsDispatch, specimenData, specimenDataDispatch, admin, handlers, student, }
+    const annotationClientContext: annotationClientData = { annotationsAndPositions, annotationsAndPositionsDispatch, specimenData, specimenDataDispatch, admin, handlers, student, adminAssigned }
 
     // Set the activeAnnotation when its dependency is changed from the BotanistModelViewer, either via clicking an annotation or creating a new one
     useEffect(() => activeAnnotationChangeHandler(annotationsAndPositions, annotationsAndPositionsDispatch), [annotationsAndPositions.activeAnnotationIndex]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -101,6 +107,8 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
             specimenDataDispatch({ type: 'newModelClicked', model: props.modelsToAnnotate[0] })
         }
     }, [props.modelsToAnnotate])
+
+    useEffect(() => { if (props.admin && specimenData.uid) { setAdminAssignedFn() } }, [specimenData.uid])
 
     return <AnnotationClientData.Provider value={annotationClientContext} >
 
@@ -124,7 +132,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
                                     {!viewerLoaded && <div className="absolute h-full w-full flex justify-center items-center"><Spinner label="Loading Model Viewer" /></div> /* Manual loading screen for model viewer */}
                                     {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px] w-full absolute"><BotanistRefWrapper ref={newAnnotationEnabled} setViewerLoaded={setViewerLoaded} /></div>}
                                 </div>
-                                {viewerLoaded && <AdminAnnotation admin={props.admin} students={props.students as studentsAssignmentsAndModels[]} />}
+                                {viewerLoaded && <AdminAnnotation admin={props.admin} authorizedUsers={props.authorizedUsers as authorized[]} />}
                                 {viewerLoaded && <AdminAnnotationButtons setModalOpen={setModalOpen} ref={newAnnotationEnabled} setReorderOpen={setIsOpen} />}
                             </AccordionItem>
                             )}
