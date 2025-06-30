@@ -24,7 +24,6 @@ import FileInput from "@/components/Admin/Annotation/AnnotationFields/ImageInput
 
 // Main JSX
 export default function PhotoAnnotationEntry() {
-
     const annotationEntryData = (useContext(AnnotationEntryData) as annotationEntryContext).annotationEntryData
     const apData = useContext(AnnotationClientData) as annotationClientData
     const photoPath = getNfsPath(annotationEntryData.url)
@@ -63,7 +62,7 @@ export default function PhotoAnnotationEntry() {
 
                 </div>
 
-                <div className="mx-12"><Annotation annotation={(apData.annotationsAndPositions.activeAnnotation as photo_annotation).annotation} field='annotation' /></div>
+                <div className="mx-12"><Annotation annotation={(apData.annotationsAndPositions.activeAnnotation as photo_annotation)?.annotation ?? ''} field='annotation' /></div>
 
             </section>
         }

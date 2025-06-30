@@ -29,7 +29,7 @@ export default function VideoAnnotationEntry() {
                     <TextInput value={annotationEntryData.annotationTitle as string} field='annotationTitle' title='Annotation Title' required />
                     <TextInput value={annotationEntryData.videoSource as string} field='videoSource' title='URL' required />
                     <TextInput value={annotationEntryData.length as string} field='length' title='Length' required />
-                    <Annotation annotation={apData.annotationsAndPositions.activeAnnotation?.annotation as string} field='annotation' notRequired/>
+                    <Annotation annotation={apData.annotationsAndPositions.activeAnnotation?.annotation as string ?? ''} field='annotation' notRequired/>
                 </div>
                 <div className="flex h-[60vh] w-1/2 justify-center pl-12">
                     {

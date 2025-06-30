@@ -161,7 +161,7 @@ export default function ManagerClient(props: ManagerClientProps) {
 
                 {/* AccordionItem holds nested "Annotations" accordion */}
                 <AccordionItem key={'adminAnnotations'} aria-label={'New Image Set'} title={"Annotations"} classNames={{ title: 'text-[ #004C46] text-2xl' }}>
-                    <Select value={annotationModelUid} setValue={setAnnotationModelUid} models={approvedModels.filter(model => model.base_model)} />
+                    <Select value={annotationModelUid} setValue={setAnnotationModelUid} models={approvedModels.filter(model => model.base_model)} width="w-1/5"  />
                     {annotationModelUid && <AnnotationClient
                         modelsToAnnotate={approvedModels.filter(model => model.uid === annotationModelUid)}
                         annotationModels={unusedModelAnnotations}

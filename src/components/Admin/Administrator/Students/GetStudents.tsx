@@ -11,7 +11,7 @@
 // Typical imports
 import { studentsAssignmentsAndModels } from "@/interface/interface"
 import { Button } from "@heroui/react"
-import { useContext } from "react"
+import { useContext, useMemo } from "react"
 import { deleteStudent } from "@/functions/server/admin/administrator"
 import { DataTransferContext } from "../ManagerClient"
 
@@ -28,7 +28,7 @@ export default function StudentTable(props: { studentsAssignmentsAndModels: stud
     const removeStudentHandler = async (studentEmail: string) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, deleteStudent, [studentEmail], 'Removing student')
 
     // Abbreviating prop
-    const sam = props.studentsAssignmentsAndModels
+    const sam = useMemo(() => props.studentsAssignmentsAndModels.filter(user => user.role === 'student'), [props.studentsAssignmentsAndModels])
 
     return <section className="flex w-full items-center flex-col">
         <div className="flex w-1/2 rounded-lg overflow-hidden mb-16">

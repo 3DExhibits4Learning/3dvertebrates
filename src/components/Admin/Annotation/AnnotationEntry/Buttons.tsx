@@ -1,5 +1,6 @@
 'use client'
 
+// Typical imports
 import { Button } from "@heroui/react"
 import { AnnotationClientData } from "../Annotation Client/AnnotationClient"
 import { annotationClientData } from "@/interface/interface"
