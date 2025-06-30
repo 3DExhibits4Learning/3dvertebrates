@@ -57,11 +57,11 @@ export const unassignAnnotation = async (email: string, uid: string) => {
 
         // Annotator update + assignment queries
         const updateAnnotator = prisma.model.update({ where: { uid: uid }, data: { annotator: null } })
-        const unassignModelForAnnotation = prisma.assignment.delete({ where: { uid: uid, email: email } })
+        const unassignModelForAnnotation = prisma.assignment.delete({ where: { uid: uid } })
 
         // Await transaction and inform student of assignment
         await prisma.$transaction([updateAnnotator, unassignModelForAnnotation])
-            .catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction([updateAnnotator, unassignModelForAnnotation])', "Couldn't unassign model to student"))
+            .catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction([updateAnnotator, unassignModelForAnnotation])', "Couldn't unassign model"))
 
         // Success message
         return `Model unassigned`

@@ -24,6 +24,7 @@ import { assignAnnotation, unassignAnnotation, approveAnnotations, unapproveAnno
 import { AnnotationNumbers } from "@/ts/ts"
 import { renumberAnnotationsServer } from "@/functions/server/admin/annotator"
 import { StudentTransferContext } from "../../Student/StudentClient"
+import { useSession } from "next-auth/react"
 
 // Default imports
 import BotanistRefWrapper from "../Annotation Model Viwer/AnnotationModelViewerRef"
@@ -34,14 +35,13 @@ import AdminAnnotation from "./AdminAnnotation"
 import AnnotationButtons from "./AnnotationButtons"
 import ModalWrapper from "@/components/Shared/Modals/ModalWrapper"
 import AdminAnnotationButtons from "./AdminAnnotationButtons"
-import { useSession } from "next-auth/react"
 
 // Exported context
 export const AnnotationClientData = createContext<annotationClientData | ''>('')
 
 // Main JSX
 export default function AnnotationClient(props: { modelsToAnnotate: model[], annotationModels: model[], admin: boolean, students?: studentsAssignmentsAndModels[], authorizedUsers?: authorized[] }) {
-
+    // Session and email
     const { data: session } = useSession()
     const userEmail = session?.user?.email
 
@@ -59,8 +59,9 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     const [modalOpen, setModalOpen] = useState(false)
     const [viewerLoaded, setViewerLoaded] = useState(false)
 
-    // Reorder annotations states
+    // Annotation reorder open state, admin assigned state
     const [isOpen, setIsOpen] = useState(false)
+    const [adminAssigned, setAdminAssigned] = useState(false)
 
     // Refs
     const modelClicked = useRef(false)
@@ -79,16 +80,16 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     const renumberAnnotations = async (annotationNumbers: AnnotationNumbers) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, renumberAnnotationsServer, [annotationNumbers], 'Renumbering annotations')
 
     // Annotation assign and unassign handlers
+    console.log(props.students)
     const assignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, assignAnnotation, [name, email, specimenData.uid], 'Assigning annotation of model')
-    const getAnnotationUnassignmentEmail = () => (props.students as studentsAssignmentsAndModels[]).find(student => student.assignment.find(assignment => assignment.uid === specimenData.uid))?.email
+    const getAnnotationUnassignmentEmail = async() => (props.students as studentsAssignmentsAndModels[]).find(student => student.assignment.find(assignment => assignment.uid === specimenData.uid))?.email
     const unassignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unassignAnnotation, [getAnnotationUnassignmentEmail(), specimenData.uid], 'Unassigning annotation of model')
+    const setAdminAssignedFn = async () => setAdminAssigned(await getAssignmentEmail(specimenData.uid as string) === userEmail)
 
     // Handler object for context; student context object
     const handlers = { approveAnnotationsHandler, unapproveAnnotationsHandler, assignAnnotationHandler, unassignAnnotationHandler, setNameAndEmailStates }
     const student = { name: name, email: email }
     const admin = props.admin
-    const [adminAssigned, setAdminAssigned] = useState(false)
-    const setAdminAssignedFn = async () => setAdminAssigned(await getAssignmentEmail(specimenData.uid as string) === userEmail)
 
     // Context 
     const annotationClientContext: annotationClientData = { annotationsAndPositions, annotationsAndPositionsDispatch, specimenData, specimenDataDispatch, admin, handlers, student, adminAssigned }
@@ -114,7 +115,6 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
 
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />
         {annotationsAndPositions.annotations && annotationsAndPositions.annotations.length >= 2 && specimenData.uid && <ModalWrapper isOpen={isOpen} setIsOpen={setIsOpen} renumberAnnotations={renumberAnnotations} />}
-
 
         {
             props.admin &&

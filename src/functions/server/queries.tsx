@@ -158,8 +158,8 @@ export async function getSoftwares(uid: string) {
  */
 export const getAllSiteReadyModels = async (development: boolean): Promise<model[]> => {
 
-  const whereClause = development ? { site_ready: true, base_model: true, thumbnail: { not: null } } : 
-  { site_ready: true, base_model: true, annotator: { not: null }, annotated: true, thumbnail: { not: null }, annotationsApproved: true }
+  const whereClause = development ? { site_ready: true, base_model: true, thumbnail: { not: null } } :
+    { site_ready: true, base_model: true, annotator: { not: null }, annotated: true, thumbnail: { not: null }, annotationsApproved: true }
 
   const models = await prisma.model.findMany({
     where: whereClause,
@@ -177,7 +177,7 @@ export const getAllSiteReadyModels = async (development: boolean): Promise<model
  * 
  * @returns {Promise<model[]>}
  */
-export const getAllModels = async ()=> {return await prisma.model.findMany({orderBy: {spec_name: 'asc'}})}
+export const getAllModels = async () => { return await prisma.model.findMany({ orderBy: { spec_name: 'asc' } }) }
 
 /**
  * @function getModelAnnotations
@@ -185,7 +185,7 @@ export const getAllModels = async ()=> {return await prisma.model.findMany({orde
  * 
  * @returns {Promise<model[]>}
  */
-export const getModelAnnotations = async ()=> {return await prisma.annotations.findMany({where: {annotation_type: 'model'}, include: {model_annotation: true}})}
+export const getModelAnnotations = async () => { return await prisma.annotations.findMany({ where: { annotation_type: 'model' }, include: { model_annotation: true } }) }
 
 /**
  * @function getModelsWithoutThumbnails
@@ -578,27 +578,27 @@ export const updateModelAnnotation = async (uid: string, annotation: string, id:
 export const deleteAnnotation = async (id: string, modelUid: string) => {
 
   // Get annotation pending deletion and store its number
-  const annotationPendingDeletion = await prisma.annotations.findUnique({where: {annotation_id: id}})
+  const annotationPendingDeletion = await prisma.annotations.findUnique({ where: { annotation_id: id } })
   const annotationPendingDeletionNumber = annotationPendingDeletion?.annotation_no
 
   // Get remaining annotations with higher annotation numbers
   const remainingAnnotations = await prisma.annotations.findMany({
     where: {
       uid: modelUid,
-      annotation_no: {gt: annotationPendingDeletionNumber}
+      annotation_no: { gt: annotationPendingDeletionNumber }
     },
-    orderBy:{annotation_no: 'asc'}
+    orderBy: { annotation_no: 'asc' }
   })
 
   // Promises array; push deletion of annotation with given annoation_id
   const promises = []
-  promises.push(prisma.annotations.delete({where: {annotation_id: id}}))
+  promises.push(prisma.annotations.delete({ where: { annotation_id: id } }))
 
   // Push updates to all remaining annotation higher in number; number is decresed by 1
   for (let i in remainingAnnotations) {
     promises.push(prisma.annotations.update({
-      where: {annotation_id: remainingAnnotations[i].annotation_id},
-      data: {annotation_no: remainingAnnotations[i].annotation_no - 1}
+      where: { annotation_id: remainingAnnotations[i].annotation_id },
+      data: { annotation_no: remainingAnnotations[i].annotation_no - 1 }
     }))
   }
 
@@ -757,7 +757,17 @@ export const unassignModelToStudent = async (uid: string, email: string) => {
  * 
  */
 export const getStudentsAndAssignments = async () => {
-  return await prisma.authorized.findMany({ where: { role: 'student' }, include: { assignment: true } satisfies Prisma.authorizedInclude })
+  return await prisma.authorized.findMany({
+    where: {
+      OR: [
+        { role: 'student' },
+        { role: 'admin' }
+      ]
+    },
+    include: {
+      assignment: true
+    } satisfies Prisma.authorizedInclude
+  })
 }
 
 /**
