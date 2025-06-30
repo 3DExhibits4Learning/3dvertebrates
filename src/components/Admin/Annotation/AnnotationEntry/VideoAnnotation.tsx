@@ -10,14 +10,16 @@
 import { useContext } from "react"
 import { AnnotationEntryData } from "./AnnotationEntry"
 import { annotationEntryContext } from "@/interface/interface"
+import { annotationClientData } from "@/interface/interface"
+import { AnnotationClientData } from "@/components/Admin/Annotation/Annotation Client/AnnotationClient"
 
 // Default imports
 import TextInput from "@/components/Shared/Form Fields/TextInput"
 import Annotation from "./Annotation"
 
 export default function VideoAnnotationEntry() {
-
     const annotationEntryData = (useContext(AnnotationEntryData) as annotationEntryContext).annotationEntryData
+    const apData = useContext(AnnotationClientData) as annotationClientData
 
     return <>
         {
@@ -27,7 +29,7 @@ export default function VideoAnnotationEntry() {
                     <TextInput value={annotationEntryData.annotationTitle as string} field='annotationTitle' title='Annotation Title' required />
                     <TextInput value={annotationEntryData.videoSource as string} field='videoSource' title='URL' required />
                     <TextInput value={annotationEntryData.length as string} field='length' title='Length' required />
-                    <Annotation annotation={annotationEntryData.annotation} field='annotation' notRequired/>
+                    <Annotation annotation={apData.annotationsAndPositions.activeAnnotation?.annotation as string} field='annotation' notRequired/>
                 </div>
                 <div className="flex h-[60vh] w-1/2 justify-center pl-12">
                     {

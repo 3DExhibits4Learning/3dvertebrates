@@ -13,14 +13,14 @@ import { useContext } from "react"
 import { AnnotationEntryData } from "./AnnotationEntry"
 import { annotationClientData, annotationEntryContext } from "@/interface/interface"
 import { getNfsPath } from "@/functions/client/utils"
+import { AnnotationClientData } from "../Annotation Client/AnnotationClient"
+import { photo_annotation } from "@prisma/client"
 
 // Default imports
 import TextInput from "@/components/Shared/Form Fields/TextInput"
 import License from "@/components/Admin/Annotation/AnnotationFields/License"
 import Annotation from "./Annotation"
 import FileInput from "@/components/Admin/Annotation/AnnotationFields/ImageInput"
-import { AnnotationClientData } from "../Annotation Client/AnnotationClient"
-import { photo_annotation } from "@prisma/client"
 
 // Main JSX
 export default function PhotoAnnotationEntry() {
