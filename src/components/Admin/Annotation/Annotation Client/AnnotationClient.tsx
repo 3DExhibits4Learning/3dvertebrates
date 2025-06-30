@@ -11,7 +11,7 @@
 
 // Typical imports
 import { Accordion, AccordionItem, Spinner } from "@heroui/react"
-import { useEffect, useState, useRef, useContext, createContext, useReducer, memo } from "react"
+import { useEffect, useState, useRef, useContext, createContext, useReducer } from "react"
 import { authorized, model } from "@prisma/client"
 import { studentsAssignmentsAndModels, annotationClientData } from "@/interface/interface"
 import { toUpperFirstLetter } from "@/functions/utils/toUpperFirstLetter"
@@ -33,8 +33,8 @@ import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHan
 import AnnotationEntryWrapper from "./AnnotationEntryWrapper"
 import AdminAnnotation from "./AdminAnnotation"
 import AnnotationButtons from "./AnnotationButtons"
-import ModalWrapper from "@/components/Shared/Modals/ModalWrapper"
 import AdminAnnotationButtons from "./AdminAnnotationButtons"
+import AnnotationReorder from "@/components/Shared/Modals/AnnotationReorder"
 
 // Exported context
 export const AnnotationClientData = createContext<annotationClientData | ''>('')
@@ -113,7 +113,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     return <AnnotationClientData.Provider value={annotationClientContext} >
 
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />
-        {annotationsAndPositions.annotations && annotationsAndPositions.annotations.length >= 2 && specimenData.uid && <ModalWrapper isOpen={isOpen} setIsOpen={setIsOpen} renumberAnnotations={renumberAnnotations} />}
+        {annotationsAndPositions.annotations && annotationsAndPositions.annotations.length >= 2 && specimenData.uid && <AnnotationReorder isOpen={isOpen} setIsOpen={setIsOpen} renumberAnnotations={renumberAnnotations} />}
 
         {
             props.admin &&
