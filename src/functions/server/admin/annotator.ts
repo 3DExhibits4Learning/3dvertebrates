@@ -242,6 +242,12 @@ export const updateAnnotator = async (uid: string, annotator: string) => {
     }
 }
 
+/**
+ * 
+ * @param newAnnotationData 
+ * @param length 
+ * @param annotation 
+ */
 export const createNewVideoAnnotation = async (newAnnotationData: newAnnotationData, length: string, annotation: string) => {
     try {
         const newVideoBaseAnnotation = prisma.annotations.create({ data: newAnnotationData })
@@ -249,4 +255,61 @@ export const createNewVideoAnnotation = async (newAnnotationData: newAnnotationD
         await prisma.$transaction([newVideoBaseAnnotation, newVideoAnnotation])
     }
     catch (e: any) { serverActionErrorHandler(path, e.message, 'createNewVideoAnnotation()', "Error: Couldn't create video annotation") }
+}
+
+/**
+ * 
+ * @param newAnnotationData 
+ * @param email 
+ * @param modelAnnotationUid 
+ * @param annotation 
+ * @param annotationId 
+ */
+export const createNewModelAnnotation = async (newAnnotationData: newAnnotationData, email: string, modelAnnotationUid: string, annotation: string) => {
+    try {
+        // Get modeler and annotator
+        const annotator = prisma.authorized.findUnique({ where: { email: email } }).then(user => user?.email)
+        const modeler = prisma.model.findUnique({ where: { uid: modelAnnotationUid } }).then(model => model?.modeled_by)
+        const res = await Promise.all([annotator, modeler])
+
+        // Annotation creation
+        const newModelBaseAnnotation = prisma.annotations.create({ data: newAnnotationData })
+        const newModelAnnotation = prisma.model_annotation.create({
+            data: {
+                uid: modelAnnotationUid,
+                annotation: annotation,
+                annotation_id: newAnnotationData.annotation_id,
+                annotator: res[0],
+                modeler: res[1]
+            }
+        })
+        // Await transaction
+        await prisma.$transaction([newModelBaseAnnotation, newModelAnnotation])
+    }
+    catch (e: any) { serverActionErrorHandler(path, e.message, 'createNewModelAnnotation()', "Error: Couldn't create model annotation") }
+}
+
+export const createNewPhotoAnnotation = async (newAnnotationData: newAnnotationData, author: string, license: string, email: string, annotation: string, website: string, title: string) => {
+    // Get annotator
+    const annotator = await prisma.authorized.findUnique({ where: { email: email } }).then(user => user?.email)
+    
+    // Create annotation record
+    const newBasePhotoAnnotation = prisma.annotations.create({ data: newAnnotationData })
+
+    // Create photo annotation record
+    const newPhotoAnnotation = prisma.photo_annotation.create({
+        data: {
+            url: newAnnotationData.url,
+            author: author,
+            license: license,
+            annotator: annotator as string,
+            annotation_id: newAnnotationData.annotation_id,
+            annotation: annotation,
+            website: website,
+            title: title
+        }
+    })
+
+    // Await transaction
+    await prisma.$transaction([newBasePhotoAnnotation, newPhotoAnnotation])
 }

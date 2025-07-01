@@ -170,7 +170,7 @@ export const insertAnnotation = async (data: FormData, method?: 'PATCH' | 'DELET
     return await fetch('/api/annotations', {
         method: method ? method : 'POST',
         body: data
-    }).then(res => res.json()).then(json => json.data)
+    }).then(res => res.text())
 }
 /**
  * 
@@ -319,6 +319,14 @@ export const createAnnotation = (index: number, uid: string, position: string, d
     }
 }
 
+/**
+ * 
+ * @param index 
+ * @param dataTransferWrapper 
+ * @param aeData 
+ * @param apData 
+ * @param specimen 
+ */
 export const updateAnnotation = (index: number, dataTransferWrapper: Function, aeData: annotationEntry, apData: annotationsAndPositions, specimen: annotationClientSpecimen) => {
     if (index == 1) {
         const data = annotationFormData(aeData, specimen.uid as string, index.toString(), apData.position3D as string)

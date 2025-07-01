@@ -361,18 +361,7 @@ export async function getModelAnnotation(id: string) {
  * @description returns a user account based on the userId and the provider
  * 
  */
-export const insertFirstAnnotationPosition = async (uid: string, position: string) => {
-
-  const update = await prisma.model.update({
-    where: {
-      uid: uid
-    },
-    data: {
-      annotationPosition: position
-    }
-  })
-  return update
-}
+export const insertFirstAnnotationPosition = async (uid: string, position: string) => await prisma.model.update({ where: { uid: uid }, data: { annotationPosition: position } })
 
 /**
  * @function getFirstAnnotationPostion

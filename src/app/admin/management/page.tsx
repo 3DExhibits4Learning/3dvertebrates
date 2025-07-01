@@ -21,8 +21,6 @@ import createStudentsAssignmentsAndModels from "@/functions/client/managerClient
 import Header from "@/components/Header/Header"
 import Foot from "@/components/Shared/Foot"
 import FullPageError from "@/components/Error/FullPageError"
-import { reMapAnnotations, renumberCurrentAnnotations, tmpPositionData, updateAnnotator } from "@/functions/server/admin/annotator"
-import prisma from "@/functions/utils/prisma"
 
 // Path
 const path = '/src/app/admin/management/page.tsx'
@@ -31,13 +29,6 @@ const path = '/src/app/admin/management/page.tsx'
 export default async function Page() {
 
     try {
-
-        // const res = await renumberCurrentAnnotations()
-        // console.log(res)
-        // await reMapAnnotations('267c5b476b5e4e67a34f61aba4d68f4e','36bec4844dc84c9cb23650341e621241')
-        // await tmpPositionData('36bec4844dc84c9cb23650341e621241')
-        // await updateAnnotator('36bec4844dc84c9cb23650341e621241', 'Abigayle Hendon')
-
         // Get session
         const session = await getServerSession(authOptions).catch((e) => serverErrorHandler(path, e.message, "Couldn't get session", 'getServerSession()', false))
 
