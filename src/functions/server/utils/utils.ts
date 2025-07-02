@@ -28,3 +28,17 @@ export const convertCloudPathToLocalPath = (path: string) => 'X:' + path.slice(1
  * @param values 
  */
 export const checkEssentialValues = (values: any[]) => { for (let i in values) { if (!i) throw new Error(`Error: Value for ${i} is missing`) } }
+
+/**
+ * 
+ * @param path 
+ * @returns 
+ */
+export const convertDbPathToLocalPath = (path: string) => 'X:' + path.slice(5)
+
+/**
+ * 
+ * @param oldUrl 
+ * @returns 
+ */
+export const getOldUrl = (oldUrl: FormDataEntryValue | null) => oldUrl ? isLocalDevEnv() ? convertDbPathToLocalPath(oldUrl as string) : oldUrl as string : ''

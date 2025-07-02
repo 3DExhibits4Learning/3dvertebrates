@@ -18,6 +18,7 @@ import { model, model_annotation, photo_annotation, video_annotation } from "@pr
 // SINGLETON
 import prisma from "@/functions/utils/prisma"
 import { unlink } from "fs/promises"
+import { convertDbPathToLocalPath, isLocalDevEnv } from "@/functions/server/utils/utils"
 
 // Path
 const path = 'src/functions/server/admin/annotator.ts'
@@ -346,7 +347,7 @@ export const updateToVideoAnnotationWithMediaTransition = async (previousMedia: 
         // Delete photo annotation (if it was a photo annotation)
         if (previousMedia === 'photo') {
             // Eliminate previous annotation photo and store query in deletion
-            await unlink(`public${oldUrl}`).catch((e) => nonFatalError('annotator.ts', e.message, 'unlink'))
+            await unlink(`public${oldUrl}`).catch(e => nonFatalError('annotator.ts', e.message, 'unlink'))
             deletion = prisma.photo_annotation.delete({ where: { annotation_id: annotationId } })
         }
         // Else delete the model annotation

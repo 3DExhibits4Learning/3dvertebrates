@@ -6,7 +6,7 @@
  */
 
 // Typical imports
-import { insertFirstAnnotationPosition, getFirstAnnotationPostion, deleteAnnotation } from "@/functions/server/queries"
+import { getFirstAnnotationPostion, deleteAnnotation } from "@/functions/server/queries"
 import { mkdir, writeFile, unlink } from "fs/promises"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
@@ -28,7 +28,7 @@ export const dynamic = 'force-dynamic'
 // Default imports
 import routeHandlerTypicalResponse from "@/functions/server/typicalSuccessResponse"
 import { checkEssentialValues, convertCloudPathToLocalPath, isLocalDevEnv } from "@/functions/server/utils/utils"
-import { loadProjectInfo } from "next/dist/build/webpack-config"
+import { getOldUrl } from "@/functions/server/utils/utils"
 
 // Global-scope route for console error reference
 const route = 'src/app/api/annotations/route.tsx'
@@ -189,7 +189,7 @@ export async function PATCH(request: Request) {
         // Video annotation update case
         case 'video':
             const previousMedia = data.get('previousMedia') as string
-            const oldUrl = data.get('oldUrl') ? data.get('oldUrl') : ''
+            const oldUrl = getOldUrl(data.get('oldUrl'))
             const annotation_id = data.get('annotation_id') as string
             const uid = data.get('uid') as string
             const position = data.get('position') as string
