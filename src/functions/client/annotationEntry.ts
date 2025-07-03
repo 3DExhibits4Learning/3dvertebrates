@@ -526,13 +526,11 @@ export const annotationUpdateData = (aeData: annotationEntry, apData: annotation
         case 'video':
             data.set('length', aeData.length)
             data.set('url', aeData.videoSource)
-
             break
 
         // Model_annotation table data
         case 'model':
             data.set('modelAnnotationUid', aeData.modelAnnotationUid as string)
-
             break
 
         // Photo_annotation table data
@@ -560,7 +558,7 @@ export const annotationUpdateData = (aeData: annotationEntry, apData: annotation
     }
 
     // Else if the databased annotation is a photo, the url should be the same
-    else if (apData.activeAnnotationType === 'photo') data.set('url', (apData.activeAnnotation as photo_annotation).url)
+    else if (aeData.photoChecked) data.set('url', (apData.activeAnnotation as photo_annotation).url)
 
     // Route handler data
     data.set('mediaType', aeData.mediaType as string)

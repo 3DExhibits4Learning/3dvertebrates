@@ -12,7 +12,7 @@ export const autoWriteFile = async (file: File, dir: string, path: string) => {
         // Convert to file arrayBuffer, then arrayBuffer to buffer
         const arrayBuffer = await file.arrayBuffer()
         const buffer = Buffer.from(arrayBuffer)
-
+        
         // Make the directory and write a typed array from the buffer
         await mkdir(dir, { recursive: true })
         await writeFile(path, new Uint8Array(buffer))

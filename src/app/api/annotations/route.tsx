@@ -13,7 +13,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { getAuthorizedUsers } from "@/functions/server/queries"
 import { authorized } from "@prisma/client"
 import { nonFatalError, routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/server/error"
-import { createNewModelAnnotation, createNewPhotoAnnotation, createNewVideoAnnotation, updateToVideoAnnotationWithMediaTransition, updateVideoAnnotation } from "@/functions/server/admin/annotator"
+import { createNewModelAnnotation, createNewPhotoAnnotation, createNewVideoAnnotation, updateModelAnnotation, updateToModelAnnotationWithMediaTransition, updateToVideoAnnotationWithMediaTransition, updateVideoAnnotation } from "@/functions/server/admin/annotator"
 import { autoWriteFile } from "@/functions/server/utils/file"
 
 // PATH
@@ -142,7 +142,7 @@ export async function POST(request: Request) {
                 const website = data.get('website') ? data.get('website') : ''
                 const title = data.get('photoTitle') ? data.get('title') : ''
 
-                // Write photo to disk, create annotation and return success
+                // // Write photo to disk, create annotation and return success
                 await autoWriteFile(file, dir, path)
                 await createNewPhotoAnnotation(newAnnotationData, author, license, email, annotation, website as string, title as string)
 
@@ -184,134 +184,62 @@ export async function PATCH(request: Request) {
         return new Response('Annotation Updated')
     }
 
+    const previousMedia = data.get('previousMedia') as string
+    const oldUrl = getOldUrl(data.get('oldUrl'))
+    const annotation_id = data.get('annotation_id') as string
+    const uid = data.get('uid') as string
+    const position = data.get('position') as string
+    const url = data.get('url') as string
+    const type = data.get('annotation_type') as string
+    const title = data.get('title') as string
+    const length = data.get('length') as string
+    const annotation = data.get('annotation') as string
+    const modelAnnotationUid = data.get('modelAnnotationUid') as string
+
     // Conditional based on annotationType for all other annotations
     switch (data.get('annotation_type')) {
-        // Video annotation update case
         case 'video':
-            const previousMedia = data.get('previousMedia') as string
-            const oldUrl = getOldUrl(data.get('oldUrl'))
-            const annotation_id = data.get('annotation_id') as string
-            const uid = data.get('uid') as string
-            const position = data.get('position') as string
-            const url = data.get('url') as string
-            const type = data.get('annotation_type') as string
-            const videoAnnotationTitle = data.get('title') as string
-            const length = data.get('length') as string
-            const annotation = data.get('annotation') as string
-
             // Run update with transition if there is a media transition, then return success
             if (data.get('mediaTransition')) {
-                await updateToVideoAnnotationWithMediaTransition(previousMedia, oldUrl as string, annotation_id, uid, position, url, type, videoAnnotationTitle, length, annotation)
+                await updateToVideoAnnotationWithMediaTransition(previousMedia, oldUrl as string, annotation_id, uid, position, url, type, title, length, annotation)
                 return new Response('Annotation updated')
             }
             // Else run basic update and return
-            await updateVideoAnnotation(annotation_id, uid, position, url, type, videoAnnotationTitle, length, annotation)
+            await updateVideoAnnotation(annotation_id, uid, position, url, type, title, length, annotation)
             return new Response('Annotation updated')
 
-        // annotationType = 'model' handler
         case 'model':
-
-            // If there is a change in media for the update, delete previous child of the annotations table, update, then return
+            // Run update with transition if there is a media transition, then return success
             if (data.get('mediaTransition')) {
-
-                let deletion
-
-                // Delete the photo annotation (if the previous media was a photo)
-                if (data.get('previousMedia') === 'photo') {
-
-                    // Eliminate previous annotation photo
-                    await unlink(`public${data.get('oldUrl')}`).catch((e) => nonFatalError(route, e.message, 'unlink'))
-                    // Delete photo annotation record
-                    deletion = prisma.photo_annotation.delete({ where: { annotation_id: data.get('annotation_id') as string } })
-                }
-
-                // Or else delete the video annotation
-                else deletion = prisma.video_annotation.delete({ where: { annotation_id: data.get('annotation_id') as string } })
-
-                // Base annotation update
-                const updatedBaseAnnotation = prisma.annotations.update({
-                    where: { annotation_id: data.get('annotation_id') as string },
-                    data: {
-                        uid: data.get('uid') as string,
-                        position: data.get('position') as string,
-                        annotation_type: data.get('annotation_type') as string,
-                        title: data.get('title') as string
-                    },
-                })
-
-                // Create new model annotation
-                const newModelAnnotation = prisma.model_annotation.create({
-                    data: {
-                        uid: data.get('modelAnnotationUid') as string,
-                        annotation: data.get('annotation') as string,
-                        annotation_id: data.get('annotation_id') as string,
-                        annotator: session.user.name ?? 'Student',
-                        modeler: session.user.name ?? 'Student'
-                    }
-                }).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH newModelAnnotation()', "Couldn't create new model annotation"))
-
-                // Await transaction
-                const updatedModelAnnotationTransaction = await prisma.$transaction([deletion as any, updatedBaseAnnotation, newModelAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, "prisma.transaction([updating model annotation])", "Couldn't update model annotation"))
-
-                // Typical response
+                // Media transition update and return
+                updateToModelAnnotationWithMediaTransition(previousMedia, oldUrl, annotation_id, uid, position, type, title, modelAnnotationUid, annotation, email)
                 return new Response('Annotation updated')
             }
+            // Else run basic update and return
+            await updateModelAnnotation(annotation_id, uid, position, type, title, modelAnnotationUid, annotation)
+            return new Response('Annotation updated')
 
-            // Annotation update
-            const updatedAnnotation1 = prisma.annotations.update({
-                where: { annotation_id: data.get('annotation_id') as string },
-                data: {
-                    uid: data.get('uid') as string,
-                    position: data.get('position') as string,
-                    annotation_type: data.get('annotation_type') as string,
-                    title: data.get('title') as string
-                },
-            })
-
-            // Model annotation update
-            const updatedModelAnnotation = prisma.model_annotation.update({
-                where: { annotation_id: data.get('annotation_id') as string },
-                data: {
-                    uid: data.get('modelAnnotationUid') as string,
-                    annotation: data.get('annotation') as string,
-                }
-            })
-
-            const updatedModelAnnotationTransaction = await prisma.$transaction([updatedAnnotation1, updatedModelAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, "prisma.transaction([updating model annotation])", "Couldn't update model annotation"))
-
-            // Typical response
-            return routeHandlerTypicalResponse('Annotation updated', updatedModelAnnotationTransaction)
-
-
-
-        // Default case (annotationType == 'photo')
-        default:
-
-
-
-            // Optional photo_annotation data initializtion
+        default: // Default case (annotationType == 'photo')
             if (data.get('file')) {
-
-                // Get file
+                // Get file and check relevant variables
                 const file = data.get('file') as File
+                const dataDir = data.get('dir') as string
+                const dataPath = data.get('path') as string
 
-                // Convert file => arrayBuffer => buffer
-                const bytes = await file.arrayBuffer().catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH file.arrayBuffer()', "Couldn't get array buffer")) as ArrayBuffer
-                const photoBuffer = Buffer.from(bytes)
+                // Convert path to local for local development
+                const dir = isLocalDevEnv() ? convertCloudPathToLocalPath(dataDir) : dataDir
+                const path = isLocalDevEnv() ? convertCloudPathToLocalPath(dataPath) : dataPath
 
-                // Make directory
-                await mkdir(data.get('dir') as string, { recursive: true }).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH mkdir()', "Couldn't make directory"))
-
-                //@ts-ignore - ts incorreclty thinks buffers can't be written with writeFile() (needs update)
-                await writeFile(data.get('path') as string, photoBuffer).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH writeFile()', "Couldn't write file"))
+                // Write photo
+                await autoWriteFile(file, dir, path)
             }
 
             // Eliminate previous photo uploaded to data storage container if it exists
-            if (data.get('oldUrl') && data.get('file')) await unlink(`public${data.get('oldUrl')}`).catch((e) => nonFatalError(route, e.message, 'unlink'))
+            if (data.get('oldUrl') && data.get('file')) await unlink(oldUrl).catch((e) => nonFatalError(route, e.message, 'unlink'))
 
             // Remaining optional fields
-            const website = data.get('website') ? data.get('website') : undefined
-            const title = data.get('photoTitle') ? data.get('title') : undefined
+            const website = data.get('website') ? data.get('website') as string : ''
+            const photoTitle = data.get('photoTitle') ? data.get('title') as string : ''
 
             // If there is a change in media for the update, delete previous child of the annotations table, update, then return
             if (data.get('mediaTransition')) {
@@ -346,7 +274,7 @@ export async function PATCH(request: Request) {
                         annotation_id: data.get('annotation_id') as string,
                         annotation: data.get('annotation') as string,
                         website: website ? website as string : '',
-                        title: title ? title as string : '',
+                        title: title ? photoTitle as string : '',
                     }
                 }).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH createPhotoAnnotation()', "Couldn't create photo annotation"))
 
