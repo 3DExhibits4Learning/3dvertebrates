@@ -7,14 +7,16 @@
 
 // Typical imports
 import { getFirstAnnotationPostion, deleteAnnotation } from "@/functions/server/queries"
-import { mkdir, writeFile, unlink } from "fs/promises"
+import { unlink } from "fs/promises"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { getAuthorizedUsers } from "@/functions/server/queries"
 import { authorized } from "@prisma/client"
 import { nonFatalError, routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/server/error"
-import { createNewModelAnnotation, createNewPhotoAnnotation, createNewVideoAnnotation, updateModelAnnotation, updateToModelAnnotationWithMediaTransition, updateToVideoAnnotationWithMediaTransition, updateVideoAnnotation } from "@/functions/server/admin/annotator"
+import { createNewModelAnnotation, createNewPhotoAnnotation, createNewVideoAnnotation, transitionToModelAnnotation, transitionToPhotoAnnotation, transitionToVideoAnnotation, updateModelAnnotationEntry, updatePhotoAnnotationEntry, updateVideoAnnotationEntry } from "@/functions/server/admin/annotator"
 import { autoWriteFile } from "@/functions/server/utils/file"
+import { checkEssentialValues, convertCloudPathToLocalPath, isLocalDevEnv } from "@/functions/server/utils/utils"
+import { getOldUrl } from "@/functions/server/utils/utils"
 
 // PATH
 const path = 'src/app/api/annotations/route.tsx'
@@ -27,8 +29,6 @@ export const dynamic = 'force-dynamic'
 
 // Default imports
 import routeHandlerTypicalResponse from "@/functions/server/typicalSuccessResponse"
-import { checkEssentialValues, convertCloudPathToLocalPath, isLocalDevEnv } from "@/functions/server/utils/utils"
-import { getOldUrl } from "@/functions/server/utils/utils"
 
 // Global-scope route for console error reference
 const route = 'src/app/api/annotations/route.tsx'
@@ -46,7 +46,6 @@ export async function GET(request: Request) {
 
     // Return first annotation position if it exists
     try {
-
         // Get first annotation position
         const firstAnnotationPosition = await getFirstAnnotationPostion(searchParams.get('uid') as string)
             .catch((e) => routeHandlerErrorHandler(route, e.message, 'GET insertFirstAnnotationPosition()', "Couldn't get first annotation position"))
@@ -160,162 +159,104 @@ export async function POST(request: Request) {
  * @returns typical response
  */
 export async function PATCH(request: Request) {
+    try {
+        // Get session and authorized users
+        const session = await getServerSession(authOptions).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH getServerSession', "Couldn't get session"))
+        const authorizedUsers = await getAuthorizedUsers().catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH getAuthorizedUsers', "Couldn't get authorized users")) as authorized[]
 
-    // Get session and authorized users
-    const session = await getServerSession(authOptions).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH getServerSession', "Couldn't get session"))
-    const authorizedUsers = await getAuthorizedUsers().catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH getAuthorizedUsers', "Couldn't get authorized users")) as authorized[]
+        // Authorized user redirect
+        const email = session?.user?.email as string
+        if (!authorizedUsers.find(user => user.email === email)) return <h1>NOT AUTHORIZED</h1>
 
-    // Authorized user redirect
-    const email = session?.user?.email as string
-    if (!authorizedUsers.find(user => user.email === email)) return <h1>NOT AUTHORIZED</h1>
+        // Get formData
+        const data = await request.formData().catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH request.formData()', "Couldn't get FormData")) as FormData
 
-    // Get formData
-    const data = await request.formData().catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH request.formData()', "Couldn't get FormData")) as FormData
+        // First annotation handler; always taxonomy and description, insert position with typical try-catch return
+        if (data.get('index') === '1') {
+            // Get and check relevant variables
+            const uid = data.get('uid') as string
+            const position = data.get('position') as string
+            checkEssentialValues([uid, position])
 
-    // First annotation handler; always taxonomy and description, insert position with typical try-catch return
-    if (data.get('index') === '1') {
-        // Get and check relevant variables
+            // Update position and return success
+            await prisma.model.update({ where: { uid: uid }, data: { annotationPosition: position } }).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH insertFirstAnnotationPosition()', "Couldn't insert first annotation position"))
+            return new Response('Annotation Updated')
+        }
+
+        const previousMedia = data.get('previousMedia') as string
+        const oldUrl = getOldUrl(data.get('oldUrl'))
+        const annotation_id = data.get('annotation_id') as string
         const uid = data.get('uid') as string
         const position = data.get('position') as string
-        checkEssentialValues([uid, position])
+        const url = data.get('url') as string
+        const type = data.get('annotation_type') as string
+        const title = data.get('title') as string
+        const length = data.get('length') as string
+        const annotation = data.get('annotation') as string
+        const modelAnnotationUid = data.get('modelAnnotationUid') as string
 
-        // Update position and return success
-        await prisma.model.update({ where: { uid: uid }, data: { annotationPosition: position } }).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH insertFirstAnnotationPosition()', "Couldn't insert first annotation position"))
-        return new Response('Annotation Updated')
-    }
-
-    const previousMedia = data.get('previousMedia') as string
-    const oldUrl = getOldUrl(data.get('oldUrl'))
-    const annotation_id = data.get('annotation_id') as string
-    const uid = data.get('uid') as string
-    const position = data.get('position') as string
-    const url = data.get('url') as string
-    const type = data.get('annotation_type') as string
-    const title = data.get('title') as string
-    const length = data.get('length') as string
-    const annotation = data.get('annotation') as string
-    const modelAnnotationUid = data.get('modelAnnotationUid') as string
-
-    // Conditional based on annotationType for all other annotations
-    switch (data.get('annotation_type')) {
-        case 'video':
-            // Run update with transition if there is a media transition, then return success
-            if (data.get('mediaTransition')) {
-                await updateToVideoAnnotationWithMediaTransition(previousMedia, oldUrl as string, annotation_id, uid, position, url, type, title, length, annotation)
-                return new Response('Annotation updated')
-            }
-            // Else run basic update and return
-            await updateVideoAnnotation(annotation_id, uid, position, url, type, title, length, annotation)
-            return new Response('Annotation updated')
-
-        case 'model':
-            // Run update with transition if there is a media transition, then return success
-            if (data.get('mediaTransition')) {
-                // Media transition update and return
-                updateToModelAnnotationWithMediaTransition(previousMedia, oldUrl, annotation_id, uid, position, type, title, modelAnnotationUid, annotation, email)
-                return new Response('Annotation updated')
-            }
-            // Else run basic update and return
-            await updateModelAnnotation(annotation_id, uid, position, type, title, modelAnnotationUid, annotation)
-            return new Response('Annotation updated')
-
-        default: // Default case (annotationType == 'photo')
-            if (data.get('file')) {
-                // Get file and check relevant variables
-                const file = data.get('file') as File
-                const dataDir = data.get('dir') as string
-                const dataPath = data.get('path') as string
-
-                // Convert path to local for local development
-                const dir = isLocalDevEnv() ? convertCloudPathToLocalPath(dataDir) : dataDir
-                const path = isLocalDevEnv() ? convertCloudPathToLocalPath(dataPath) : dataPath
-
-                // Write photo
-                await autoWriteFile(file, dir, path)
-            }
-
-            // Eliminate previous photo uploaded to data storage container if it exists
-            if (data.get('oldUrl') && data.get('file')) await unlink(oldUrl).catch((e) => nonFatalError(route, e.message, 'unlink'))
-
-            // Remaining optional fields
-            const website = data.get('website') ? data.get('website') as string : ''
-            const photoTitle = data.get('photoTitle') ? data.get('title') as string : ''
-
-            // If there is a change in media for the update, delete previous child of the annotations table, update, then return
-            if (data.get('mediaTransition')) {
-
-                let deletion
-
-                // Delete video annotation (if it was a video)
-                if (data.get('previousMedia') === 'video') deletion = prisma.video_annotation.delete({ where: { annotation_id: data.get('annotation_id') as string } })
-
-                // Or else delete the model annotation
-                else deletion = prisma.model_annotation.delete({ where: { annotation_id: data.get('annotation_id') as string } })
-
-                // Update annotation
-                const updatedAnnotation = prisma.annotations.update({
-                    where: { annotation_id: data.get('annotation_id') as string },
-                    data: {
-                        uid: data.get('uid') as string,
-                        position: data.get('position') as string,
-                        url: data.get('url') as string,
-                        annotation_type: data.get('annotation_type') as string,
-                        title: data.get('title') as string
-                    },
-                }).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH updatedAnnotation()', "Couldn't update annotation"))
-
-                // Create new photo annotation
-                const newPhotoAnnotation = prisma.photo_annotation.create({
-                    data: {
-                        url: data.get('url') as string,
-                        author: data.get('author') as string,
-                        license: data.get('license') as string,
-                        annotator: session.user.name ? session.user.name : 'student',
-                        annotation_id: data.get('annotation_id') as string,
-                        annotation: data.get('annotation') as string,
-                        website: website ? website as string : '',
-                        title: title ? photoTitle as string : '',
-                    }
-                }).catch((e) => routeHandlerErrorHandler(route, e.message, 'PATCH createPhotoAnnotation()', "Couldn't create photo annotation"))
-
-                await prisma.$transaction([deletion as any, updatedAnnotation, newPhotoAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, "prisma.transaction([updating model annotation])", "Couldn't update model annotation"))
-
-                // Typical response
-                return new Response('Annotation updated')
-            }
-
-            // Update annotation
-            const updatedAnnotation = prisma.annotations.update({
-                where: { annotation_id: data.get('annotation_id') as string },
-                data: {
-                    uid: data.get('uid') as string,
-                    position: data.get('position') as string,
-                    url: data.get('url') as string,
-                    annotation_type: data.get('annotation_type') as string,
-                    title: data.get('title') as string
-                },
-            })
-
-            // Update photo annotation
-            const updatedPhotoAnnotation = prisma.photo_annotation.update({
-                where: { annotation_id: data.get('annotation_id') as string },
-                data: {
-                    url: data.get('url') as string,
-                    author: data.get('author') as string,
-                    license: data.get('license') as string,
-                    annotator: session.user.name ? session.user.name : 'student',
-                    annotation: data.get('annotation') as string,
-                    website: website ? website as string : '',
-                    title: title ? title as string : '',
+        // Conditional based on annotationType for all other annotations
+        switch (data.get('annotation_type')) {
+            case 'video':
+                // Run update with transition if there is a media transition, then return success
+                if (data.get('mediaTransition')) {
+                    await transitionToVideoAnnotation(previousMedia, oldUrl as string, annotation_id, uid, position, url, type, title, length, annotation)
+                    return new Response('Annotation updated')
                 }
-            })
+                // Else run basic update and return
+                await updateVideoAnnotationEntry(annotation_id, uid, position, url, type, title, length, annotation)
+                return new Response('Annotation updated')
 
-            const updatedPhotoAnnotationTransaction = await prisma.$transaction([updatedAnnotation, updatedPhotoAnnotation]).catch(e => routeHandlerErrorHandler(path, e.message, "prisma.transaction([updating photo annotation])", "Couldn't update photo annotation"))
+            case 'model':
+                // Run update with transition if there is a media transition, then return success
+                if (data.get('mediaTransition')) {
+                    // Media transition update and return
+                    transitionToModelAnnotation(previousMedia, oldUrl, annotation_id, uid, position, type, title, modelAnnotationUid, annotation, email)
+                    return new Response('Annotation updated')
+                }
+                // Else run basic update and return
+                await updateModelAnnotationEntry(annotation_id, uid, position, type, title, modelAnnotationUid, annotation)
+                return new Response('Annotation updated')
 
-            // Typical response
-            return new Response('Annotation updated')
+            default: // Default case (annotationType === 'photo')
+                if (data.get('file')) {
+                    // Get file and check relevant variables
+                    const file = data.get('file') as File
+                    const dataDir = data.get('dir') as string
+                    const dataPath = data.get('path') as string
 
+                    // Convert path to local for local development
+                    const dir = isLocalDevEnv() ? convertCloudPathToLocalPath(dataDir) : dataDir
+                    const path = isLocalDevEnv() ? convertCloudPathToLocalPath(dataPath) : dataPath
+
+                    // Write photo
+                    await autoWriteFile(file, dir, path)
+                }
+
+                // Get optional fields author and license
+                const author = data.get('author') as string
+                const license = data.get('license') as string
+
+                // Eliminate previous photo uploaded to data storage container if it exists
+                if (data.get('oldUrl') && data.get('file')) await unlink(oldUrl).catch((e) => nonFatalError(route, e.message, 'unlink'))
+
+                // Remaining optional fields
+                const website = data.get('website') ? data.get('website') as string : ''
+                const photoTitle = data.get('photoTitle') ? data.get('title') as string : ''
+
+                // If there is a change in media for the update, delete previous child of the annotations table, update, then return
+                if (data.get('mediaTransition')) {
+                    // Run update with transition if there is a media transition, then return success 
+                    transitionToPhotoAnnotation(previousMedia, url, annotation_id, uid, position, type, title, author, annotation, email, photoTitle, author, license)
+                    return new Response('Annotation updated')
+                }
+
+                // Else update annotation and return
+                updatePhotoAnnotationEntry(url, annotation_id, uid, position, type, title, author, annotation, email, photoTitle, license, website)
+                return new Response('Annotation updated')
+        }
     }
+    catch (e: any) { }
 }
 
 /**

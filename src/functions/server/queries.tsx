@@ -19,10 +19,8 @@ export function prismaClient() {
  * @description returns an array of authorized username objects
  * 
  */
-export async function getAuthorizedUsers() {
-  const users = await prisma.authorized.findMany()
-  return users
-}
+export const getAuthorizedUsers = async() => await prisma.authorized.findMany()
+
 
 /**
  * @function getUserById
