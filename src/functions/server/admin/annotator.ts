@@ -10,7 +10,7 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { nonFatalError, routeHandlerTypicalCatch, serverActionErrorHandler, serverErrorHandler } from "../error"
-import { AnnotationNumbers, newAnnotationData } from "@/ts/ts"
+import { annotationDataEntryObj, annotationDataEntryUpdateObj, AnnotationNumbers, newAnnotationData } from "@/ts/ts"
 import { v4 as uuidv4 } from 'uuid'
 import { fullAnnotation } from "@/interface/interface"
 import { model, model_annotation, photo_annotation, video_annotation } from "@prisma/client"
@@ -18,7 +18,8 @@ import { model, model_annotation, photo_annotation, video_annotation } from "@pr
 // SINGLETON
 import prisma from "@/functions/utils/prisma"
 import { unlink } from "fs/promises"
-import { convertDbPathToLocalPath, isLocalDevEnv } from "@/functions/server/utils/utils"
+import { checkEssentialValues, convertCloudPathToLocalPath, convertDbPathToLocalPath, isLocalDevEnv } from "@/functions/server/utils/utils"
+import { autoWriteFile } from "@/functions/server/utils/file"
 
 // Path
 const path = 'src/functions/server/admin/annotator.ts'
@@ -301,7 +302,7 @@ export const createNewModelAnnotation = async (newAnnotationData: newAnnotationD
  * @param website 
  * @param title 
  */
-export const createNewPhotoAnnotation = async (newAnnotationData: newAnnotationData, author: string, license: string, email: string, annotation: string, website: string, title: string) => {
+export const createNewPhotoAnnotation = async (annotationEntryData: annotationDataEntryObj, newAnnotationData: newAnnotationData, email: string) => {
     // Get annotator
     const annotator = await prisma.authorized.findUnique({ where: { email: email } }).then(user => user?.email)
 
@@ -311,19 +312,113 @@ export const createNewPhotoAnnotation = async (newAnnotationData: newAnnotationD
     // Create photo annotation record
     const newPhotoAnnotation = prisma.photo_annotation.create({
         data: {
-            url: newAnnotationData.url,
-            author: author,
-            license: license,
+            url: annotationEntryData.url as string,
+            author: annotationEntryData.author as string,
+            license: annotationEntryData.license as string,
             annotator: annotator as string,
-            annotation_id: newAnnotationData.annotation_id,
-            annotation: annotation,
-            website: website,
-            title: title
+            annotation_id: annotationEntryData.annotationId,
+            annotation: annotationEntryData.annotation,
+            website: annotationEntryData.website,
+            title: annotationEntryData.photoTitle
         }
     })
 
     // Await transaction
     await prisma.$transaction([newBasePhotoAnnotation, newPhotoAnnotation])
+}
+
+/**
+ * 
+ * @param annotationEntryData 
+ */
+export const updateVideoAnnotationEntry = async (annotationEntryData: annotationDataEntryObj) => {
+    try {
+        // Base annotation update
+        const updatedBaseAnnotation = prisma.annotations.update({
+            where: { annotation_id: annotationEntryData.annotationId },
+            data: {
+                uid: annotationEntryData.uid,
+                position: annotationEntryData.position,
+                url: annotationEntryData.url,
+                annotation_type: annotationEntryData.annotationType,
+                title: annotationEntryData.title
+            },
+        })
+        // Video annotation update
+        const updatedVideoAnnotation = prisma.video_annotation.update({
+            where: { annotation_id: annotationEntryData.annotationId },
+            data: { url: annotationEntryData.url, length: annotationEntryData.length, annotation: annotationEntryData.annotation }
+        })
+
+        await prisma.$transaction([updatedBaseAnnotation, updatedVideoAnnotation])
+    }
+    catch (e: any) { }
+}
+
+/**
+ * 
+ * @param annotationEntryData 
+ */
+export const updateModelAnnotationEntry = async (annotationEntryData: annotationDataEntryObj) => {
+    // Annotation update
+    const updatedAnnotation = prisma.annotations.update({
+        where: { annotation_id: annotationEntryData.annotationId },
+        data: {
+            uid: annotationEntryData.uid,
+            position: annotationEntryData.position,
+            annotation_type: annotationEntryData.annotationType,
+            title: annotationEntryData.title
+        },
+    })
+
+    // Model annotation update
+    const updatedModelAnnotation = prisma.model_annotation.update({
+        where: { annotation_id: annotationEntryData.annotationId },
+        data: {
+            uid: annotationEntryData.modelAnnotationUid,
+            annotation: annotationEntryData.annotation,
+        }
+    })
+
+    await prisma.$transaction([updatedAnnotation, updatedModelAnnotation])
+}
+
+/**
+ * 
+ * @param annotationEntryData 
+ * @param email 
+ */
+export const updatePhotoAnnotationEntry = async (annotationEntryData: annotationDataEntryObj, email: string) => {
+    // Get annotator
+    const annotator = await prisma.authorized.findUnique({ where: { email: email } }).then(user => user?.email)
+
+    // Update annotation
+    const updatedAnnotation = prisma.annotations.update({
+        where: { annotation_id: annotationEntryData.annotationId },
+        data: {
+            uid: annotationEntryData.uid,
+            position: annotationEntryData.position,
+            url: annotationEntryData.url,
+            annotation_type: annotationEntryData.annotationType,
+            title: annotationEntryData.title
+        },
+    })
+
+    // Update photo annotation
+    const updatedPhotoAnnotation = prisma.photo_annotation.update({
+        where: { annotation_id: annotationEntryData.annotationId },
+        data: {
+            url: annotationEntryData.url,
+            author: annotationEntryData.author,
+            license: annotationEntryData.license,
+            annotator: annotator,
+            annotation: annotationEntryData.annotation,
+            website: annotationEntryData.website,
+            title: annotationEntryData.photoTitle,
+        }
+    })
+
+    await prisma.$transaction([updatedAnnotation, updatedPhotoAnnotation])
 }
 
 /**
@@ -339,79 +434,44 @@ export const createNewPhotoAnnotation = async (newAnnotationData: newAnnotationD
  * @param length 
  * @param annotation 
  */
-export const transitionToVideoAnnotation = async (previousMedia: string, oldUrl: string, annotationId: string, uid: string, position: string, url: string, type: string, title: string, length: string, annotation: string) => {
+export const transitionToVideoAnnotation = async (entryUpdateObj: annotationDataEntryUpdateObj) => {
     try {
         // Variable for transaction deletion query
         let deletion
 
         // Delete photo annotation (if it was a photo annotation)
-        if (previousMedia === 'photo') {
+        if (entryUpdateObj.previousMedia === 'photo') {
             // Eliminate previous annotation photo and store query in deletion
-            await unlink(oldUrl).catch(e => nonFatalError('annotator.ts', e.message, 'unlink'))
-            deletion = prisma.photo_annotation.delete({ where: { annotation_id: annotationId } })
+            await unlink(entryUpdateObj.oldUrl as string).catch(e => nonFatalError('annotator.ts', e.message, 'unlink'))
+            deletion = prisma.photo_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
         }
         // Else delete the model annotation
-        else deletion = prisma.model_annotation.delete({ where: { annotation_id: annotationId } })
+        else deletion = prisma.model_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
 
         // Base annotation update
         const updatedBaseAnnotation = prisma.annotations.update({
-            where: { annotation_id: annotationId },
+            where: { annotation_id: entryUpdateObj.annotationId },
             data: {
-                uid: uid,
-                position: position,
-                url: url,
-                annotation_type: type,
-                title: title
+                uid: entryUpdateObj.uid,
+                position: entryUpdateObj.position,
+                url: entryUpdateObj.url,
+                annotation_type: entryUpdateObj.annotationType,
+                title: entryUpdateObj.title
             },
         })
         // Video annotation creation
         const newVideoAnnotation = prisma.video_annotation.create({
             data: {
-                url: url,
-                length: length,
-                annotation_id: annotationId,
-                annotation: annotation,
+                url: entryUpdateObj.url as string,
+                length: entryUpdateObj.length,
+                annotation_id: entryUpdateObj.annotationId,
+                annotation: entryUpdateObj.annotation,
             }
         })
         // Await transaction
         await prisma.$transaction([deletion as any, updatedBaseAnnotation, newVideoAnnotation])
     }
     catch (e: any) { serverActionErrorHandler(path, e.message, 'updateToVideoAnnotationWithMediaTransition()', "Error: Couldn't update annotation") }
-}
-
-/**
- * 
- * @param annotationId 
- * @param uid 
- * @param position 
- * @param url 
- * @param type 
- * @param title 
- * @param length 
- * @param annotation 
- */
-export const updateVideoAnnotationEntry = async (annotationId: string, uid: string, position: string, url: string, type: string, title: string, length: string, annotation: string) => {
-    try {
-        // Base annotation update
-        const updatedBaseAnnotation = prisma.annotations.update({
-            where: { annotation_id: annotationId },
-            data: {
-                uid: uid,
-                position: position,
-                url: url,
-                annotation_type: type,
-                title: title
-            },
-        })
-        // Video annotation update
-        const updatedVideoAnnotation = prisma.video_annotation.update({
-            where: { annotation_id: annotationId },
-            data: { url: url, length: length, annotation: annotation }
-        })
-
-        await prisma.$transaction([updatedBaseAnnotation, updatedVideoAnnotation])
-    }
-    catch (e: any) { }
 }
 
 /**
@@ -427,42 +487,42 @@ export const updateVideoAnnotationEntry = async (annotationId: string, uid: stri
  * @param annotation 
  * @param email 
  */
-export const transitionToModelAnnotation = async (previousMedia: string, oldUrl: string, annotationId: string, uid: string, position: string, type: string, title: string, modelAnnotationUid: string, annotation: string, email: string) => {
+export const transitionToModelAnnotation = async (entryUpdateObj: annotationDataEntryUpdateObj, email: string) => {
     // Get modeler and annotator
     const annotator = prisma.authorized.findUnique({ where: { email: email } }).then(user => user?.email)
-    const modeler = prisma.model.findUnique({ where: { uid: modelAnnotationUid } }).then(model => model?.modeled_by)
+    const modeler = prisma.model.findUnique({ where: { uid: entryUpdateObj.modelAnnotationUid } }).then(model => model?.modeled_by)
     const res = await Promise.all([annotator, modeler])
 
     // Variable to story deletion query
     let deletion
 
     // Delete the photo annotation (if the previous media was a photo)
-    if (previousMedia === 'photo') {
+    if (entryUpdateObj.previousMedia === 'photo') {
         // Eliminate previous annotation photo and create deletion query
-        await unlink(oldUrl).catch((e) => nonFatalError('annotator.ts', e.message, 'unlink'))
-        deletion = prisma.photo_annotation.delete({ where: { annotation_id: annotationId } })
+        await unlink(entryUpdateObj.oldUrl as string).catch((e) => nonFatalError('annotator.ts', e.message, 'unlink'))
+        deletion = prisma.photo_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
     }
 
     // Or else delete the video annotation
-    else deletion = prisma.video_annotation.delete({ where: { annotation_id: annotationId } })
+    else deletion = prisma.video_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
 
     // Base annotation update
     const updatedBaseAnnotation = prisma.annotations.update({
-        where: { annotation_id: annotationId },
+        where: { annotation_id: entryUpdateObj.annotationId },
         data: {
-            uid: uid,
-            position: position,
-            annotation_type: type,
-            title: title
+            uid: entryUpdateObj.uid,
+            position: entryUpdateObj.position,
+            annotation_type: entryUpdateObj.annotationType,
+            title: entryUpdateObj.title
         },
     })
 
     // Create new model annotation
     const newModelAnnotation = prisma.model_annotation.create({
         data: {
-            uid: modelAnnotationUid,
-            annotation: annotation,
-            annotation_id: annotationId,
+            uid: entryUpdateObj.modelAnnotationUid as string,
+            annotation: entryUpdateObj.annotation,
+            annotation_id: entryUpdateObj.annotationId,
             annotator: res[0],
             modeler: res[1]
         }
@@ -472,39 +532,6 @@ export const transitionToModelAnnotation = async (previousMedia: string, oldUrl:
     await prisma.$transaction([deletion as any, updatedBaseAnnotation, newModelAnnotation])
 }
 
-/**
- * 
- * @param annotationId 
- * @param uid 
- * @param position 
- * @param type 
- * @param title 
- * @param modelAnnotationUid 
- * @param annotation 
- */
-export const updateModelAnnotationEntry = async (annotationId: string, uid: string, position: string, type: string, title: string, modelAnnotationUid: string, annotation: string) => {
-    // Annotation update
-    const updatedAnnotation = prisma.annotations.update({
-        where: { annotation_id: annotationId },
-        data: {
-            uid: uid,
-            position: position,
-            annotation_type: type,
-            title: title
-        },
-    })
-
-    // Model annotation update
-    const updatedModelAnnotation = prisma.model_annotation.update({
-        where: { annotation_id: annotationId },
-        data: {
-            uid: modelAnnotationUid,
-            annotation: annotation,
-        }
-    })
-
-    await prisma.$transaction([updatedAnnotation, updatedModelAnnotation])
-}
 
 /**
  * 
@@ -522,19 +549,20 @@ export const updateModelAnnotationEntry = async (annotationId: string, uid: stri
  * @param license 
  * @param website 
  */
-export const transitionToPhotoAnnotation = async (previousMedia: string, url: string, annotationId: string, uid: string, position: string, type: string, title: string, author: string, annotation: string, email: string, photoTitle: string, license: string, website: string) => {
+export const transitionToPhotoAnnotation = async (entryUpdateObj: annotationDataEntryUpdateObj, email: string) => {
     // Delete previous annotation based on annotation type
-    const deletion = previousMedia === 'video' ? prisma.video_annotation.delete({ where: { annotation_id: annotationId } }) : prisma.model_annotation.delete({ where: { annotation_id: annotationId } })
+    const deletion = entryUpdateObj.previousMedia === 'video' ? prisma.video_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } }) :
+        prisma.model_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
 
     // Update base annotation
     const updatedAnnotation = prisma.annotations.update({
-        where: { annotation_id: annotationId },
+        where: { annotation_id: entryUpdateObj.annotationId },
         data: {
-            uid: uid,
-            position: position,
-            url: url,
-            annotation_type: type,
-            title: title
+            uid: entryUpdateObj.uid,
+            position: entryUpdateObj.position,
+            url: entryUpdateObj.url,
+            annotation_type: entryUpdateObj.annotationType,
+            title: entryUpdateObj.title
         },
     })
 
@@ -544,49 +572,164 @@ export const transitionToPhotoAnnotation = async (previousMedia: string, url: st
     // Create new photo annotation
     const newPhotoAnnotation = prisma.photo_annotation.create({
         data: {
-            url: url,
-            author: author,
-            license: license,
+            url: entryUpdateObj.url as string,
+            author: entryUpdateObj.author ?? '',
+            license: entryUpdateObj.license ?? '',
             annotator: annotator as string ?? '',
-            annotation_id: annotationId,
-            annotation: annotation,
-            website: website ? website as string : '',
-            title: photoTitle ? photoTitle as string : '',
+            annotation_id: entryUpdateObj.annotationId,
+            annotation: entryUpdateObj.annotation,
+            website: entryUpdateObj.website ? entryUpdateObj.website as string : '',
+            title: entryUpdateObj.photoTitle ? entryUpdateObj.photoTitle as string : '',
         }
     })
 
     await prisma.$transaction([deletion as any, updatedAnnotation, newPhotoAnnotation])
 }
 
-export const updatePhotoAnnotationEntry = async (url: string, annotationId: string, uid: string, position: string, type: string, title: string, author: string, annotation: string, email: string, photoTitle: string, license: string, website: string) => {
-    // Get annotator
-    const annotator = await prisma.authorized.findUnique({ where: { email: email } }).then(user => user?.email)
+export async function createNewAnnotationEntry(annotationEntryData: annotationDataEntryObj) {
+    try {
+        // Get session (mainly just for name, quick auth check while we're here) and authorized users
+        const session = await getServerSession(authOptions).catch((e) => serverActionErrorHandler(path, e.message, 'POST getServerSession', "Couldn't get session"))
+        const authorizedUsers = await prisma.authorized.findMany()
 
-    // Update annotation
-    const updatedAnnotation = prisma.annotations.update({
-        where: { annotation_id: annotationId },
-        data: {
-            uid: uid,
-            position: position,
-            url: url,
-            annotation_type: type,
-            title: title
-        },
-    })
+        // Unauthorized error
+        const email = session?.user?.email as string
+        if (!authorizedUsers.find(user => user.email === email)) { throw Error("Not authorized") }
 
-    // Update photo annotation
-    const updatedPhotoAnnotation = prisma.photo_annotation.update({
-        where: { annotation_id: annotationId },
-        data: {
-            url: url,
-            author: author,
-            license: license,
-            annotator: annotator,
-            annotation: annotation,
-            website: website,
-            title: photoTitle,
+        // First annotation handler
+        if (annotationEntryData.index === '1') {
+            // Update model record and return success
+            await prisma.model.update({ where: { uid: annotationEntryData.uid }, data: { annotationPosition: annotationEntryData.position } }).catch((e) => serverActionErrorHandler(path, e.message, 'POST prisma.model.update()', "Couldn't insert first annotation position"))
+            return new Response('Annotation Created')
         }
-    })
 
-    await prisma.$transaction([updatedAnnotation, updatedPhotoAnnotation])
+        // Data for new base annotations other than 1
+        const newAnnotationData = {
+            uid: annotationEntryData.uid,
+            position: annotationEntryData.position,
+            url: annotationEntryData.url ?? '',
+            annotation_no: parseInt(annotationEntryData.annotationNo),
+            annotation_id: annotationEntryData.annotationId,
+            annotation_type: annotationEntryData.annotationType,
+            title: annotationEntryData.title
+        }
+
+        // Conditional based on annotationType
+        switch (annotationEntryData.annotationType) {
+
+            case 'video':
+                // Get and check relevant variable
+                checkEssentialValues([annotationEntryData.length])
+
+                // Create new video annotation and return success
+                await createNewVideoAnnotation(newAnnotationData, annotationEntryData.length as string, annotationEntryData.annotation)
+                return new Response('Video annotation created')
+
+            case 'model':
+                // Get and check relevant variables
+                checkEssentialValues([annotationEntryData.modelAnnotationUid])
+
+                // Create new model annotation and return success
+                await createNewModelAnnotation(newAnnotationData, email, annotationEntryData.modelAnnotationUid as string, annotationEntryData.annotation)
+                return new Response('Model nnotation created')
+
+            default: // Default case (annotationType === 'photo')
+                // Get and check relevant variables
+                const file = annotationEntryData.file as File
+                const dataDir = annotationEntryData.dir as string
+                const dataPath = annotationEntryData.path as string
+                const author = annotationEntryData.author as string
+                const license = annotationEntryData.license as string
+                checkEssentialValues([file, dataDir, dataPath, author, license])
+
+                // Convert path to local for local development
+                const dir = isLocalDevEnv() ? convertCloudPathToLocalPath(dataDir) : dataDir
+                const path = isLocalDevEnv() ? convertCloudPathToLocalPath(dataPath) : dataPath
+
+                // Write photo to disk, create annotation and return success
+                await autoWriteFile(file, dir, path)
+                await createNewPhotoAnnotation(annotationEntryData, newAnnotationData, email)
+
+                // Typical response
+                return 'Photo Annotation created'
+        }
+    }
+    catch (e: any) { return `Error: ${e.message}` }
+}
+
+/**
+ * 
+ * @param updateObject 
+ * @returns 
+ */
+export const updateAnnotationEntry = async (updateObject: annotationDataEntryUpdateObj) => {
+    try {
+        // Get session and authorized users
+        const session = await getServerSession(authOptions).catch(e => serverActionErrorHandler(path, e.message, 'PATCH getServerSession', "Couldn't get session"))
+        const authorizedUsers = await prisma.authorized.findMany()
+
+        // Unauthorized error
+        const email = session?.user?.email as string
+        if (!authorizedUsers.find(user => user.email === email)) { throw Error("Not authorized") }
+
+        // First annotation handler; always taxonomy and description, insert position with typical try-catch return
+        if (updateObject.index === '1') {
+            // Update position and return success
+            await prisma.model.update({ where: { uid: updateObject.uid }, data: { annotationPosition: updateObject.position } }).catch((e) => serverActionErrorHandler(path, e.message, 'prisma.model.update()', "Couldn't insert first annotation position"))
+            return 'Annotation Updated'
+        }
+
+        // Conditional based on annotationType for all other annotations
+        switch (updateObject.annotationType) {
+            case 'video':
+                // Run update with transition if there is a media transition, then return success
+                if (updateObject.mediaTransition) {
+                    await transitionToVideoAnnotation(updateObject)
+                    return 'Annotation updated'
+                }
+                // Else run basic update and return
+                await updateVideoAnnotationEntry(updateObject)
+                return 'Annotation updated'
+
+            case 'model':
+                // Run update with transition if there is a media transition, then return success
+                if (updateObject.mediaTransition) {
+                    // Media transition update and return
+                    transitionToModelAnnotation(updateObject, email)
+                    return new Response('Annotation updated')
+                }
+                // Else run basic update and return
+                await updateModelAnnotationEntry(updateObject)
+                return new Response('Annotation updated')
+
+            default: // Default case (annotationType === 'photo')
+                if (updateObject.file) {
+                    // Get file and check relevant variables
+                    const file = updateObject.file as File
+                    const dataDir = updateObject.dir as string
+                    const dataPath = updateObject.path as string
+
+                    // Convert path to local for local development
+                    const dir = isLocalDevEnv() ? convertCloudPathToLocalPath(dataDir) : dataDir
+                    const path = isLocalDevEnv() ? convertCloudPathToLocalPath(dataPath) : dataPath
+
+                    // Write photograph to disk
+                    await autoWriteFile(file, dir, path)
+                }
+
+                // Eliminate previous photo uploaded to data storage container if it exists
+                if (updateObject.oldUrl && updateObject.file) await unlink(updateObject.oldUrl).catch((e) => nonFatalError(path, e.message, 'unlink'))
+
+                // If there is a change in media for the update, delete previous child of the annotations table, update, then return
+                if (updateObject.mediaTransition) {
+                    // Run update with transition if there is a media transition, then return success 
+                    transitionToPhotoAnnotation(updateObject, email)
+                    return new Response('Annotation updated')
+                }
+                // Else update annotation and return
+                updatePhotoAnnotationEntry(updateObject, email)
+                return new Response('Annotation updated')
+        }
+    }
+    catch (e: any) { }
 }

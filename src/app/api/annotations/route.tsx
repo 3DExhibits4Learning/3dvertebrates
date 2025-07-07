@@ -143,7 +143,7 @@ export async function POST(request: Request) {
 
                 // // Write photo to disk, create annotation and return success
                 await autoWriteFile(file, dir, path)
-                await createNewPhotoAnnotation(newAnnotationData, author, license, email, annotation, website as string, title as string)
+                //await createNewPhotoAnnotation(newAnnotationData, author, license, email, annotation, website as string, title as string)
 
                 // Typical response
                 return new Response('Photo Annotation created')
@@ -200,22 +200,22 @@ export async function PATCH(request: Request) {
             case 'video':
                 // Run update with transition if there is a media transition, then return success
                 if (data.get('mediaTransition')) {
-                    await transitionToVideoAnnotation(previousMedia, oldUrl as string, annotation_id, uid, position, url, type, title, length, annotation)
+                    //await transitionToVideoAnnotation(previousMedia, oldUrl as string, annotation_id, uid, position, url, type, title, length, annotation)
                     return new Response('Annotation updated')
                 }
                 // Else run basic update and return
-                await updateVideoAnnotationEntry(annotation_id, uid, position, url, type, title, length, annotation)
+                //await updateVideoAnnotationEntry(annotation_id, uid, position, url, type, title, length, annotation)
                 return new Response('Annotation updated')
 
             case 'model':
                 // Run update with transition if there is a media transition, then return success
                 if (data.get('mediaTransition')) {
                     // Media transition update and return
-                    transitionToModelAnnotation(previousMedia, oldUrl, annotation_id, uid, position, type, title, modelAnnotationUid, annotation, email)
+                    //transitionToModelAnnotation(previousMedia, oldUrl, annotation_id, uid, position, type, title, modelAnnotationUid, annotation, email)
                     return new Response('Annotation updated')
                 }
                 // Else run basic update and return
-                await updateModelAnnotationEntry(annotation_id, uid, position, type, title, modelAnnotationUid, annotation)
+                //await updateModelAnnotationEntry(annotation_id, uid, position, type, title, modelAnnotationUid, annotation)
                 return new Response('Annotation updated')
 
             default: // Default case (annotationType === 'photo')
@@ -247,12 +247,12 @@ export async function PATCH(request: Request) {
                 // If there is a change in media for the update, delete previous child of the annotations table, update, then return
                 if (data.get('mediaTransition')) {
                     // Run update with transition if there is a media transition, then return success 
-                    transitionToPhotoAnnotation(previousMedia, url, annotation_id, uid, position, type, title, author, annotation, email, photoTitle, author, license)
+                    //transitionToPhotoAnnotation(previousMedia, url, annotation_id, uid, position, type, title, author, annotation, email, photoTitle, author, license)
                     return new Response('Annotation updated')
                 }
 
                 // Else update annotation and return
-                updatePhotoAnnotationEntry(url, annotation_id, uid, position, type, title, author, annotation, email, photoTitle, license, website)
+                //updatePhotoAnnotationEntry(url, annotation_id, uid, position, type, title, author, annotation, email, photoTitle, license, website)
                 return new Response('Annotation updated')
         }
     }

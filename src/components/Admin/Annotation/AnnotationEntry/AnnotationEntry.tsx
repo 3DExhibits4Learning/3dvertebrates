@@ -28,6 +28,7 @@ import PhotoAnnotationEntry from "./PhotoAnnotation"
 import VideoAnnotationEntry from "./VideoAnnotation"
 import ModelAnnotationEntry from "./ModelAnnotationEntry"
 import AnnotationEntryButtons from "./Buttons"
+import { createNewAnnotationEntry, updateAnnotationEntry } from '@/functions/server/admin/annotator'
 
 // Data context initialization
 export const AnnotationEntryData = createContext<annotationEntryContext | ''>('')
@@ -65,8 +66,8 @@ export default function AnnotationEntry(props: { index: number, new: boolean, an
     const dataTransferWrapper = (fn: Function, args: any[], label: string) => dataTransferHandler(initializeDataTransferHandler, terminateDataTransferHandler, fn, args, label)
 
     // Annotation CUD handlers
-    const createAnnotation = () => aeFn.createAnnotation(props.index, specimen.uid as string, apData.position3D as string, dataTransferWrapper, annotationEntryData)
-    const updateAnnotation = () => aeFn.updateAnnotation(props.index, dataTransferWrapper, annotationEntryData, apData, specimen)
+    const createAnnotation = () => dataTransferWrapper(createNewAnnotationEntry, [aeFn.getAnnotationEntryDataObj(annotationEntryData, specimen.uid as string, props.index.toString(), apData.position3D as string, apData)], 'Creating Annotation')
+    const updateAnnotation = () => dataTransferWrapper(updateAnnotationEntry, [aeFn.getAnnotationEntryUpdateDataObj(annotationEntryData, props.index.toString(), apData.position3D as string, apData, specimen)], 'Updating Annotation')
     const deleteAnnotation = () => aeFn.deleteAnnotation(apData, specimen.uid as string, dataTransferWrapper)
 
     // Image visibility effect dependencies
@@ -81,8 +82,6 @@ export default function AnnotationEntry(props: { index: number, new: boolean, an
     useEffect(() => aeFn.setImageVisibility(props.index, annotationEntryData, props.new, annotationEntryDataDispatch), imageVisibilityDependencies)
     useEffect(() => aeFn.populateFormFields(apData, annotationEntryDataDispatch), [apData.activeAnnotation, apData.activeAnnotationIndex]) // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => aeFn.enableSaveOrUpdateButton(apData, annotationEntryData, enableFirstAnnotation, props.index, props.new, setCreateDisabled, setSaveDisabled, isNewPosition), enableDependencies) // eslint-disable-line react-hooks/exhaustive-deps  
-
-    //console.log("Annotation entry data: ", annotationEntryData.annotation)
 
     // JSX for first annotation
     if (props.index === 1) return <AnnotationEntryData.Provider value={annotationEntryContext}>

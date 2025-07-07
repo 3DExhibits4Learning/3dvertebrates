@@ -16,6 +16,8 @@ import { SetStateAction, Dispatch, MutableRefObject } from "react"
 import { v4 as uuidv4 } from 'uuid'
 import { annotationEntryAction } from "@/interface/actions"
 import { convertDbPathToLocalPath, isLocalDevEnv } from "@/functions/server/utils/utils"
+import { annotationDataEntryObj, annotationDataEntryUpdateObj } from "@/ts/ts"
+import { createNewAnnotationEntry } from "@/functions/server/admin/annotator"
 
 export const allTruthy = (value: any) => value ? true : false
 export const allSame = (originalValues: any[], currentValues: any[]) => JSON.stringify(originalValues) === JSON.stringify(currentValues) ? true : false
@@ -144,23 +146,7 @@ export function getImagePath(photoAnnotation: photo_annotation) {
     const path = process.env.NEXT_PUBLIC_LOCAL === 'development' ? `X:${photoAnnotation.url.slice(5)}` : `public${photoAnnotation.url}`
     return `/api/nfs?path=${path}`
 }
-/**
- * 
- * @param uid of the 3D model
- * @param position of the annotation (stringified array)
- * @param index should always be one; this triggers the correct code block on the route handler
- * @returns 
- */
-export const firstAnnotationFormData = (uid: string, position: string, index: string) => {
 
-    const data = new FormData()
-
-    data.set('uid', uid as string)
-    data.set('position', position as string)
-    data.set('index', index)
-
-    return data
-}
 /**
  * 
  * @param data form data for the route handler and database records
@@ -302,27 +288,6 @@ export const deleteAnnotationData = (apData: annotationsAndPositions, uid: strin
 /**
  * 
  * @param index 
- * @param uid 
- * @param position 
- * @param dataTransferWrapper 
- * @param aeData 
- */
-export const createAnnotation = (index: number, uid: string, position: string, dataTransferWrapper: Function, aeData: annotationEntry) => {
-    // Simple handler for the first annotation (always taxonomy and description)
-    if (index === 1) {
-        const data = firstAnnotationFormData(uid, position, index.toString())
-        dataTransferWrapper(insertAnnotation, [data], "Creating annotation")
-    }
-    // Handler for all other annotations
-    else {
-        const data = annotationFormData(aeData, uid, index.toString(), position)
-        dataTransferWrapper(insertAnnotation, [data], "Creating annotation")
-    }
-}
-
-/**
- * 
- * @param index 
  * @param dataTransferWrapper 
  * @param aeData 
  * @param apData 
@@ -442,7 +407,7 @@ export const annotationFormData = (aeData: annotationEntry, uid: string, index: 
     const data = new FormData()
 
     // For first annotation
-    if (index === '1') return firstAnnotationFormData(uid, position, index)
+    //if (index === '1') return firstAnnotationFormData(uid, position, index)
 
     // For all other annotations (this is the annotation id)
     const annotationId = uuidv4()
@@ -599,12 +564,132 @@ export function sanitizeHtml(htmlString: string): string {
                 continue;
             } else {
                 // Remove non-element and non-text nodes
-                child.remove();
+                child.remove()
             }
         }
     }
 
-    clean(wrapper);
+    clean(wrapper)
 
-    return wrapper.innerHTML;
+    return wrapper.innerHTML
+}
+
+export const getAnnotationEntryDataObj = (aeData: annotationEntry, uid: string, index: string, position: string, apData: annotationsAndPositions) => {
+    // For first annotation
+    if (index === '1') return { uid: uid, position: position, index: index }
+
+    // For all other annotations (this is the annotation id)
+    const annotationId = uuidv4()
+
+    // Object initialization
+    const entryObject: annotationDataEntryObj = {
+        index: index,
+        uid: uid,
+        annotationNo: index.toString(),
+        annotationType: aeData.annotationType,
+        position: position,
+        title: aeData.annotationTitle as string,
+        annotationId: annotationId,
+        annotation: aeData.annotation
+    }
+
+    // Directory, path and url data for photo uploads
+    if (aeData.file) {
+        const photo = aeData.file as File
+        entryObject.file = photo
+        entryObject.dir = `public/data/Vertebrates/Annotations/${uid}/${annotationId}`
+        entryObject.path = `public/data/Vertebrates/Annotations/${uid}/${annotationId}/${photo.name}`
+        entryObject.url = `/data/Vertebrates/Annotations/${uid}/${annotationId}/${photo.name}`
+    }
+
+    // Set relevant data based on annotationType
+    switch (aeData.annotationType) {
+        // Video_annotation table data
+        case 'video':
+            entryObject.length = aeData.length
+            entryObject.url = aeData.videoSource
+            break
+
+        // Model_annotation table data
+        case 'model':
+            entryObject.modelAnnotationUid = aeData.modelAnnotationUid as string
+            break
+
+        // Photo_annotation table data
+        default:
+            entryObject.author = aeData.author
+            entryObject.license = aeData.license
+            entryObject.photoTitle = aeData.photoTitle ?? (apData.activeAnnotation as photo_annotation).title ?? ''
+            entryObject.website = aeData.website ?? (apData.activeAnnotation as photo_annotation).title ?? ''
+    }
+    return entryObject
+}
+
+export const getAnnotationEntryUpdateDataObj = (aeData: annotationEntry, index: string, position: string, apData: annotationsAndPositions, specimen: annotationClientSpecimen) => {
+    // For first annotation
+    if (index === '1') return { uid: specimen.uid, position: position, index: index }
+
+    // Current annotation ID
+    const annotationId = apData.activeAnnotation?.annotation_id as string
+    const uid = specimen.uid as string
+
+    // Update object initialization
+    const updateObject: annotationDataEntryUpdateObj = {
+        specimenName: specimen.specimenName as string,
+        index: index,
+        uid: specimen.uid as string,
+        annotationNo: index.toString(),
+        annotationType: aeData.annotationType,
+        position: position,
+        title: aeData.annotationTitle as string,
+        annotationId: apData.activeAnnotation?.annotation_id as string,
+        annotation: aeData.annotation,
+        mediaTransition: apData.activeAnnotationType !== aeData.annotationType,
+        previousMedia: apData.activeAnnotationType
+    }
+
+    // Set relevant data based on annotationType
+    switch (aeData.annotationType) {
+        // Video_annotation table data
+        case 'video':
+            updateObject.length = aeData.length
+            updateObject.url = aeData.videoSource
+            break
+
+        // Model_annotation table data
+        case 'model':
+            updateObject.modelAnnotationUid = aeData.modelAnnotationUid as string
+            updateObject.url = ''
+            break
+
+        // Photo_annotation table data
+        default:
+            updateObject.author = aeData.author
+            updateObject.license = aeData.license
+            updateObject.photoTitle = aeData.photoTitle ?? (apData.activeAnnotation as photo_annotation).title ?? ''
+            updateObject.website = aeData.website ?? (apData.activeAnnotation as photo_annotation).title ?? ''
+    }
+
+    // If there is a new photograph file
+    if (aeData.file) {
+        // Type safe declaration; add photo to object
+        const photo = aeData.file as File
+        updateObject.file = photo
+
+        // Add directory, path and url to object
+        updateObject.dir = `public/data/Vertebrates/Annotations/${uid}/${annotationId}`
+        updateObject.path = `public/data/Vertebrates/Annotations/${uid}/${annotationId}/${photo.name}`
+        updateObject.url = `/data/Vertebrates/Annotations/${uid}/${annotationId}/${photo.name}`
+
+        // If the annotation being updated was already a photo annotation, delete the previous photograph by adding oldUrl to the update object
+        if (apData.activeAnnotationType === 'photo') updateObject.oldUrl = (apData.activeAnnotation as photo_annotation).url
+    }
+
+    // Else if the databased annotation is a photo, the url should be the same
+    else if (aeData.photoChecked) updateObject.url = (apData.activeAnnotation as photo_annotation).url
+
+    // If there was a media transition and the original annotation was a photo annotation, delete the original photograph by adding oldUrl to the update object
+    if (updateObject.mediaTransition && apData.activeAnnotationType === 'photo') updateObject.oldUrl = (apData.activeAnnotation as photo_annotation).url
+
+    return updateObject
 }
