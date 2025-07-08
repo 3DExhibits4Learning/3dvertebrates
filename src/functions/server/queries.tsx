@@ -572,7 +572,7 @@ export const deleteAnnotation = async (id: string, modelUid: string) => {
     // Get remaining annotations with higher annotation numbers
     const remainingAnnotations = await prisma.annotations.findMany({
       where: {
-        uid: modelUid,
+        uid: modelUid,   
         annotation_no: { gt: annotationPendingDeletionNumber }
       },
       orderBy: { annotation_no: 'asc' }
@@ -590,7 +590,7 @@ export const deleteAnnotation = async (id: string, modelUid: string) => {
       }))
     }
 
-    // // Await promises to resolve
+    // Await the transaction
     await prisma.$transaction(promises)
   }
   catch (e: any) { serverActionErrorHandler('queries', e.message, 'deleteAnnotation', 'Error deleting annotation') }

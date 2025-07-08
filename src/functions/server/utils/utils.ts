@@ -41,4 +41,4 @@ export const convertDbPathToLocalPath = (path: string) => 'X:' + path.slice(5)
  * @param oldUrl 
  * @returns 
  */
-export const getOldUrl = (oldUrl: FormDataEntryValue | null) => oldUrl ? isLocalDevEnv() ? convertDbPathToLocalPath(oldUrl as string) : oldUrl as string : ''
+export const getPathToUnlink = (path?: string) => path ? isLocalDevEnv() ? convertDbPathToLocalPath(path) : path : ''

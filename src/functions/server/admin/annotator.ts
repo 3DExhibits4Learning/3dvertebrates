@@ -9,18 +9,18 @@
 // Typical imports
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
-import { nonFatalError, routeHandlerTypicalCatch, serverActionErrorHandler, serverErrorHandler } from "../error"
+import { nonFatalError, serverActionErrorHandler } from "../error"
 import { annotationDataEntryObj, annotationDataEntryUpdateObj, AnnotationNumbers, newAnnotationData } from "@/ts/ts"
 import { v4 as uuidv4 } from 'uuid'
 import { fullAnnotation } from "@/interface/interface"
-import { model, model_annotation, photo_annotation, video_annotation } from "@prisma/client"
+import { model_annotation, photo_annotation, video_annotation } from "@prisma/client"
 import { unlink } from "fs/promises"
-import { checkEssentialValues, convertCloudPathToLocalPath, convertDbPathToLocalPath, isLocalDevEnv } from "@/functions/server/utils/utils"
+import { checkEssentialValues, convertCloudPathToLocalPath, convertDbPathToLocalPath, getPathToUnlink, isLocalDevEnv } from "@/functions/server/utils/utils"
 import { autoWriteFile } from "@/functions/server/utils/file"
+import { deleteAnnotation } from "@/functions/server/queries"
 
 // SINGLETON
 import prisma from "@/functions/utils/prisma"
-import { deleteAnnotation } from "@/functions/server/queries"
 
 // Path
 const path = 'src/functions/server/admin/annotator.ts'
@@ -37,7 +37,7 @@ export const getBaseAnnotations = async (uid: string) => await prisma.annotation
  * @param uid 
  * @returns 
  */
-export const getFirstAnnotationPosition = async(uid: string) => await prisma.model.findUnique({where: {uid: uid}}).then(model => model?.annotationPosition ? JSON.parse(model?.annotationPosition as string) : '')
+export const getFirstAnnotationPosition = async (uid: string) => await prisma.model.findUnique({ where: { uid: uid } }).then(model => model?.annotationPosition ? JSON.parse(model?.annotationPosition as string) : '')
 
 /**
  * 
@@ -441,7 +441,8 @@ export const transitionToVideoAnnotation = async (entryUpdateObj: annotationData
         // Delete photo annotation (if it was a photo annotation)
         if (entryUpdateObj.previousMedia === 'photo') {
             // Eliminate previous annotation photo and store query in deletion
-            await unlink(entryUpdateObj.oldUrl as string).catch(e => nonFatalError('annotator.ts', e.message, 'unlink'))
+            const oldUrl = getPathToUnlink(entryUpdateObj.oldUrl)
+            await unlink(oldUrl).catch(e => nonFatalError('annotator.ts', e.message, 'unlink'))
             deletion = prisma.photo_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
         }
         // Else delete the model annotation
@@ -489,8 +490,9 @@ export const transitionToModelAnnotation = async (entryUpdateObj: annotationData
 
     // Delete the photo annotation (if the previous media was a photo)
     if (entryUpdateObj.previousMedia === 'photo') {
-        // Eliminate previous annotation photo and create deletion query
-        await unlink(entryUpdateObj.oldUrl as string).catch((e) => nonFatalError('annotator.ts', e.message, 'unlink'))
+        // Eliminate previous annotation photo and store query in deletion
+        const oldUrl = getPathToUnlink(entryUpdateObj.oldUrl)
+        await unlink(oldUrl).catch(e => nonFatalError('annotator.ts', e.message, 'unlink'))
         deletion = prisma.photo_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
     }
 
@@ -565,6 +567,11 @@ export const transitionToPhotoAnnotation = async (entryUpdateObj: annotationData
     await prisma.$transaction([deletion as any, updatedAnnotation, newPhotoAnnotation])
 }
 
+/**
+ * 
+ * @param annotationEntryData 
+ * @returns 
+ */
 export async function createNewAnnotationEntry(annotationEntryData: annotationDataEntryObj) {
     try {
         // Get session (mainly just for name, quick auth check while we're here) and authorized users
@@ -579,7 +586,7 @@ export async function createNewAnnotationEntry(annotationEntryData: annotationDa
         if (annotationEntryData.index === '1') {
             // Update model record and return success
             await prisma.model.update({ where: { uid: annotationEntryData.uid }, data: { annotationPosition: annotationEntryData.position } }).catch((e) => serverActionErrorHandler(path, e.message, 'POST prisma.model.update()', "Couldn't insert first annotation position"))
-            return new Response('Annotation Created')
+            return 'Annotation Created'
         }
 
         // Data for new base annotations other than 1
@@ -602,7 +609,7 @@ export async function createNewAnnotationEntry(annotationEntryData: annotationDa
 
                 // Create new video annotation and return success
                 await createNewVideoAnnotation(newAnnotationData, annotationEntryData.length as string, annotationEntryData.annotation)
-                return new Response('Video annotation created')
+                return 'Video annotation created'
 
             case 'model':
                 // Get and check relevant variables
@@ -610,7 +617,7 @@ export async function createNewAnnotationEntry(annotationEntryData: annotationDa
 
                 // Create new model annotation and return success
                 await createNewModelAnnotation(newAnnotationData, email, annotationEntryData.modelAnnotationUid as string, annotationEntryData.annotation)
-                return new Response('Model nnotation created')
+                return 'Model nnotation created'
 
             default: // Default case (annotationType === 'photo')
                 // Get and check relevant variables
@@ -675,11 +682,11 @@ export const updateAnnotationEntry = async (updateObject: annotationDataEntryUpd
                 if (updateObject.mediaTransition) {
                     // Media transition update and return
                     transitionToModelAnnotation(updateObject, email)
-                    return new Response('Annotation updated')
+                    return 'Annotation updated'
                 }
                 // Else run basic update and return
                 await updateModelAnnotationEntry(updateObject)
-                return new Response('Annotation updated')
+                return 'Annotation updated'
 
             default: // Default case (annotationType === 'photo')
                 if (updateObject.file) {
@@ -697,16 +704,17 @@ export const updateAnnotationEntry = async (updateObject: annotationDataEntryUpd
                 }
 
                 // Eliminate previous photograph if the 'oldUrl' path is provided and there is a new photograph
-                if (updateObject.oldUrl && updateObject.file) await unlink(updateObject.oldUrl).catch((e) => nonFatalError(path, e.message, 'unlink'))
+                const pathToUnlink = getPathToUnlink(updateObject.oldUrl)
+                if (pathToUnlink && updateObject.file) await unlink(pathToUnlink).catch((e) => nonFatalError(path, e.message, 'unlink'))
 
                 // Run transition if necessary
                 if (updateObject.mediaTransition) {
                     transitionToPhotoAnnotation(updateObject, email)
-                    return new Response('Annotation updated')
+                    return 'Annotation updated'
                 }
                 // Else update annotation and return
                 updatePhotoAnnotationEntry(updateObject, email)
-                return new Response('Annotation updated')
+                return 'Annotation updated'
         }
     }
     catch (e: any) { return `Error: ${e.message}` }
