@@ -15,7 +15,8 @@ import { useState, useEffect, useContext, createContext, useReducer } from "reac
 import { annotationClientData, annotationEntryContext } from "@/interface/interface"
 import { AnnotationClientData } from "@/components/Admin/Annotation/Annotation Client/AnnotationClient"
 import { getInitialAnnotationEntryData } from "@/interface/initializers"
-import { model } from '@prisma/client'
+import { model, photo_annotation } from '@prisma/client'
+import { createNewAnnotationEntry, deleteAnnotationEntry, updateAnnotationEntry } from '@/functions/server/admin/annotator'
 
 // Default imports
 import annotationEntryReducer from "@/functions/client/reducers/AnnotationEntryData"
@@ -28,7 +29,6 @@ import PhotoAnnotationEntry from "./PhotoAnnotation"
 import VideoAnnotationEntry from "./VideoAnnotation"
 import ModelAnnotationEntry from "./ModelAnnotationEntry"
 import AnnotationEntryButtons from "./Buttons"
-import { createNewAnnotationEntry, updateAnnotationEntry } from '@/functions/server/admin/annotator'
 
 // Data context initialization
 export const AnnotationEntryData = createContext<annotationEntryContext | ''>('')
@@ -65,10 +65,15 @@ export default function AnnotationEntry(props: { index: number, new: boolean, an
     const terminateDataTransferHandler = (result: string) => transferStateDispatch({ type: 'terminate', result: result })
     const dataTransferWrapper = (fn: Function, args: any[], label: string) => dataTransferHandler(initializeDataTransferHandler, terminateDataTransferHandler, fn, args, label)
 
+    // Annotation creation/update argument objects
+    const annotationCreationArg = aeFn.getAnnotationEntryDataObj(annotationEntryData, specimen.uid as string, props.index.toString(), apData.position3D as string, apData)
+    const annotationUpdateArg = aeFn.getAnnotationEntryUpdateDataObj(annotationEntryData, props.index.toString(), apData.position3D as string, apData, specimen)
+    const getAnnotationDeletionUrl = () => apData.activeAnnotationType === 'photo' ? (apData.activeAnnotation as photo_annotation).url : ''
+
     // Annotation CUD handlers
-    const createAnnotation = () => dataTransferWrapper(createNewAnnotationEntry, [aeFn.getAnnotationEntryDataObj(annotationEntryData, specimen.uid as string, props.index.toString(), apData.position3D as string, apData)], 'Creating Annotation')
-    const updateAnnotation = () => dataTransferWrapper(updateAnnotationEntry, [aeFn.getAnnotationEntryUpdateDataObj(annotationEntryData, props.index.toString(), apData.position3D as string, apData, specimen)], 'Updating Annotation')
-    const deleteAnnotation = () => aeFn.deleteAnnotation(apData, specimen.uid as string, dataTransferWrapper)
+    const createAnnotation = () => dataTransferWrapper(createNewAnnotationEntry, [annotationCreationArg], 'Creating Annotation')
+    const updateAnnotation = () => dataTransferWrapper(updateAnnotationEntry, [annotationUpdateArg], 'Updating Annotation')
+    const deleteAnnotation = () => dataTransferWrapper(deleteAnnotationEntry, [apData.activeAnnotation?.annotation_id as string, specimen.uid as string, getAnnotationDeletionUrl()], 'Deleting Annotation')
 
     // Image visibility effect dependencies
     const imageVisibilityDependencies = [props.new, annotationEntryData.annotationType, props.index, annotationEntryData.file, apData.activeAnnotation]

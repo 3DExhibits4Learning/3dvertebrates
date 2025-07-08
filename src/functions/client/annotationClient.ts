@@ -16,6 +16,7 @@ import { dispatch } from "@/interface/interface"
 // Default imports
 import ModelAnnotations from "@/classes/ModelAnnotationsClass"
 import { model } from "@prisma/client"
+import { getFirstAnnotationPosition } from "@/functions/server/admin/annotator"
 
 // New model selected/db update dispatch action interface
 interface newModelSelectedOrDbUpdate extends dispatch{
@@ -82,22 +83,12 @@ export const activeAnnotationChangeHandler = (apData: annotationsAndPositions, a
 
 /**
  * 
- * @returns first annotation position of the active specimen if it exists, or an empty string if not
- */
-export const getFirstAnnotationPosition = async (specimenData: annotationClientSpecimen) => await fetch(`/api/annotations?uid=${specimenData.uid}`, { cache: 'no-store' })
-    .then(res => res.json()).then(json => {
-        if (json.response) return JSON.parse(json.response)
-        else return ''
-    })
-
-/**
- * 
  * @description get relevant data and dispatch when a either a model is selected or an annotation record is created/updated
  */
 export const modelOrAnnotationChangeHandler = async (specimenData: annotationClientSpecimen, apDispatch: Dispatch<newModelSelectedOrDbUpdate>) => {
     if(!specimenData.uid) return
     const modelAnnotations = await ModelAnnotations.retrieve(specimenData.uid as string)
-    const annotationPosition = await getFirstAnnotationPosition(specimenData)
+    const annotationPosition = await getFirstAnnotationPosition(specimenData.uid as string)
     apDispatch({ type: 'newModelSelectedOrDbUpdate', modelAnnotations: modelAnnotations, firstAnnotationPosition: annotationPosition })
 }
 

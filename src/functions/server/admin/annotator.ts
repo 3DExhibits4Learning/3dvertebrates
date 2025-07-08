@@ -14,12 +14,13 @@ import { annotationDataEntryObj, annotationDataEntryUpdateObj, AnnotationNumbers
 import { v4 as uuidv4 } from 'uuid'
 import { fullAnnotation } from "@/interface/interface"
 import { model, model_annotation, photo_annotation, video_annotation } from "@prisma/client"
-
-// SINGLETON
-import prisma from "@/functions/utils/prisma"
 import { unlink } from "fs/promises"
 import { checkEssentialValues, convertCloudPathToLocalPath, convertDbPathToLocalPath, isLocalDevEnv } from "@/functions/server/utils/utils"
 import { autoWriteFile } from "@/functions/server/utils/file"
+
+// SINGLETON
+import prisma from "@/functions/utils/prisma"
+import { deleteAnnotation } from "@/functions/server/queries"
 
 // Path
 const path = 'src/functions/server/admin/annotator.ts'
@@ -30,6 +31,13 @@ const path = 'src/functions/server/admin/annotator.ts'
  * @returns 
  */
 export const getBaseAnnotations = async (uid: string) => await prisma.annotations.findMany({ where: { uid: uid }, orderBy: { annotation_no: 'asc' } })
+
+/**
+ * 
+ * @param uid 
+ * @returns 
+ */
+export const getFirstAnnotationPosition = async(uid: string) => await prisma.model.findUnique({where: {uid: uid}}).then(model => model?.annotationPosition ? JSON.parse(model?.annotationPosition as string) : '')
 
 /**
  * 
@@ -642,7 +650,7 @@ export async function createNewAnnotationEntry(annotationEntryData: annotationDa
                 const license = annotationEntryData.license as string
                 checkEssentialValues([file, dataDir, dataPath, author, license])
 
-                // Convert path to local for local development
+                // Convert path to local if necessary
                 const dir = isLocalDevEnv() ? convertCloudPathToLocalPath(dataDir) : dataDir
                 const path = isLocalDevEnv() ? convertCloudPathToLocalPath(dataPath) : dataPath
 
@@ -709,7 +717,7 @@ export const updateAnnotationEntry = async (updateObject: annotationDataEntryUpd
                     const dataDir = updateObject.dir as string
                     const dataPath = updateObject.path as string
 
-                    // Convert path to local for local development
+                    // Convert path to local if necessary
                     const dir = isLocalDevEnv() ? convertCloudPathToLocalPath(dataDir) : dataDir
                     const path = isLocalDevEnv() ? convertCloudPathToLocalPath(dataPath) : dataPath
 
@@ -717,12 +725,11 @@ export const updateAnnotationEntry = async (updateObject: annotationDataEntryUpd
                     await autoWriteFile(file, dir, path)
                 }
 
-                // Eliminate previous photo uploaded to data storage container if it exists
+                // Eliminate previous photograph if the 'oldUrl' path is provided and there is a new photograph
                 if (updateObject.oldUrl && updateObject.file) await unlink(updateObject.oldUrl).catch((e) => nonFatalError(path, e.message, 'unlink'))
 
-                // If there is a change in media for the update, delete previous child of the annotations table, update, then return
+                // Run transition if necessary
                 if (updateObject.mediaTransition) {
-                    // Run update with transition if there is a media transition, then return success 
                     transitionToPhotoAnnotation(updateObject, email)
                     return new Response('Annotation updated')
                 }
@@ -731,5 +738,22 @@ export const updateAnnotationEntry = async (updateObject: annotationDataEntryUpd
                 return new Response('Annotation updated')
         }
     }
-    catch (e: any) { }
+    catch (e: any) { return `Error: ${e.message}` }
+}
+
+/**
+ * 
+ * @param annotationId 
+ * @param modelUid 
+ * @param oldUrl 
+ * @returns 
+ */
+export const deleteAnnotationEntry = async (annotationId: string, modelUid: string, oldUrl?: string) => {
+    try {
+        // Eliminate previous photo uploaded to data storage container if it exists, delete annotation, return
+        if (oldUrl) await unlink(`public${oldUrl}`).catch((e) => nonFatalError(path, e.message, 'unlink'))
+        await deleteAnnotation(annotationId, modelUid)
+        return 'Annotation deleted'
+    }
+    catch (e: any) { return `Error: ${e.message}` }
 }
