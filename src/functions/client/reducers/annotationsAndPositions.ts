@@ -58,7 +58,8 @@ export function annotationsAndPositionsReducer(annotationsAndPositions: annotati
                 ...annotationsAndPositions,
                 newAnnotationEnabled: true,
                 activeAnnotationIndex: 'new',
-                repositionEnabled: false
+                repositionEnabled: false,
+                activeAnnotation: undefined
             }
 
         case 'annotationCancelled':

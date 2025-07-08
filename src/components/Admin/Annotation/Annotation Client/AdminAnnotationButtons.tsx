@@ -9,10 +9,8 @@
 // Typical imports
 import { Button } from "@heroui/react"
 import { AnnotationClientData } from "./AnnotationClient"
-import { forwardRef, RefObject, SetStateAction, useContext, Dispatch, useEffect, useState } from "react"
+import { forwardRef, RefObject, SetStateAction, useContext, Dispatch } from "react"
 import { annotationClientData } from "@/interface/interface"
-import { useSession } from "next-auth/react"
-import { getAssignmentEmail } from "@/functions/server/admin/administrator"
 
 // Main JSX
 const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetStateAction<boolean>>, setReorderOpen: Dispatch<SetStateAction<boolean>> }, ref) => {

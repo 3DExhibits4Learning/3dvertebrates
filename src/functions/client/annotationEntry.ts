@@ -489,7 +489,7 @@ export const getAnnotationEntryUpdateDataObj = (aeData: annotationEntry, index: 
     }
 
     // Else if the databased annotation is a photo, the url should be the same
-    else if (aeData.photoChecked) updateObject.url = (apData.activeAnnotation as photo_annotation).url
+    else if (aeData.photoChecked && apData.activeAnnotation) updateObject.url = (apData.activeAnnotation as photo_annotation)?.url
 
     // If there was a media transition and the original annotation was a photo annotation, delete the original photograph by adding oldUrl to the update object
     if (updateObject.mediaTransition && apData.activeAnnotationType === 'photo') updateObject.oldUrl = (apData.activeAnnotation as photo_annotation).url
