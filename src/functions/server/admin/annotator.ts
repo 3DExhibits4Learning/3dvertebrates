@@ -431,16 +431,7 @@ export const updatePhotoAnnotationEntry = async (annotationEntryData: annotation
 
 /**
  * 
- * @param previousMedia 
- * @param oldUrl 
- * @param annotationId 
- * @param uid 
- * @param position 
- * @param url 
- * @param type 
- * @param title 
- * @param length 
- * @param annotation 
+ * @param entryUpdateObj 
  */
 export const transitionToVideoAnnotation = async (entryUpdateObj: annotationDataEntryUpdateObj) => {
     try {
@@ -484,15 +475,7 @@ export const transitionToVideoAnnotation = async (entryUpdateObj: annotationData
 
 /**
  * 
- * @param previousMedia 
- * @param oldUrl 
- * @param annotationId 
- * @param uid 
- * @param position 
- * @param type 
- * @param title 
- * @param modelAnnotationUid 
- * @param annotation 
+ * @param entryUpdateObj 
  * @param email 
  */
 export const transitionToModelAnnotation = async (entryUpdateObj: annotationDataEntryUpdateObj, email: string) => {
@@ -540,22 +523,10 @@ export const transitionToModelAnnotation = async (entryUpdateObj: annotationData
     await prisma.$transaction([deletion as any, updatedBaseAnnotation, newModelAnnotation])
 }
 
-
 /**
  * 
- * @param previousMedia 
- * @param url 
- * @param annotationId 
- * @param uid 
- * @param position 
- * @param type 
- * @param title 
- * @param author 
- * @param annotation 
+ * @param entryUpdateObj 
  * @param email 
- * @param photoTitle 
- * @param license 
- * @param website 
  */
 export const transitionToPhotoAnnotation = async (entryUpdateObj: annotationDataEntryUpdateObj, email: string) => {
     // Delete previous annotation based on annotation type

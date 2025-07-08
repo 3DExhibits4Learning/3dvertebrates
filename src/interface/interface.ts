@@ -3,7 +3,7 @@
  * @fileoverview contains the type definitions of the API calls used throughout the application.
  */
 
-import { Dispatch } from "react";
+import { Dispatch, RefObject } from "react";
 import { SetStateAction } from "react";
 import { annotations, photo_annotation, video_annotation, model, model_annotation, software, tags, authorized, assignment } from "@prisma/client";
 import { annotationDataTransferAction } from "./actions";
@@ -87,9 +87,25 @@ export interface annotationClientData {
     unassignAnnotationHandler: Function,
     setNameAndEmailStates: Function
   }
-  student:{
+  student: {
     name: string | null | undefined,
     email: string | null | undefined
+  }
+  setters: {
+    setViewerLoaded: Dispatch<SetStateAction<boolean>>,
+    setSureModalOpen: Dispatch<SetStateAction<boolean>>,
+    setReorderModalOpen: Dispatch<SetStateAction<boolean>>
+  }
+  refs: {
+    modelClicked: RefObject<boolean>,
+    newAnnotationEnabled: RefObject<boolean>
+  }
+  properties: {
+    modelsToAnnotate: model[],
+    annotationModels: model[],
+    admin: boolean, students?:
+    studentsAssignmentsAndModels[],
+    authorizedUsers?: authorized[]
   }
 }
 

@@ -11,7 +11,7 @@
 
 // Imports
 import { annotationClientSpecimen, annotationEntry, annotationsAndPositions } from "@/interface/interface"
-import { photo_annotation, video_annotation, model_annotation } from "@prisma/client"
+import { photo_annotation, video_annotation, model_annotation, model } from "@prisma/client"
 import { SetStateAction, Dispatch, MutableRefObject } from "react"
 import { v4 as uuidv4 } from 'uuid'
 import { annotationEntryAction } from "@/interface/actions"

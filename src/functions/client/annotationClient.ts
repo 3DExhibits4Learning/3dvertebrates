@@ -9,23 +9,23 @@
 'use client'
 
 // Typical imports
-import { Dispatch } from "react"
+import { Dispatch, SetStateAction } from "react"
 import { annotationClientSpecimen, annotationsAndPositions, studentsAssignmentsAndModels } from "@/interface/interface"
 import { dispatch } from "@/interface/interface"
-
-// Default imports
-import ModelAnnotations from "@/classes/ModelAnnotationsClass"
 import { model } from "@prisma/client"
 import { getFirstAnnotationPosition } from "@/functions/server/admin/annotator"
 
+// Default imports
+import ModelAnnotations from "@/classes/ModelAnnotationsClass"
+
 // New model selected/db update dispatch action interface
-interface newModelSelectedOrDbUpdate extends dispatch{
+interface newModelSelectedOrDbUpdate extends dispatch {
     modelAnnotations: ModelAnnotations,
     firstAnnotationPosition: number[]
 }
 
 // Specimen data update interface
-interface newModelClicked extends dispatch{
+interface newModelClicked extends dispatch {
     model: model
 }
 
@@ -34,7 +34,6 @@ interface newModelClicked extends dispatch{
  * @returns the index of the active annotation for the selected model in the annotation client
  */
 export const getIndex = (apData: annotationsAndPositions) => {
-
     // Index
     var index
 
@@ -48,12 +47,18 @@ export const getIndex = (apData: annotationsAndPositions) => {
     return index
 }
 
+export const simulateAccordionPress = (setViewerLoaded: Dispatch<SetStateAction<boolean>>, apDataDispatch: Dispatch<any>, specimenDataDispatch: Dispatch<any>, model: model) => {
+    setViewerLoaded(false)
+    apDataDispatch({ type: 'newModelClicked' })
+    specimenDataDispatch({ type: 'newModelClicked', model: model })
+}
+
 /**
  * 
  * @param students array of students, assignments and models (see type)
  * @returns email of student who is assigned the model with uid from specimenData object
  */
-export const findStudentEmail = (students: studentsAssignmentsAndModels[], specimenData: annotationClientSpecimen) => 
+export const findStudentEmail = (students: studentsAssignmentsAndModels[], specimenData: annotationClientSpecimen) =>
     students.find(student => student.assignment.find(assignment => assignment.uid === specimenData.uid))?.email
 
 /**
@@ -86,7 +91,7 @@ export const activeAnnotationChangeHandler = (apData: annotationsAndPositions, a
  * @description get relevant data and dispatch when a either a model is selected or an annotation record is created/updated
  */
 export const modelOrAnnotationChangeHandler = async (specimenData: annotationClientSpecimen, apDispatch: Dispatch<newModelSelectedOrDbUpdate>) => {
-    if(!specimenData.uid) return
+    if (!specimenData.uid) return
     const modelAnnotations = await ModelAnnotations.retrieve(specimenData.uid as string)
     const annotationPosition = await getFirstAnnotationPosition(specimenData.uid as string)
     apDispatch({ type: 'newModelSelectedOrDbUpdate', modelAnnotations: modelAnnotations, firstAnnotationPosition: annotationPosition })
@@ -100,7 +105,7 @@ export const modelOrAnnotationChangeHandler = async (specimenData: annotationCli
  * @param sdDispatch specimenDataDispatch
  */
 export const modelClickHandler = (modelClicked: boolean, model: model, apDispatch: Dispatch<dispatch>, sdDispatch: Dispatch<newModelClicked | dispatch>, admin: boolean) => {
-    if(admin) return
+    if (admin) return
     if (modelClicked) {
         // First annotation position MUST be loaded before BotanistRefWrapper, so it is set to undefined while model data is set
         apDispatch({ type: 'newModelClicked' })

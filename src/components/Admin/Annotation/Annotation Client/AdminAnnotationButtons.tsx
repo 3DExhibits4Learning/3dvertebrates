@@ -71,14 +71,14 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
             }
             {
                 // 'Mark as annotated' button
-                annotationsAndPositions.annotations && annotationsAndPositions.annotations?.length >= 4 && annotationsAndPositions.activeAnnotationIndex != 'new' &&
+                annotationsAndPositions.annotations && annotationsAndPositions.activeAnnotationIndex != 'new' &&
                 <div className="flex justify-end items-center pt-2">
                     <br></br>
                     <Button
                         onPress={() => props.setModalOpen(true)}
                         size='sm'
                         className="text-white text-md min-w-[171px] rounded-md"
-                        isDisabled={annotationsAndPositions.repositionEnabled || !context.specimenData.annotated}>
+                        isDisabled={annotationsAndPositions.repositionEnabled || !context.specimenData.annotated || annotationsAndPositions.annotations?.length < 4}>
                         Publish Model
                     </Button>
                 </div>

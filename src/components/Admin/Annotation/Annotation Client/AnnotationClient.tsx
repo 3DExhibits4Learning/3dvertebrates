@@ -1,8 +1,8 @@
 /**
  * @file src/components/Admin/AnnotationClient.tsx
  * 
- * @fileoverview annotation client parent component; 
- * its most significant children are AnnotationModelViewer and AnnotationEntry; 
+ * @fileoverview annotation client parent component 
+ * its most significant children are AnnotationModelViewer and AnnotationEntry
  * these are the three main components of the client annotation CRUD interface
  * 
  */
@@ -10,11 +10,9 @@
 'use client'
 
 // Typical imports
-import { Accordion, AccordionItem, Spinner } from "@heroui/react"
 import { useEffect, useState, useRef, useContext, createContext, useReducer } from "react"
 import { authorized, model } from "@prisma/client"
 import { studentsAssignmentsAndModels, annotationClientData } from "@/interface/interface"
-import { toUpperFirstLetter } from "@/functions/utils/toUpperFirstLetter"
 import { DataTransferContext } from "@/components/Admin/Administrator/ManagerClient"
 import { annotationsAndPositionsReducer } from "@/functions/client/reducers/annotationsAndPositions"
 import { annotationClientSpecimenReducer } from "@/functions/client/reducers/annotationClientSpecimen"
@@ -25,16 +23,14 @@ import { AnnotationNumbers } from "@/ts/ts"
 import { renumberAnnotationsServer } from "@/functions/server/admin/annotator"
 import { StudentTransferContext } from "../../Student/StudentClient"
 import { useSession } from "next-auth/react"
+import { simulateAccordionPress } from "@/functions/client/annotationClient"
 
 // Default imports
-import BotanistRefWrapper from "../Annotation Model Viwer/AnnotationModelViewerRef"
 import AreYouSure from "@/components/Shared/Modals/AreYouSure"
 import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler"
-import AnnotationEntryWrapper from "./AnnotationEntryWrapper"
-import AdminAnnotation from "./AdminAnnotation"
-import AnnotationButtons from "./AnnotationButtons"
-import AdminAnnotationButtons from "./AdminAnnotationButtons"
 import AnnotationReorder from "@/components/Shared/Modals/AnnotationReorder"
+import AdminAnnotationClient from "@/components/Admin/Annotation/Annotation Client/AdminAnnotationClient"
+import StudentAnnotationClient from "@/components/Admin/Annotation/Annotation Client/StudentAnnotationClient"
 
 // Exported context
 export const AnnotationClientData = createContext<annotationClientData | ''>('')
@@ -81,17 +77,20 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
 
     // Annotation assign and unassign handlers
     const assignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, assignAnnotation, [name, email, specimenData.uid], 'Assigning annotation of model')
-    const getAnnotationUnassignmentEmail = async() => (props.students as studentsAssignmentsAndModels[]).find(student => student.assignment.find(assignment => assignment.uid === specimenData.uid))?.email
+    const getAnnotationUnassignmentEmail = async () => (props.students as studentsAssignmentsAndModels[]).find(student => student.assignment.find(assignment => assignment.uid === specimenData.uid))?.email
     const unassignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unassignAnnotation, [getAnnotationUnassignmentEmail(), specimenData.uid], 'Unassigning annotation of model')
     const setAdminAssignedFn = async () => setAdminAssigned(await getAssignmentEmail(specimenData.uid as string) === userEmail)
 
-    // Handler object for context; student context object
+    // All remaining context objects
     const handlers = { approveAnnotationsHandler, unapproveAnnotationsHandler, assignAnnotationHandler, unassignAnnotationHandler, setNameAndEmailStates }
     const student = { name: name, email: email }
     const admin = props.admin
+    const setters = { setViewerLoaded: setViewerLoaded, setSureModalOpen: setModalOpen, setReorderModalOpen: setIsOpen }
+    const refs = { modelClicked: modelClicked, newAnnotationEnabled: newAnnotationEnabled }
+    const properties = { ...props }
 
     // Context 
-    const annotationClientContext: annotationClientData = { annotationsAndPositions, annotationsAndPositionsDispatch, specimenData, specimenDataDispatch, admin, handlers, student, adminAssigned }
+    const annotationClientContext: annotationClientData = { annotationsAndPositions, annotationsAndPositionsDispatch, specimenData, specimenDataDispatch, admin, handlers, student, adminAssigned, setters, refs, properties }
 
     // Set the activeAnnotation when its dependency is changed from the BotanistModelViewer, either via clicking an annotation or creating a new one
     useEffect(() => activeAnnotationChangeHandler(annotationsAndPositions, annotationsAndPositionsDispatch), [annotationsAndPositions.activeAnnotationIndex]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -99,15 +98,10 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
     // Set relevant model data onPress of the Accordion or when an annotation record has been changed in the database
     useEffect(() => { newAnnotationEnabled.current = false; modelOrAnnotationChangeHandler(specimenData, annotationsAndPositionsDispatch) }, [specimenData.uid, annotationsAndPositions.annotationSavedOrDeleted])
 
-    // Simulate a press of the accrodion for the admin portal; only one model is passed from admin via a select ()
-    useEffect(() => {
-        if (props.admin) {
-            setViewerLoaded(false)
-            annotationsAndPositionsDispatch({ type: 'newModelClicked' })
-            specimenDataDispatch({ type: 'newModelClicked', model: props.modelsToAnnotate[0] })
-        }
-    }, [props.modelsToAnnotate])
+    // Simulate a press of the accrodion for the admin portal; only one model is passed from admin via a <select> (There is a large gap between the model and annotation form otherwise)
+    useEffect(() => { if (props.admin) { simulateAccordionPress(setViewerLoaded, annotationsAndPositionsDispatch, specimenDataDispatch, props.modelsToAnnotate[0]) } }, [props.modelsToAnnotate])
 
+    // Sets the 'admin assigned' variable, indicating whethere the active specimen is assigned to the administrator using the portal
     useEffect(() => { if (props.admin && specimenData.uid) { setAdminAssignedFn() } }, [specimenData.uid])
 
     return <AnnotationClientData.Provider value={annotationClientContext} >
@@ -115,57 +109,8 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], ann
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />
         {annotationsAndPositions.annotations && annotationsAndPositions.annotations.length >= 2 && specimenData.uid && <AnnotationReorder isOpen={isOpen} setIsOpen={setIsOpen} renumberAnnotations={renumberAnnotations} />}
 
-        {
-            props.admin &&
-            <div className="flex flex-col w-full h-full text-[#004C46 dark:text-white]">
-                <section className="flex">
-                    <section className="h-full w-1/5 min-w-[325px]">
-                        <Accordion className="h-full" onSelectionChange={(keys: any) => modelClicked.current = keys.size ? true : false} selectedKeys={["0"]}>
-                            {props.modelsToAnnotate.map((model, i) => <AccordionItem
-                                key={i}
-                                aria-label={'Specimen to model'}
-                                title={toUpperFirstLetter(model.spec_name)}
-                                classNames={{ title: 'text-[ #004C46] text-2xl' }}
-                                onPress={() => modelClickHandler(modelClicked.current as boolean, model, annotationsAndPositionsDispatch, specimenDataDispatch, props.admin)}>
-                                <div className="relative h-[400px] w-full">
-                                    {!viewerLoaded && <div className="absolute h-full w-full flex justify-center items-center"><Spinner label="Loading Model Viewer" /></div> /* Manual loading screen for model viewer */}
-                                    {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px] w-full absolute"><BotanistRefWrapper ref={newAnnotationEnabled} setViewerLoaded={setViewerLoaded} /></div>}
-                                </div>
-                                {viewerLoaded && <AdminAnnotation admin={props.admin} authorizedUsers={props.authorizedUsers as authorized[]} />}
-                                {viewerLoaded && <AdminAnnotationButtons setModalOpen={setModalOpen} ref={newAnnotationEnabled} setReorderOpen={setIsOpen} />}
-                            </AccordionItem>
-                            )}
-                        </Accordion>
-                    </section>
-                    <AnnotationEntryWrapper modelsToAnnotate={props.modelsToAnnotate} admin={props.admin} annotationModels={props.annotationModels} viewerLoaded={viewerLoaded} />
-                </section>
-            </div>
-        }
+        {props.admin && <AdminAnnotationClient viewerLoaded={viewerLoaded} />}
+        {!props.admin && <StudentAnnotationClient viewerLoaded={viewerLoaded} />}
 
-        {
-            !props.admin &&
-            <div className="flex flex-col w-full h-full text-[#004C46 dark:text-white]">
-                <section className="flex">
-                    <section className="h-full w-1/5 min-w-[325px]">
-                        <Accordion className="h-full" onSelectionChange={(keys: any) => modelClicked.current = keys.size ? true : false}>
-                            {props.modelsToAnnotate.map((model, i) => <AccordionItem
-                                key={i}
-                                aria-label={'Specimen to model'}
-                                title={toUpperFirstLetter(model.spec_name)}
-                                classNames={{ title: 'text-[ #004C46] text-2xl' }}
-                                onPress={() => modelClickHandler(modelClicked.current as boolean, model, annotationsAndPositionsDispatch, specimenDataDispatch, props.admin)}>
-                                <div className="relative h-[400px] w-full">
-                                    {!viewerLoaded && <div className="absolute h-full w-full flex justify-center items-center"><Spinner label="Loading Model Viewer" /></div> /* Manual loading screen for model viewer */}
-                                    {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px] w-full absolute"><BotanistRefWrapper ref={newAnnotationEnabled} setViewerLoaded={setViewerLoaded} /></div>}
-                                </div>
-                                {viewerLoaded && <AnnotationButtons setModalOpen={setModalOpen} ref={newAnnotationEnabled} setReorderOpen={setIsOpen} />}
-                            </AccordionItem>
-                            )}
-                        </Accordion>
-                    </section>
-                    <AnnotationEntryWrapper modelsToAnnotate={props.modelsToAnnotate} admin={props.admin} annotationModels={props.annotationModels} viewerLoaded={viewerLoaded} />
-                </section>
-            </div>
-        }
     </AnnotationClientData.Provider>
 }
