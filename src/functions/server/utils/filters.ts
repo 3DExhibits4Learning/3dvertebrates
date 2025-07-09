@@ -14,4 +14,4 @@ export const isAnnotationModel = (model: model) => model.site_ready && !model.ba
  * @param modelAnnotations a 3d model annotation record with the model_annotation record included
  * @returns boolean value indicating if a 3d model has been used as an annotation model
  */
-export const isUsedAnnotationModel = (model: model, modelAnnotations: annotationWithModel[] ) => modelAnnotations.some(annotationModel => annotationModel.model_annotation.uid === model.uid)
+export const isUsedAnnotationModel = (model: model, modelAnnotations: annotationWithModel[] ) => modelAnnotations.some(annotation => annotation.model_annotation.uid === model.uid)

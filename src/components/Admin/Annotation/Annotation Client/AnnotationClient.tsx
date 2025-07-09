@@ -36,7 +36,7 @@ import StudentAnnotationClient from "@/components/Admin/Annotation/Annotation Cl
 export const AnnotationClientData = createContext<annotationClientData | ''>('')
 
 // Main JSX
-export default function AnnotationClient(props: { modelsToAnnotate: model[], annotationModels: model[], admin: boolean, students?: studentsAssignmentsAndModels[], authorizedUsers?: authorized[] }) {
+export default function AnnotationClient(props: { modelsToAnnotate: model[], admin: boolean, students?: studentsAssignmentsAndModels[], authorizedUsers?: authorized[] }) {
     // Session and email
     const { data: session } = useSession()
     const userEmail = session?.user?.email

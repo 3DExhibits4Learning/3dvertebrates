@@ -32,7 +32,6 @@ export default function AdminAnnotationClient(props: {viewerLoaded: boolean}) {
     // Parent props 
     const modelsToAnnotate = properties.modelsToAnnotate
     const authorizedUsers = properties.authorizedUsers
-    const annotationModels = properties.annotationModels
 
     // Dispatches 
     const annotationsAndPositions = context.annotationsAndPositions
@@ -64,7 +63,7 @@ export default function AdminAnnotationClient(props: {viewerLoaded: boolean}) {
                     )}
                 </Accordion>
             </section>
-            <AnnotationEntryWrapper modelsToAnnotate={modelsToAnnotate} admin annotationModels={annotationModels} viewerLoaded={viewerLoaded} />
+            <AnnotationEntryWrapper modelsToAnnotate={modelsToAnnotate} admin viewerLoaded={viewerLoaded} />
         </section>
     </div>
 }

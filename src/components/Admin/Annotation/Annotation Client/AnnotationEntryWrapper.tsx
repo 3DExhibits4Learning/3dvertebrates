@@ -17,7 +17,7 @@ import { getIndex } from "@/functions/client/annotationClient"
 import AnnotationEntry from "../AnnotationEntry/AnnotationEntry"
 
 // Main JSX
-export default function AnnotationEntryWrapper(props: { modelsToAnnotate: model[], admin: boolean, annotationModels: model[], viewerLoaded: boolean }) {
+export default function AnnotationEntryWrapper(props: { modelsToAnnotate: model[], admin: boolean, viewerLoaded: boolean }) {
 
     const context = useContext(AnnotationClientData) as annotationClientData
     const specimenData = context.specimenData
@@ -41,11 +41,11 @@ export default function AnnotationEntryWrapper(props: { modelsToAnnotate: model[
             }
             {
                 // Databased annotation
-                typeof (annotationsAndPositions.activeAnnotationIndex) === 'number' && specimenData.uid && props.viewerLoaded && <AnnotationEntry index={getIndex(annotationsAndPositions) as number} new={false} annotationModels={props.annotationModels} />
+                typeof (annotationsAndPositions.activeAnnotationIndex) === 'number' && specimenData.uid && props.viewerLoaded && <AnnotationEntry index={getIndex(annotationsAndPositions) as number} new={false} />
             }
             {
                 // New annotation
-                typeof (annotationsAndPositions.activeAnnotationIndex) === 'string' && specimenData.uid && props.viewerLoaded && <AnnotationEntry index={getIndex(annotationsAndPositions) as number} new annotationModels={props.annotationModels} />
+                typeof (annotationsAndPositions.activeAnnotationIndex) === 'string' && specimenData.uid && props.viewerLoaded && <AnnotationEntry index={getIndex(annotationsAndPositions) as number} new />
             }
         </section>
     </div>

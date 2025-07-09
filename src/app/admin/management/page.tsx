@@ -67,7 +67,6 @@ export default async function Page() {
                     modelsNeedingThumbnails={modelsNeedingThumbnails}
                     studentsAssignmentsAndModels={studentsAssignmentsAndModels}
                     admin={true}
-                    modelAnnotations={unusedAnnotationModels}
                     authorizedUsers={authorizedUsers} />
             </main>
             <Foot />

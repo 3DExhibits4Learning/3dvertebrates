@@ -102,7 +102,6 @@ export interface annotationClientData {
   }
   properties: {
     modelsToAnnotate: model[],
-    annotationModels: model[],
     admin: boolean, students?:
     studentsAssignmentsAndModels[],
     authorizedUsers?: authorized[]
@@ -398,7 +397,6 @@ export interface ManagerClientProps {
   modelsNeedingThumbnails: string
   studentsAssignmentsAndModels: string
   admin: boolean
-  modelAnnotations: string
   authorizedUsers: authorized[]
 }
 

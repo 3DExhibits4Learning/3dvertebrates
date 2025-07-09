@@ -60,7 +60,6 @@ export default function ManagerClient(props: ManagerClientProps) {
     const models: fullModel[] = JSON.parse(props.models)
     const modelsNeedingThumbnails: fullModel[] = (JSON.parse(props.modelsNeedingThumbnails) as fullModel[]).filter(model => model.modelApproved)
     const studentsAssignmentsAndModels: studentsAssignmentsAndModels[] = JSON.parse(props.studentsAssignmentsAndModels)
-    const unusedAnnotationModels = JSON.parse(props.modelAnnotations)
     const unapprovedModels = useMemo(() => models.filter(model => !model.modelApproved), [props.models])
     const approvedModels = useMemo(() => models.filter(model => model.modelApproved), [props.models])
 
@@ -164,7 +163,6 @@ export default function ManagerClient(props: ManagerClientProps) {
                     <Select value={annotationModelUid} setValue={setAnnotationModelUid} models={approvedModels.filter(model => model.base_model)} width="w-1/5"  />
                     {annotationModelUid && <AnnotationClient
                         modelsToAnnotate={approvedModels.filter(model => model.uid === annotationModelUid)}
-                        annotationModels={unusedAnnotationModels}
                         admin={props.admin}
                         students={studentsAssignmentsAndModels} 
                         authorizedUsers={props.authorizedUsers}/>}

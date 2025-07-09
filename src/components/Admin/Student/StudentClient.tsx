@@ -65,7 +65,7 @@ export default function StudentClient(props: { modelsToAnnotate: string, annotat
             </AccordionItem>
 
             <AccordionItem key='assignments' aria-label='Assignments' title='Assigned Models' classNames={{ title: accordionTitlesCss }}>
-                <AnnotationClient modelsToAnnotate={modelsToAnnotate} annotationModels={JSON.parse(props.annotationModels)} admin={false} />
+                <AnnotationClient modelsToAnnotate={modelsToAnnotate} admin={false} />
             </AccordionItem>
 
             <AccordionItem key='updateModel' aria-label='Update Model' title='Update Model' classNames={{ title: accordionTitlesCss }}>

@@ -34,7 +34,7 @@ import AnnotationEntryButtons from "./Buttons"
 export const AnnotationEntryData = createContext<annotationEntryContext | ''>('')
 
 // Main JSX
-export default function AnnotationEntry(props: { index: number, new: boolean, annotationModels: model[] }) {
+export default function AnnotationEntry(props: { index: number, new: boolean }) {
 
     // Annotation client context
     const clientData = useContext(AnnotationClientData) as annotationClientData
@@ -86,9 +86,8 @@ export default function AnnotationEntry(props: { index: number, new: boolean, an
     // Effects: set whether annotation photo is visible, populate form fields upon annotation selection, enable save/update button, respectively
     useEffect(() => aeFn.setImageVisibility(props.index, annotationEntryData, props.new, annotationEntryDataDispatch), imageVisibilityDependencies)
     useEffect(() => aeFn.populateFormFields(apData, annotationEntryDataDispatch), [apData.activeAnnotation, apData.activeAnnotationIndex]) // eslint-disable-line react-hooks/exhaustive-deps
-    useEffect(() => aeFn.enableSaveOrUpdateButton(apData, annotationEntryData, enableFirstAnnotation, props.index, props.new, setCreateDisabled, setSaveDisabled, isNewPosition), enableDependencies) // eslint-disable-line react-hooks/exhaustive-deps 
-    
-    //useEffect(() => clearStaleState())
+    useEffect(() => aeFn.enableSaveOrUpdateButton(apData, annotationEntryData, enableFirstAnnotation, props.index, props.new, setCreateDisabled, setSaveDisabled, isNewPosition), enableDependencies) // eslint-disable-line react-hooks/exhaustive-deps
+    useEffect(() => annotationEntryDataDispatch({type: 'clearAnnotationEntry', apData: apData}), [apData.annotationSavedOrDeleted]) 
 
     // JSX for first annotation
     if (props.index === 1) return <AnnotationEntryData.Provider value={annotationEntryContext}>
@@ -104,7 +103,7 @@ export default function AnnotationEntry(props: { index: number, new: boolean, an
             <section className="w-full h-fit">
                 <PhotoAnnotationEntry />
                 <VideoAnnotationEntry />
-                <ModelAnnotationEntry annotationModels={props.annotationModels} />
+                <ModelAnnotationEntry />
             </section>
             <AnnotationEntryButtons new={props.new} index={props.index} createAnnotation={createAnnotation} updateAnnotation={updateAnnotation} deleteAnnotation={deleteAnnotation} createDisabled={createDisabled} saveDisabled={saveDisabled} />
         </div>

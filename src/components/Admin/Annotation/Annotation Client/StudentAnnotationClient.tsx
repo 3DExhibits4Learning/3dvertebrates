@@ -28,7 +28,6 @@ export default function StudentAnnotationClient(props: {viewerLoaded: boolean}) 
 
     // Parent props 
     const modelsToAnnotate = properties.modelsToAnnotate
-    const annotationModels = properties.annotationModels
 
     // Dispatches 
     const annotationsAndPositions = context.annotationsAndPositions
@@ -59,7 +58,7 @@ export default function StudentAnnotationClient(props: {viewerLoaded: boolean}) 
                     )}
                 </Accordion>
             </section>
-            <AnnotationEntryWrapper modelsToAnnotate={modelsToAnnotate} admin={false} annotationModels={annotationModels} viewerLoaded={viewerLoaded} />
+            <AnnotationEntryWrapper modelsToAnnotate={modelsToAnnotate} admin={false} viewerLoaded={viewerLoaded} />
         </section>
     </div>
 }

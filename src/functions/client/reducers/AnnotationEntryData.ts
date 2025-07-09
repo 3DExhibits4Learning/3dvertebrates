@@ -9,7 +9,7 @@
 import { annotationEntry, annotationsAndPositions } from "@/interface/interface";
 import { photo_annotation, video_annotation, model_annotation } from "@prisma/client";
 import { annotationEntryAction, setImageSource, setImageVisibility, loadAnnotation, setStringValue, setFile } from "@/interface/actions";
-import { getNewAnnotationEntryData } from "@/interface/initializers";
+import { getInitialAnnotationEntryData, getNewAnnotationEntryData } from "@/interface/initializers";
 
 // Main JSX
 export default function annotationEntryReducer(data: annotationEntry, action: annotationEntryAction): annotationEntry {
@@ -180,6 +180,11 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
                 ...data,
                 file: setFileAction.file
             }
+        
+            case 'clearAnnotationEntry':
+                const clearEntryAction = action as loadAnnotation
+                const initialEntryData = getInitialAnnotationEntryData(clearEntryAction.apData)
+                return {...initialEntryData}
 
         default:
             throw Error('Unknow action type')

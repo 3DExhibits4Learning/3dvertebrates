@@ -13,7 +13,7 @@ import { nonFatalError, serverActionErrorHandler } from "../error"
 import { annotationDataEntryObj, annotationDataEntryUpdateObj, AnnotationNumbers, newAnnotationData } from "@/ts/ts"
 import { v4 as uuidv4 } from 'uuid'
 import { fullAnnotation } from "@/interface/interface"
-import { model_annotation, photo_annotation, video_annotation } from "@prisma/client"
+import { model, model_annotation, photo_annotation, video_annotation } from "@prisma/client"
 import { unlink } from "fs/promises"
 import { checkEssentialValues, convertCloudPathToLocalPath, convertDbPathToLocalPath, getPathToUnlink, isLocalDevEnv } from "@/functions/server/utils/utils"
 import { autoWriteFile } from "@/functions/server/utils/file"
@@ -735,4 +735,19 @@ export const deleteAnnotationEntry = async (annotationId: string, modelUid: stri
         return 'Annotation deleted'
     }
     catch (e: any) { return `Error: ${e.message}` }
+}
+
+/**
+ * 
+ * @returns 
+ */
+export const getAnnotationModels = async () => {
+    const isUsedAnnotationModel = (annotations: model_annotation[], model: model) => annotations.some(annotation => annotation.uid === model.uid)
+
+    const resolves = await Promise.all([prisma.model.findMany({ where: { base_model: false } }), prisma.model_annotation.findMany()])
+    const annotationModels = resolves[0]
+    const modelAnnotations = resolves[1]
+    
+    const availableAnnotationModels = annotationModels.filter(model => !isUsedAnnotationModel(modelAnnotations, model))
+    return JSON.stringify(availableAnnotationModels)
 }
