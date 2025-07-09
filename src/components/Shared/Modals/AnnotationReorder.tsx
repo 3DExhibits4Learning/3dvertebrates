@@ -8,7 +8,7 @@
 
 // Typical imports
 import { Button, Modal, ModalContent } from "@heroui/react"
-import { Dispatch, SetStateAction, useContext, useState, useEffect, ChangeEvent } from "react"
+import { Dispatch, SetStateAction, useContext, useState, useEffect, ChangeEvent, Fragment } from "react"
 import { AnnotationClientData } from "@/components/Admin/Annotation/Annotation Client/AnnotationClient"
 import { annotationClientData, fullAnnotation } from "@/interface/interface"
 import { AnnotationNumbers } from "@/ts/ts"
@@ -48,22 +48,20 @@ export default function AnnotationReorder(props: { isOpen: boolean, setIsOpen: D
                 <div className="flex w-full justify-end mb-6 text-xl"><button onClick={() => props.setIsOpen(false)}>x</button></div>
                 <div className="flex w-full justify-center">
                     <section className="grid grid-cols-[max-content_max-content] w-fit">
-                        {
-                            annotationNumbers && annotations?.map((annotation, index) => <>
-                                <div className="flex border text-2xl items-center px-3 max-w-[300px] text-clip whitespace-nowrap overflow-hidden" key={index}>{annotation.title}</div>
+                        {annotationNumbers && annotations?.map(annotation => <Fragment key={annotation.annotation_id}>
+                                <div className="flex border text-2xl items-center px-3 max-w-[300px] text-clip whitespace-nowrap overflow-hidden">{annotation.title}</div>
                                 <AnnotationNumber
-                                    key={annotation.annotation_id}
                                     max={max.toString()}
                                     annotationNumbers={annotationNumbers}
                                     setAnnotationNumbers={setAnnotationNumbers}
                                     annotation={annotationNumbers.find(annotationNumber => annotation.annotation_id === annotationNumber.id) as AnnotationNumbers} />
-                            </>)
-                        }
+                            </Fragment>)}
                     </section>
                 </div>
             </div>
 
             <div className="flex w-full justify-center p-8"><Button isDisabled={saveDisabled} onClick={() => props.renumberAnnotations(annotationNumbers)} className="w-4/5 text-white">Save Annotation Numbers</Button></div>
+        
         </ModalContent>
     </Modal>
 }

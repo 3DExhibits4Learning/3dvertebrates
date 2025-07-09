@@ -1,6 +1,6 @@
 'use client'
 import { Modal, ModalContent, ModalBody, ModalFooter, Spinner, Button } from "@heroui/react"
-import { SetStateAction, Dispatch } from "react";
+import { SetStateAction, Dispatch } from "react"
 
 export default function AnnotationEntryDataTransfer(props: {
     open: boolean,

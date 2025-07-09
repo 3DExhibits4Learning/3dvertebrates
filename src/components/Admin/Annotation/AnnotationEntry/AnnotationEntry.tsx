@@ -87,7 +87,7 @@ export default function AnnotationEntry(props: { index: number, new: boolean }) 
     useEffect(() => aeFn.setImageVisibility(props.index, annotationEntryData, props.new, annotationEntryDataDispatch), imageVisibilityDependencies)
     useEffect(() => aeFn.populateFormFields(apData, annotationEntryDataDispatch), [apData.activeAnnotation, apData.activeAnnotationIndex]) // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => aeFn.enableSaveOrUpdateButton(apData, annotationEntryData, enableFirstAnnotation, props.index, props.new, setCreateDisabled, setSaveDisabled, isNewPosition), enableDependencies) // eslint-disable-line react-hooks/exhaustive-deps
-    useEffect(() => annotationEntryDataDispatch({type: 'clearAnnotationEntry', apData: apData}), [apData.annotationSavedOrDeleted]) 
+    //useEffect(() => annotationEntryDataDispatch({type: 'clearAnnotationEntry', apData: apData}), [apData.annotationSavedOrDeleted]) 
 
     // JSX for first annotation
     if (props.index === 1) return <AnnotationEntryData.Provider value={annotationEntryContext}>

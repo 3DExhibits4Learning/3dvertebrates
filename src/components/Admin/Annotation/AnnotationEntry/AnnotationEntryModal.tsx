@@ -8,10 +8,10 @@
 
 // Default imports
 import { Modal, ModalContent, ModalBody, ModalFooter, Spinner, Button } from "@heroui/react"
-import { useContext } from "react";
-import { AnnotationEntryData } from "./AnnotationEntry";
-import { annotationClientData, annotationEntryContext } from "@/interface/interface";
-import { AnnotationClientData } from "@/components/Admin/Annotation/Annotation Client/AnnotationClient";
+import { useContext } from "react"
+import { AnnotationEntryData } from "./AnnotationEntry"
+import { annotationClientData, annotationEntryContext } from "@/interface/interface"
+import { AnnotationClientData } from "@/components/Admin/Annotation/Annotation Client/AnnotationClient"
 
 // Main JSX
 export default function AnnotationEntryTransferModal() {

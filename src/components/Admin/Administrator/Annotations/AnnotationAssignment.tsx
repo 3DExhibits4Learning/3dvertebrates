@@ -57,15 +57,14 @@ export default function AnnotationAssignment(props: { students: studentsAssignme
         }
     }, [assignmentUid, student])
 
-    return (
-        <>
+    return <>
             <section className="flex justify-center w-full h-3/4 flex-col ml-12">
 
                 <section className="flex flex-col w-1/2 mt-8">
                     <Select value={assignmentUid} setValue={setAssignmentUid} models={props.unannotatedModels} title='Select Model' />
                 </section>
 
-                <StudentSelect setNameAndEmailStates={setNameAndEmailStates} students={props.students} />
+                <StudentSelect setNameAndEmailStates={setNameAndEmailStates} authorizedUsers={props.students} />
 
             </section>
 
@@ -80,5 +79,4 @@ export default function AnnotationAssignment(props: { students: studentsAssignme
                 </Button>
             </section>
         </>
-    )
 }
