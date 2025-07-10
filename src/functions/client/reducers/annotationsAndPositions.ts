@@ -106,7 +106,8 @@ export function annotationsAndPositionsReducer(annotationsAndPositions: annotati
 
             return {
                 ...annotationsAndPositions,
-                annotationSavedOrDeleted: !annotationsAndPositions.annotationSavedOrDeleted
+                annotationSavedOrDeleted: !annotationsAndPositions.annotationSavedOrDeleted,
+                activeAnnotationIndex: undefined,
             }
 
         default:

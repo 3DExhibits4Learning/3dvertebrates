@@ -4,7 +4,7 @@
  * @fileoverview initial data objects, generally for reducers
  */
 
-import { annotationsAndPositions, annotationClientSpecimen, annotationEntry} from "./interface"
+import { annotationsAndPositions, annotationClientSpecimen, annotationEntry } from "./interface"
 import { photo_annotation, video_annotation } from "@prisma/client"
 
 // Annotation and position state data object for context
