@@ -11,6 +11,7 @@ import { Button } from "@heroui/react"
 import { AnnotationClientData } from "./AnnotationClient"
 import { forwardRef, RefObject, SetStateAction, useContext, Dispatch } from "react"
 import { annotationClientData } from "@/interface/interface"
+import Link from "next/link"
 
 // Main JSX
 const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetStateAction<boolean>>, setReorderOpen: Dispatch<SetStateAction<boolean>> }, ref) => {
@@ -43,13 +44,15 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
                 annotationsAndPositions.activeAnnotationIndex != 'new' &&
                 <div className="flex justify-end items-center border-b pb-2">
                     <br></br>
-                    <Button
-                        onPress={() => console.log('Preview Model Clicked')}
-                        size='sm'
-                        className="text-white text-md min-w-[171px] rounded-md"
-                        isDisabled={annotationsAndPositions.repositionEnabled}>
-                        Preview Annotations
-                    </Button>
+                    <Link href={`/collections/${context.specimenData.specimenName}?preview=1`} target='_blank'>
+                        <Button
+                            onPress={() => console.log('Preview Model Clicked')}
+                            size='sm'
+                            className="text-white text-md min-w-[171px] rounded-md"
+                            isDisabled={annotationsAndPositions.repositionEnabled}>
+                            Preview Annotations
+                        </Button>
+                    </Link>
                 </div>
             }
             {
@@ -81,7 +84,7 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
                     </Button>
                 </div>
             }
-        </section>
+        </section >
         {
             // Click to place annotation or cancel
             annotationsAndPositions.newAnnotationEnabled &&

@@ -78,16 +78,16 @@ export async function getFullModels() {
 }
 
 /**
- * @function getModelUid
- * @description returns a list of models matching the species parameter
  * 
- * @param {string} species of the model
+ * @param species 
+ * @param preview 
+ * @returns 
  */
-export async function getModel(species: string) {
-  const models = await prisma.model.findMany({
-    where: { spec_name: species, site_ready: true, base_model: true }
-  })
+export async function getCollectionsModels(species: string, preview?: boolean) {
+  const where = preview ? { spec_name: species, site_ready: true, base_model: true } :
+    { spec_name: species, site_ready: true, base_model: true, annotated: true }
 
+  const models = await prisma.model.findMany({where: where})
   return models
 }
 
@@ -572,7 +572,7 @@ export const deleteAnnotation = async (id: string, modelUid: string) => {
     // Get remaining annotations with higher annotation numbers
     const remainingAnnotations = await prisma.annotations.findMany({
       where: {
-        uid: modelUid,   
+        uid: modelUid,
         annotation_no: { gt: annotationPendingDeletionNumber }
       },
       orderBy: { annotation_no: 'asc' }
