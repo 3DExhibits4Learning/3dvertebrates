@@ -26,7 +26,7 @@ type annotationModalProps = {
   gMatch: { hasInfo: boolean, data?: GbifResponse }
   title: string;
   index: number | null
-  imgSrc: string | undefined,
+  imgSrc: string | null,
   imgLoading: boolean
 }
 
@@ -111,7 +111,7 @@ export default function AnnotationModal(props: annotationModalProps) {
                       </p>
                     }
                     {
-                      !props.imgLoading &&
+                      !props.imgLoading && props.imgSrc &&
                       <p id="modalMedia2">
                         <div className="fade w-full h-full text-center">
                           <img className="center w-full h-[50vh]" src={props.imgSrc} alt={`Annotation number ${annotations[props.index - 1].annotation_no}`}></img>

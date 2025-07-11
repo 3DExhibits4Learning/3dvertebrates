@@ -46,7 +46,6 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
                     <br></br>
                     <Link href={`/collections/${context.specimenData.specimenName}?preview=1`} target='_blank'>
                         <Button
-                            onPress={() => console.log('Preview Model Clicked')}
                             size='sm'
                             className="text-white text-md min-w-[171px] rounded-md"
                             isDisabled={annotationsAndPositions.repositionEnabled}>

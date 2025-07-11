@@ -7,11 +7,18 @@
 import { fullAnnotation } from "@/interface/interface"
 import { photo_annotation } from "@prisma/client"
 import { Skeleton } from "@heroui/react"
+import { useContext } from "react"
+import { collectionsContext, CollectionsContext } from "@/components/Collections/SketchFabAPI"
 
-export default function PhotoAnnotation(props: { annotation: fullAnnotation, imgSrc: string, imgLoading: boolean }) {
-    const annotation = props.annotation
-    const photoAnnotation = props.annotation.annotation as photo_annotation
-    const imgLoading = props.imgLoading
+// Main JSX
+export default function PhotoAnnotation() {
+    // Context, variables from context
+    const context = useContext(CollectionsContext) as collectionsContext
+    const index = context.state.index as number
+    const annotations = context.state.annotations as fullAnnotation[]
+    const baseAnnotation = annotations[index - 1] 
+    const photoAnnotation = baseAnnotation.annotation as photo_annotation
+    const imgLoading = context.state.imgLoading
 
     return <>
         <div className="w-full h-[65%]" id="annotationDivMedia" style={{ display: "block" }}>
@@ -23,17 +30,20 @@ export default function PhotoAnnotation(props: { annotation: fullAnnotation, img
             }
             {
                 !imgLoading &&
-                <div className='w-full h-full text-center fade'>
+                <div className='flex w-full h-full text-center fade justify-center items-center'>
                     <img key={Math.random()} className='fade center w-[98%] h-full pr-[2%] pt-[1%]'
-                        src={props.imgSrc}
-                        alt={`Image for annotation number ${annotation.annotation_no}`}>
+                        // <div className="h-fit w-fit mt-12">
+                        //     <img key={Math.random()} className='fade center'
+                        src={context.state.imgSrc as string}
+                        alt={`Image for annotation number ${baseAnnotation.annotation_no}`}>
                     </img>
+                    {/* </div> */}
                 </div>
             }
         </div>
         <div id="annotationDivText">
             <br></br>
-            <p dangerouslySetInnerHTML={{ __html: photoAnnotation.annotation }} className='m-auto pr-[3%] pl-[2%] text-center fade' />
+            <p dangerouslySetInnerHTML={{ __html: photoAnnotation.annotation as string }} className='m-auto pr-[3%] pl-[2%] text-center fade' />
         </div>
         <div id="annotationDivCitation">
             <br></br>

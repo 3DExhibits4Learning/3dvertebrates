@@ -8,53 +8,78 @@
 "use client"
 
 // Typical imports
-import { useEffect, useState, useRef, Ref } from 'react'
+import { useEffect, useState, useRef, Ref, createContext } from 'react'
 import { model, model_annotation, video_annotation } from '@prisma/client'
 import { fullAnnotation, GbifImageResponse, GbifResponse } from '@/interface/interface'
-import { setViewerWidth, annotationControl } from './SketchfabDom'
 import { useSearchParams } from 'next/navigation'
+import { annotationSwitchListener, annotationSwitchMobileListener, initializeAnnotations, initializeExhibit } from '@/functions/client/collections'
 
 // Default imports
 import AnnotationModal from '@/components/Collections/AnnotationModal'
-import Sketchfab from '@sketchfab/viewer-api'
 import Vertebrates from '@/classes/HerbariumClass'
 import FirstAnnotation from './3dExhibit/FirstAnnotation'
 import PhotoAnnotation from './3dExhibit/PhotoAnnotation'
 import VideoAnnotation from './3dExhibit/VideoAnnotation'
 import ModelAnnotation from './3dExhibit/ModelAnnotation'
 
+export interface collectionsContext {
+  state: CollectionState,
+  props: CollectionsProps,
+}
+
+export interface CollectionState {
+  s: Vertebrates | undefined
+  annotations: fullAnnotation[] | undefined
+  api: any
+  index: number | null
+  mobileIndex: number | null
+  imgSrc: string | null
+  annotationTitle: string
+  imgLoading: boolean
+}
+
+export interface CollectionsProps {
+  gMatch: {
+    hasInfo: boolean
+    data?: GbifResponse
+  }
+  model: model,
+  images: GbifImageResponse[]
+  imageTitle: string
+}
+
+export const CollectionsContext = createContext<collectionsContext | null>(null)
+
 // Main JSX
-export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifResponse }, model: model, images: GbifImageResponse[], imageTitle: string }) {
+export default function SFAPI(props: CollectionsProps) {
 
   // Variable Declarations
   const gMatch = props.gMatch.data as GbifResponse
   const searchParams = useSearchParams()
   const annotationUid = searchParams.get('annotation')
 
-  // States
-  const [s, setS] = useState<Vertebrates>() // s = specimen due to constant repetition
-  const [annotations, setAnnotations] = useState<fullAnnotation[]>()
-  const [api, setApi] = useState<any>()
-  const [index, setIndex] = useState<number | null>(null)
-  const [mobileIndex, setMobileIndex] = useState<number | null>(null)
-  const [imgSrc, setImgSrc] = useState<string>()
-  const [annotationTitle, setAnnotationTitle] = useState("")
-  const [imgLoading, setImgLoading] = useState(false)
+  // Collections state object
+  const [collectionState, setCollectionState] = useState<CollectionState>({
+    s: undefined,
+    annotations: undefined,
+    api: undefined,
+    index: null,
+    mobileIndex: null,
+    imgSrc: null,
+    annotationTitle: '',
+    imgLoading: false
+  })
 
   // Refs
   const sRef = useRef<Vertebrates>(undefined)
   const modelViewer = useRef<HTMLIFrameElement>(undefined)
   const annotationDiv = useRef<HTMLDivElement>(undefined)
 
-  // Get switches - should probably update this to refs
-  const annotationSwitch = document.getElementById("annotationSwitch")
-  const annotationSwitchMobile = document.getElementById("annotationSwitchMobileHidden")
-
   // Sketchfab viewer mobile success object
   const successObj = {
     success: (api: any) => {
       api.start()
-      api.addEventListener('viewerready', () => setApi(api))
+      api.addEventListener('viewerready', () => setCollectionState(prev => ({ ...prev, api: api })))
     },
     error: () => { },
     ui_stop: 0,
@@ -70,150 +95,91 @@ export default function SFAPI(props: { gMatch: { hasInfo: boolean; data?: GbifRe
   // Sketchfab viewer desktop success object
   const successObjDesktop = { ...successObj, annotation: 1, ui_fadeout: 1 }
 
+  // Context value
+  const value = { state: collectionState, props: { ...props } }
+
   // Annotation switch event listener
-  const annotationSwitchListener = (event: Event) => {
-    setViewerWidth(modelViewer.current, annotationDiv.current, (event.target as HTMLInputElement).checked)
-    annotationControl(api, annotations, (event.target as HTMLInputElement).checked)
+  const annotationSwitchListenerWrapper = (event: Event) => annotationSwitchListener(event, modelViewer, annotationDiv, collectionState.api, collectionState.annotations)
+  const annotationSwitchMobileListenerWrapper = (event: Event) => annotationSwitchMobileListener(event, modelViewer, annotationDiv, collectionState.api, collectionState.annotations)
+
+  // Effect chain initizlized exhibit, then annotations and various listeners
+  useEffect(() => { initializeExhibit(props, modelViewer, successObj, successObjDesktop, setCollectionState, sRef) }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => initializeAnnotations(collectionState, annotationUid, setCollectionState, annotationSwitchListenerWrapper, annotationSwitchMobileListenerWrapper),
+    [collectionState.api, collectionState.annotations, collectionState.s])
+
+  function getImageDimensionsFromBlob(blob: Blob): Promise<{ width: number; height: number }> {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(blob)
+      const img = new Image()
+
+      img.onload = () => {
+        resolve({ width: img.naturalWidth, height: img.naturalHeight });
+        URL.revokeObjectURL(url) // clean up!
+      };
+
+      img.onerror = reject
+      img.src = url
+    })
   }
-
-  // Annotation switch mobile event listener
-  const annotationSwitchMobileListener = (event: Event) => {
-    setViewerWidth(modelViewer, annotationDiv, (event.target as HTMLInputElement).checked)
-    annotationControl(api, annotations, (event.target as HTMLInputElement).checked)
-  }
-
-  // This effect initializes the sketchfab client and instantiates the specimen:Vertebrates object; it also ensures the page begins from the top upon load
-  useEffect(() => {
-    const sketchFabLink = props.model.uid
-    const client = new Sketchfab(modelViewer.current)
-
-    // Choose initialization success object based on screen size
-    if (window.matchMedia('(max-width: 1023.5px)').matches || window.matchMedia('(orientation: portrait)').matches) client.init(sketchFabLink, successObj)
-    else client.init(sketchFabLink, successObjDesktop)
-
-    // Instantiate/set vertebrates and set annotations
-    const instantiateExhibit = async () => {
-      sRef.current = await Vertebrates.model(props.gMatch.data?.usageKey as number, props.model, props.images, props.imageTitle)
-      setS(sRef.current)
-      setAnnotations(sRef.current.annotations.annotations)
-    }
-
-    instantiateExhibit()
-    document.body.scrollTop = document.documentElement.scrollTop = 0
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // This effect implements any databased annotations and adds annotationSwitch event listeners and sets related mobile states
-  useEffect(() => {
-
-    if (s && annotations && api) {
-
-      // Create and go to the first annotation if it exists
-      if (s.model.annotationPosition) {
-        const position = JSON.parse(s.model.annotationPosition)
-        api.createAnnotationFromScenePosition(position[0], position[1], position[2], 'Taxonomy and Description', '', (err: any, index: any) => {
-          if (!annotationUid) api.gotoAnnotation(0, { preventCameraAnimation: true, preventCameraMove: false }, function (err: any, index: any) { })
-        })
-
-        // Create any futher annotations that exist
-        for (let i = 0; i < annotations.length; i++) {
-          if (annotations[i].position) {
-            const position = JSON.parse(annotations[i].position as string)
-            api.createAnnotationFromScenePosition(position[0], position[1], position[2], `${annotations[i].title}`, '', (err: any, index: any) => { })
-          }
-        }
-      }
-
-      if (annotationUid) {
-        const annotation = annotations.find(annotation => annotation.annotation_type === 'model' && (annotation.annotation as model_annotation).uid === annotationUid)
-        if (annotation) api.gotoAnnotation(annotation.annotation_no - 1, { preventCameraAnimation: true, preventCameraMove: false }, function (err: any, index: any) { })
-        else api.gotoAnnotation(0, { preventCameraAnimation: true, preventCameraMove: false }, function (err: any, index: any) { })
-      }
-
-      // Get annotationList/add event listeners
-      (annotationSwitch as HTMLInputElement).addEventListener("change", annotationSwitchListener);
-      (annotationSwitchMobile as HTMLInputElement).addEventListener("change", annotationSwitchMobileListener)
-
-
-      // Set index when an annotation is selected
-      api.addEventListener('annotationSelect', function (index: number) {
-
-        const mediaQueryWidth = window.matchMedia('(max-width: 1023.5px)')
-        const mediaQueryOrientation = window.matchMedia('(orientation: portrait)')
-
-        // this event is still triggered even when an annotation is not selected; an index of -1 is returned
-        if (index != -1) setIndex(index)
-
-        // Mobile annotation state management
-        if (index != -1 && mediaQueryWidth.matches || index != -1 && mediaQueryOrientation.matches) {
-          document.getElementById("annotationButton")?.click()
-
-          api.getAnnotation(index, function (err: any, information: any) {
-            if (!err) {
-              setAnnotationTitle(information.name)
-              setMobileIndex(index)
-            }
-          })
-        }
-      })
-    }
-  }, [api, annotations, s])
 
   const setPhotoUrl = async (path: string) => {
-    setImgLoading(true)
+    setCollectionState(prev => ({ ...prev, imgLoading: true }))
+
+    await fetch(path)
+      .then(res => res.blob()).then(blob => getImageDimensionsFromBlob(blob)).then(dimensions => console.log(dimensions))
 
     await fetch(path)
       .then(res => {
-        if (!res.ok) setImgSrc('/noImage.png')
+        if (!res.ok) setCollectionState(prev => ({ ...prev, imgSrc: '/noImage.png' }))
         else return res.blob()
       })
-      .then(blob => {
-        setImgSrc(URL.createObjectURL(blob as Blob))
-        setImgLoading(false)
-      })
+      .then(blob => setCollectionState(prev => ({ ...prev, imgSrc: URL.createObjectURL(blob as Blob), imgLoading: false })))
   }
 
   // This effect sets the imgSrc if necessary upon change of annotation index
   useEffect(() => {
-    if (!!index && annotations && annotations[index - 1].annotation_type == 'photo') {
-      const path = process.env.NEXT_PUBLIC_NODE_ENV === 'development' ? 'X:' + (annotations[index - 1].url as string).slice(5) : 'public' + (annotations[index - 1].url as string)
+    if (!!collectionState.index && collectionState.annotations && collectionState.annotations[collectionState.index - 1].annotation_type == 'photo') {
+      const path = process.env.NEXT_PUBLIC_NODE_ENV === 'development' ?
+        'X:' + (collectionState.annotations[collectionState.index - 1].url as string).slice(5) :
+        'public' + (collectionState.annotations[collectionState.index - 1].url as string)
       setPhotoUrl(`/api/nfs?path=${path}`)
     }
 
-  }, [index]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [collectionState.index]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  return (
-    <>
-      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta>
+  return <CollectionsContext.Provider value={value}>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta>
 
-      {s && <AnnotationModal {...props} title={annotationTitle} index={mobileIndex} specimen={s} imgLoading={imgLoading} imgSrc={imgSrc} />}
+    {collectionState.s && <AnnotationModal {...props} title={collectionState.annotationTitle} index={collectionState.mobileIndex} specimen={collectionState.s} imgLoading={collectionState.imgLoading} imgSrc={collectionState.imgSrc} />}
 
-      <div id="iframeDiv" className="flex bg-black m-auto min-h-[150px]" style={{ height: "100%", width: "100%" }}>
+    <div id="iframeDiv" className="flex bg-black m-auto min-h-[150px]" style={{ height: "100%", width: "100%" }}>
 
-        <iframe
-          src={props.model.uid}
-          frameBorder="0"
-          id="model-viewer"
-          title={"Model Viewer for " + ''}
-          allow="autoplay; fullscreen; xr-spatial-tracking"
-          xr-spatial-tracking="true"
-          execution-while-out-of-viewport="true"
-          execution-while-not-rendered="true"
-          web-share="true"
-          allowFullScreen
-          style={{ width: "60%", transition: "width 1.5s", zIndex: "2" }}
-          ref={modelViewer as Ref<HTMLIFrameElement>} />
+      <iframe
+        src={props.model.uid}
+        frameBorder="0"
+        id="model-viewer"
+        title={"Model Viewer for " + ''}
+        allow="autoplay; fullscreen; xr-spatial-tracking"
+        xr-spatial-tracking="true"
+        execution-while-out-of-viewport="true"
+        execution-while-not-rendered="true"
+        web-share="true"
+        allowFullScreen
+        style={{ width: "60%", transition: "width 1.5s", zIndex: "2" }}
+        ref={modelViewer as Ref<HTMLIFrameElement>} />
 
-        {
-          s && annotations &&
-          <div id="annotationDiv" ref={annotationDiv as Ref<HTMLDivElement>} style={{ width: "40%", backgroundColor: "black", transition: "width 1.5s", color: "#F5F3E7", zIndex: "1", overflowY: "auto", overflowX: "hidden" }}>
-            {index === 0 && <FirstAnnotation gMatch={gMatch} s={s} />}
-            {!!index && annotations[index - 1].annotation_type === 'photo' && <PhotoAnnotation annotation={annotations[index - 1]} imgSrc={imgSrc as string} imgLoading={imgLoading} />}
-            {!!index && annotations[index - 1].annotation_type === 'video' && <VideoAnnotation videoAnnotation={annotations[index - 1].annotation as video_annotation} />}
-            {!!index && annotations[index - 1].annotation_type === 'model' && <ModelAnnotation modelAnnotation={annotations[index - 1].annotation as model_annotation} />}
-          </div>
-        }
+      {
+        collectionState.s && collectionState.annotations &&
+        <div id="annotationDiv"
+          ref={annotationDiv as Ref<HTMLDivElement>}
+          style={{ width: "40%", backgroundColor: "black", transition: "width 1.5s", color: "#F5F3E7", zIndex: "1", overflowY: "auto", overflowX: "hidden" }}>
+          {collectionState.index === 0 && <FirstAnnotation gMatch={gMatch} s={collectionState.s} />}
+          {!!collectionState.index && collectionState.annotations[collectionState.index - 1].annotation_type === 'photo' && <PhotoAnnotation />}
+          {!!collectionState.index && collectionState.annotations[collectionState.index - 1].annotation_type === 'video' && <VideoAnnotation videoAnnotation={collectionState.annotations[collectionState.index - 1].annotation as video_annotation} />}
+          {!!collectionState.index && collectionState.annotations[collectionState.index - 1].annotation_type === 'model' && <ModelAnnotation modelAnnotation={collectionState.annotations[collectionState.index - 1].annotation as model_annotation} />}
+        </div>
+      }
 
-      </div>
-    </>
-  );
+    </div>
+  </CollectionsContext.Provider>
 }
