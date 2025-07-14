@@ -12,7 +12,7 @@ import { useEffect, useState, useRef, Ref, createContext } from 'react'
 import { model, model_annotation, video_annotation } from '@prisma/client'
 import { fullAnnotation, GbifImageResponse, GbifResponse } from '@/interface/interface'
 import { useSearchParams } from 'next/navigation'
-import { annotationSwitchListener, annotationSwitchMobileListener, initializeAnnotations, initializeExhibit } from '@/functions/client/collections'
+import { annotationSwitchListener, annotationSwitchMobileListener, handleSrcForPhotoAnnotation, initializeAnnotations, initializeExhibit } from '@/functions/client/collections'
 
 // Default imports
 import AnnotationModal from '@/components/Collections/AnnotationModal'
@@ -28,7 +28,7 @@ export interface collectionsContext {
 }
 
 export interface CollectionState {
-  s: Vertebrates | undefined
+  s: Vertebrates | undefined // s = specimen
   annotations: fullAnnotation[] | undefined
   api: any
   index: number | null
@@ -36,6 +36,11 @@ export interface CollectionState {
   imgSrc: string | null
   annotationTitle: string
   imgLoading: boolean
+  annotationDivHeight: number | undefined
+  annotationDivWidth: number | undefined
+  imgHeight: number | undefined
+  imgWidth: number | undefined
+  imgGtRect: boolean
 }
 
 export interface CollectionsProps {
@@ -58,16 +63,21 @@ export default function SFAPI(props: CollectionsProps) {
   const searchParams = useSearchParams()
   const annotationUid = searchParams.get('annotation')
 
-  // Collections state object
+  // State
   const [collectionState, setCollectionState] = useState<CollectionState>({
-    s: undefined,
+    s: undefined, // s = specimen
     annotations: undefined,
     api: undefined,
     index: null,
     mobileIndex: null,
     imgSrc: null,
     annotationTitle: '',
-    imgLoading: false
+    imgLoading: false,
+    annotationDivHeight: undefined,
+    annotationDivWidth: undefined,
+    imgHeight: undefined,
+    imgWidth: undefined,
+    imgGtRect: false
   })
 
   // Refs
@@ -98,55 +108,32 @@ export default function SFAPI(props: CollectionsProps) {
   // Context value
   const value = { state: collectionState, props: { ...props } }
 
-  // Annotation switch event listener
+  // Annotation switch event listener wrappers
   const annotationSwitchListenerWrapper = (event: Event) => annotationSwitchListener(event, modelViewer, annotationDiv, collectionState.api, collectionState.annotations)
   const annotationSwitchMobileListenerWrapper = (event: Event) => annotationSwitchMobileListener(event, modelViewer, annotationDiv, collectionState.api, collectionState.annotations)
 
-  // Effect chain initizlized exhibit, then annotations and various listeners
+  // Effect chain initializes exhibit, then annotations and various listeners
   useEffect(() => { initializeExhibit(props, modelViewer, successObj, successObjDesktop, setCollectionState, sRef) }, []) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => initializeAnnotations(collectionState, annotationUid, setCollectionState, annotationSwitchListenerWrapper, annotationSwitchMobileListenerWrapper),
     [collectionState.api, collectionState.annotations, collectionState.s])
 
-  function getImageDimensionsFromBlob(blob: Blob): Promise<{ width: number; height: number }> {
-    return new Promise((resolve, reject) => {
-      const url = URL.createObjectURL(blob)
-      const img = new Image()
+  // Set imgSrc if necessary upon selection of a new annotaion
+  useEffect(() => {handleSrcForPhotoAnnotation(collectionState, setCollectionState, annotationDiv)}, [collectionState.index]) // eslint-disable-line react-hooks/exhaustive-deps
 
-      img.onload = () => {
-        resolve({ width: img.naturalWidth, height: img.naturalHeight });
-        URL.revokeObjectURL(url) // clean up!
-      };
-
-      img.onerror = reject
-      img.src = url
-    })
-  }
-
-  const setPhotoUrl = async (path: string) => {
-    setCollectionState(prev => ({ ...prev, imgLoading: true }))
-
-    await fetch(path)
-      .then(res => res.blob()).then(blob => getImageDimensionsFromBlob(blob)).then(dimensions => console.log(dimensions))
-
-    await fetch(path)
-      .then(res => {
-        if (!res.ok) setCollectionState(prev => ({ ...prev, imgSrc: '/noImage.png' }))
-        else return res.blob()
-      })
-      .then(blob => setCollectionState(prev => ({ ...prev, imgSrc: URL.createObjectURL(blob as Blob), imgLoading: false })))
-  }
-
-  // This effect sets the imgSrc if necessary upon change of annotation index
   useEffect(() => {
-    if (!!collectionState.index && collectionState.annotations && collectionState.annotations[collectionState.index - 1].annotation_type == 'photo') {
-      const path = process.env.NEXT_PUBLIC_NODE_ENV === 'development' ?
-        'X:' + (collectionState.annotations[collectionState.index - 1].url as string).slice(5) :
-        'public' + (collectionState.annotations[collectionState.index - 1].url as string)
-      setPhotoUrl(`/api/nfs?path=${path}`)
+    if (collectionState.annotations && collectionState.s) {
+      const rect = annotationDiv.current?.getBoundingClientRect()
+
+      if (rect) {
+        setCollectionState(prev => ({ ...prev, annotationDivHeight: rect.height, annotationDivWidth: rect.width }))
+      }
     }
+  },
+    [collectionState.annotations, collectionState.s])
 
-  }, [collectionState.index]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // console.log(collectionState.annotationDivHeight, collectionState.annotationDivWidth)
+  // console.log(annotationDiv.current?.getBoundingClientRect().height)
   return <CollectionsContext.Provider value={value}>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta>
 

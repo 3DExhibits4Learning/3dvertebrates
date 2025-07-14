@@ -19,7 +19,7 @@ import dynamic from 'next/dynamic'
 import Foot from '@/components/Shared/Foot'
 
 // Dynamic Imports
-const SketchfabApi = dynamic(() => import('@/components/Collections/SketchFabAPI'), { ssr: false })
+const SketchfabApi = dynamic(() => import('@/components/Collections/Collections'), { ssr: false })
 
 // Main JSX 
 export default function MainWrap(props: {

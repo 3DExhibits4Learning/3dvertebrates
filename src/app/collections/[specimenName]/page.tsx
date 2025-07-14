@@ -13,12 +13,11 @@ import { model } from "@prisma/client"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
-
 // Default Imports
 import dynamic from "next/dynamic"
 import CollectionsError from "@/components/Collections/CollectionsError"
 import prisma from "@/functions/utils/prisma"
-import ClientWrapper from "@/components/Collections/ClientWrapper"
+import ClientWrapper from "@/components/Collections/CollectionsClient"
 
 // Dynamic Imports
 const Header = dynamic(() => import('@/components/Header/Header'))

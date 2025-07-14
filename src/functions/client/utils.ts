@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * @file src\functions\client\utils.ts
  * 
@@ -41,3 +43,15 @@ export const replaceBackslashWithForwardSlash = (text: string) => text.replace(/
  * @returns 
  */
 export const stripTagsExceptIAP = (html: string) => html.replace(/<\/?(?!i\b|a\b|p\b)[a-z][^>]*>/gi, '')
+
+/**
+ * 
+ * @returns 
+ */
+export const getClientLocalEnv = () => process.env.NEXT_PUBLIC_NODE_ENV
+
+/**
+ * 
+ * @returns 
+ */
+export const isLocalDevEnvClient = () => 'development' === getClientLocalEnv()
