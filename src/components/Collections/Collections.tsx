@@ -12,7 +12,7 @@ import { useEffect, useState, useRef, Ref, createContext } from 'react'
 import { model, model_annotation, video_annotation } from '@prisma/client'
 import { fullAnnotation, GbifImageResponse, GbifResponse } from '@/interface/interface'
 import { useSearchParams } from 'next/navigation'
-import { annotationSwitchListener, annotationSwitchMobileListener, handleSrcForPhotoAnnotation, initializeAnnotations, initializeExhibit } from '@/functions/client/collections'
+import { annotationSwitchListener, annotationSwitchMobileListener, handleSrcForPhotoAnnotation, initializeAnnotations, initializeExhibit, resizeEventHandler } from '@/functions/client/collections'
 
 // Default imports
 import AnnotationModal from '@/components/Collections/AnnotationModal'
@@ -36,8 +36,8 @@ export interface CollectionState {
   imgSrc: string | null
   annotationTitle: string
   imgLoading: boolean
-  annotationDivHeight: number | undefined
-  annotationDivWidth: number | undefined
+  // annotationDivHeight: number | undefined
+  // annotationDivWidth: number | undefined
   imgHeight: number | undefined
   imgWidth: number | undefined
   imgGtRect: boolean
@@ -73,8 +73,8 @@ export default function SFAPI(props: CollectionsProps) {
     imgSrc: null,
     annotationTitle: '',
     imgLoading: false,
-    annotationDivHeight: undefined,
-    annotationDivWidth: undefined,
+    // annotationDivHeight: undefined,
+    // annotationDivWidth: undefined,
     imgHeight: undefined,
     imgWidth: undefined,
     imgGtRect: false
@@ -112,6 +112,9 @@ export default function SFAPI(props: CollectionsProps) {
   const annotationSwitchListenerWrapper = (event: Event) => annotationSwitchListener(event, modelViewer, annotationDiv, collectionState.api, collectionState.annotations)
   const annotationSwitchMobileListenerWrapper = (event: Event) => annotationSwitchMobileListener(event, modelViewer, annotationDiv, collectionState.api, collectionState.annotations)
 
+  // Window resize event handler wrapper
+  const resizeEventHandlerWrapper = () => resizeEventHandler(annotationDiv, collectionState, setCollectionState)
+
   // Effect chain initializes exhibit, then annotations and various listeners
   useEffect(() => { initializeExhibit(props, modelViewer, successObj, successObjDesktop, setCollectionState, sRef) }, []) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => initializeAnnotations(collectionState, annotationUid, setCollectionState, annotationSwitchListenerWrapper, annotationSwitchMobileListenerWrapper),
@@ -120,20 +123,12 @@ export default function SFAPI(props: CollectionsProps) {
   // Set imgSrc if necessary upon selection of a new annotaion
   useEffect(() => {handleSrcForPhotoAnnotation(collectionState, setCollectionState, annotationDiv)}, [collectionState.index]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Handler window resize wrt annotation div for photo annotations
   useEffect(() => {
-    if (collectionState.annotations && collectionState.s) {
-      const rect = annotationDiv.current?.getBoundingClientRect()
+    window.addEventListener('resize', resizeEventHandlerWrapper)
+    return () => window.removeEventListener('resize', resizeEventHandlerWrapper)
+  }, [])
 
-      if (rect) {
-        setCollectionState(prev => ({ ...prev, annotationDivHeight: rect.height, annotationDivWidth: rect.width }))
-      }
-    }
-  },
-    [collectionState.annotations, collectionState.s])
-
-
-  // console.log(collectionState.annotationDivHeight, collectionState.annotationDivWidth)
-  // console.log(annotationDiv.current?.getBoundingClientRect().height)
   return <CollectionsContext.Provider value={value}>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta>
 

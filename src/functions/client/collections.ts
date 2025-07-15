@@ -77,10 +77,10 @@ export const addAnnotationEventListener = (collectionState: CollectionState, set
         const mediaQueryOrientation = window.matchMedia('(orientation: portrait)')
 
         // this event is still triggered even when an annotation is not selected; an index of -1 is returned
-        if (index !== -1) setCollectionState(prev => ({ ...prev, index: index }))
+        if (index !== -1) setCollectionState(prev => ({ ...prev, index: index, imgLoading: true }))
 
         // Mobile annotation state management
-        if (index != -1 && mediaQueryWidth.matches || index != -1 && mediaQueryOrientation.matches) {
+        if (index !== -1 && mediaQueryWidth.matches || index != -1 && mediaQueryOrientation.matches) {
             document.getElementById("annotationButton")?.click()
 
             collectionState.api.getAnnotation(index, function (err: any, information: any) {
@@ -113,7 +113,7 @@ export const initializeAnnotations = (collectionState: CollectionState, annotati
             for (let i = 0; i < collectionState.annotations.length; i++) {
                 if (collectionState.annotations[i].position) {
                     const position = JSON.parse(collectionState.annotations[i].position as string)
-                    collectionState.api.createAnnotationFromScenePosition(position[0], position[1], position[2], `${collectionState.annotations[i].title}`)
+                    collectionState.api.createAnnotationFromScenePosition(position[0], position[1], position[2], `${collectionState.annotations[i].title}`, '')
                 }
             }
         }
@@ -182,14 +182,33 @@ export const handleSrcForPhotoAnnotation = async (collectionState: CollectionSta
         if (blob) {
             const dimensions = await getImageDimensionsFromBlob(blob)
             const rect = annotationDiv.current?.getBoundingClientRect() as DOMRect
-            const imgObj = { imgSrc: URL.createObjectURL(blob as Blob), imgLoading: false }
-            
+            const imgObj = { imgSrc: URL.createObjectURL(blob as Blob), imgLoading: false, imgHeight: dimensions.height, imgWidth: dimensions.width }
+            console.log('dimensions', dimensions, 'rect', rect)
+
             dimensions.height > rect.height || dimensions.width > rect.width ? setCollectionState(prev => ({ ...prev, imgGtRect: true, ...imgObj })) :
                 setCollectionState(prev => ({ ...prev, imgGtRect: false, ...imgObj }))
         }
     }
 }
 
-export const setPhotoAnnotationDivStyle = () => {
 
+/**
+ * 
+ * @param annotationDiv 
+ * @param collectionState 
+ * @param setCollectionState 
+ * @returns 
+ */
+export const resizeEventHandler = (annotationDiv: RefObject<HTMLDivElement | undefined>, collectionState: CollectionState, setCollectionState: Dispatch<SetStateAction<CollectionState>>) => {
+    if (!annotationDiv.current) return
+
+    if (collectionState.annotations && collectionState.index && collectionState.annotations[collectionState.index - 1]?.annotation_type === 'photo' && collectionState.imgHeight && collectionState.imgWidth) {
+        const rect = annotationDiv.current.getBoundingClientRect()
+
+        collectionState.imgHeight > rect.height || collectionState.imgWidth > rect.width ? setCollectionState(prev => ({ ...prev, imgGtRect: true})) :
+            setCollectionState(prev => ({ ...prev, imgGtRect: false }))
+
+    }
 }
+
+

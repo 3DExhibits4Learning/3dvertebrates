@@ -8,7 +8,6 @@ import { video_annotation } from "@prisma/client"
 
 export default function VideoAnnotation(props: { videoAnnotation: video_annotation }) {
     const videoAnnotation = props.videoAnnotation
-    console.log(videoAnnotation.url)
     return <>
         {
             !videoAnnotation.annotation &&
