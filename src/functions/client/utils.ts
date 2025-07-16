@@ -55,3 +55,21 @@ export const getClientLocalEnv = () => process.env.NEXT_PUBLIC_NODE_ENV
  * @returns 
  */
 export const isLocalDevEnvClient = () => 'development' === getClientLocalEnv()
+
+/**
+ * 
+ * @param fileName 
+ * @returns 
+ */
+export const sanitizeFileName = (fileName: string) => fileName
+    // Normalize Unicode to remove weird composed forms
+    .normalize('NFKD')
+    // Replace unsafe/invisible characters (non-printable, control, etc.)
+    .replace(/[^\x20-\x7E]/g, '')
+    // Remove disallowed/special characters for Windows/macOS/Linux
+    .replace(/[<>:"/\\|?*\u0000-\u001F]/g, '')
+    // Collapse multiple spaces or dashes
+    .replace(/[\s]+/g, ' ')
+    // Trim spaces and dots
+    .trim()
+    .replace(/\.+$/, '')

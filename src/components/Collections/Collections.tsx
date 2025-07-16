@@ -36,11 +36,11 @@ export interface CollectionState {
   imgSrc: string | null
   annotationTitle: string
   imgLoading: boolean
-  // annotationDivHeight: number | undefined
-  // annotationDivWidth: number | undefined
   imgHeight: number | undefined
   imgWidth: number | undefined
   imgGtRect: boolean
+  imgHeightGtRect: boolean
+  imgWidthGtRect: boolean
 }
 
 export interface CollectionsProps {
@@ -73,16 +73,17 @@ export default function SFAPI(props: CollectionsProps) {
     imgSrc: null,
     annotationTitle: '',
     imgLoading: false,
-    // annotationDivHeight: undefined,
-    // annotationDivWidth: undefined,
     imgHeight: undefined,
     imgWidth: undefined,
-    imgGtRect: false
+    imgGtRect: false,
+    imgHeightGtRect: false,
+    imgWidthGtRect: false
   })
 
   // Refs
   const sRef = useRef<Vertebrates>(undefined)
   const modelViewer = useRef<HTMLIFrameElement>(undefined)
+  const collectionsDiv = useRef<HTMLDivElement>(undefined)
   const annotationDiv = useRef<HTMLDivElement>(undefined)
 
   // Sketchfab viewer mobile success object
@@ -113,7 +114,7 @@ export default function SFAPI(props: CollectionsProps) {
   const annotationSwitchMobileListenerWrapper = (event: Event) => annotationSwitchMobileListener(event, modelViewer, annotationDiv, collectionState.api, collectionState.annotations)
 
   // Window resize event handler wrapper
-  const resizeEventHandlerWrapper = () => resizeEventHandler(annotationDiv, collectionState, setCollectionState)
+  const resizeEventHandlerWrapper = () => resizeEventHandler(collectionsDiv, collectionState, setCollectionState)
 
   // Effect chain initializes exhibit, then annotations and various listeners
   useEffect(() => { initializeExhibit(props, modelViewer, successObj, successObjDesktop, setCollectionState, sRef) }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -121,20 +122,21 @@ export default function SFAPI(props: CollectionsProps) {
     [collectionState.api, collectionState.annotations, collectionState.s])
 
   // Set imgSrc if necessary upon selection of a new annotaion
-  useEffect(() => {handleSrcForPhotoAnnotation(collectionState, setCollectionState, annotationDiv)}, [collectionState.index]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {handleSrcForPhotoAnnotation(collectionState, setCollectionState, collectionsDiv)}, [collectionState.index]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Handler window resize wrt annotation div for photo annotations
+  // Handle window resize wrt annotation div for photo annotations
   useEffect(() => {
     window.addEventListener('resize', resizeEventHandlerWrapper)
     return () => window.removeEventListener('resize', resizeEventHandlerWrapper)
-  }, [])
+  }, [collectionState.imgWidth]) 
 
   return <CollectionsContext.Provider value={value}>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta>
+    <title>{`${props.model.spec_name} 3D Model`}</title>
 
     {collectionState.s && <AnnotationModal {...props} title={collectionState.annotationTitle} index={collectionState.mobileIndex} specimen={collectionState.s} imgLoading={collectionState.imgLoading} imgSrc={collectionState.imgSrc} />}
 
-    <div id="iframeDiv" className="flex bg-black m-auto min-h-[150px]" style={{ height: "100%", width: "100%" }}>
+    <div id="iframeDiv" ref={collectionsDiv as Ref<HTMLDivElement>} className="flex bg-black m-auto min-h-[150px]" style={{ height: "100%", width: "100%" }}>
 
       <iframe
         src={props.model.uid}

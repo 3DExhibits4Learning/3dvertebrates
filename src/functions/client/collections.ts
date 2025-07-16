@@ -76,8 +76,11 @@ export const addAnnotationEventListener = (collectionState: CollectionState, set
         const mediaQueryWidth = window.matchMedia('(max-width: 1023.5px)')
         const mediaQueryOrientation = window.matchMedia('(orientation: portrait)')
 
-        // this event is still triggered even when an annotation is not selected; an index of -1 is returned
-        if (index !== -1) setCollectionState(prev => ({ ...prev, index: index, imgLoading: true }))
+        // this event is still triggered even when an annotation is not selected; an index of -1 is returned; also checking that the same index is not selected
+        if (index !== -1) setCollectionState(prev => {
+            if(prev.index !== index) return { ...prev, index: index, imgLoading: true }
+            else return prev
+        })
 
         // Mobile annotation state management
         if (index !== -1 && mediaQueryWidth.matches || index != -1 && mediaQueryOrientation.matches) {
@@ -162,7 +165,7 @@ export const getImageDimensionsFromBlob = (blob: Blob): Promise<{ width: number;
  * @param collectionState 
  * @param setCollectionState 
  */
-export const handleSrcForPhotoAnnotation = async (collectionState: CollectionState, setCollectionState: Dispatch<SetStateAction<CollectionState>>, annotationDiv: RefObject<HTMLDivElement | undefined>) => {
+export const handleSrcForPhotoAnnotation = async (collectionState: CollectionState, setCollectionState: Dispatch<SetStateAction<CollectionState>>, collectionsDiv: RefObject<HTMLDivElement | undefined>) => {
     if (!!collectionState.index && collectionState.annotations && collectionState.annotations[collectionState.index - 1].annotation_type === 'photo') {
         // Determine appropriate path
         const path = isLocalDevEnvClient() ?
@@ -181,12 +184,18 @@ export const handleSrcForPhotoAnnotation = async (collectionState: CollectionSta
         // Get necessary dimensions and set imgGtRect
         if (blob) {
             const dimensions = await getImageDimensionsFromBlob(blob)
-            const rect = annotationDiv.current?.getBoundingClientRect() as DOMRect
-            const imgObj = { imgSrc: URL.createObjectURL(blob as Blob), imgLoading: false, imgHeight: dimensions.height, imgWidth: dimensions.width }
-            console.log('dimensions', dimensions, 'rect', rect)
+            const rect = collectionsDiv.current?.getBoundingClientRect() as DOMRect
 
-            dimensions.height > rect.height || dimensions.width > rect.width ? setCollectionState(prev => ({ ...prev, imgGtRect: true, ...imgObj })) :
-                setCollectionState(prev => ({ ...prev, imgGtRect: false, ...imgObj }))
+            if (rect) {
+                const imgObj = { imgSrc: URL.createObjectURL(blob as Blob), imgLoading: false, imgHeight: dimensions.height, imgWidth: dimensions.width }
+                const maxImgHeight = 0.65 * rect.height
+                const maxImgWidth = 0.4 * rect.width
+
+                if (dimensions.height >= maxImgHeight && dimensions.width >= maxImgWidth) setCollectionState(prev => ({ ...prev, imgHeightGtRect: true, imgWidthGtRect: true, ...imgObj }))
+                else if (dimensions.height > maxImgHeight) setCollectionState(prev => ({ ...prev, imgHeightGtRect: true, imgWidthGtRect: false, ...imgObj }))
+                else if (dimensions.width > maxImgWidth) setCollectionState(prev => ({ ...prev, imgHeightGtRect: false, imgWidthGtRect: true, ...imgObj }))
+                else setCollectionState(prev => ({ ...prev, imgHeightGtRect: false, imgWidthGtRect: false, ...imgObj }))
+            }
         }
     }
 }
@@ -199,14 +208,18 @@ export const handleSrcForPhotoAnnotation = async (collectionState: CollectionSta
  * @param setCollectionState 
  * @returns 
  */
-export const resizeEventHandler = (annotationDiv: RefObject<HTMLDivElement | undefined>, collectionState: CollectionState, setCollectionState: Dispatch<SetStateAction<CollectionState>>) => {
-    if (!annotationDiv.current) return
+export const resizeEventHandler = (collectionsDiv: RefObject<HTMLDivElement | undefined>, collectionState: CollectionState, setCollectionState: Dispatch<SetStateAction<CollectionState>>) => {
+    if (!collectionsDiv.current) return
 
     if (collectionState.annotations && collectionState.index && collectionState.annotations[collectionState.index - 1]?.annotation_type === 'photo' && collectionState.imgHeight && collectionState.imgWidth) {
-        const rect = annotationDiv.current.getBoundingClientRect()
+        const rect = collectionsDiv.current.getBoundingClientRect()
+        const maxImgHeight = 0.65 * rect.height
+        const maxImgWidth = 0.4 * rect.width
 
-        collectionState.imgHeight > rect.height || collectionState.imgWidth > rect.width ? setCollectionState(prev => ({ ...prev, imgGtRect: true})) :
-            setCollectionState(prev => ({ ...prev, imgGtRect: false }))
+        if (collectionState.imgHeight >= maxImgHeight && collectionState.imgWidth >= maxImgWidth) setCollectionState(prev => ({ ...prev, imgHeightGtRect: true, imgWidthGtRect: true }))
+        else if (collectionState.imgHeight >= maxImgHeight) setCollectionState(prev => ({ ...prev, imgHeightGtRect: true, imgWidthGtRect: false }))
+        else if (collectionState.imgWidth >= maxImgWidth) setCollectionState(prev => ({ ...prev, imgHeightGtRect: false, imgWidthGtRect: true }))
+        else setCollectionState(prev => ({ ...prev, imgHeightGtRect: false, imgWidthGtRect: false }))
 
     }
 }
