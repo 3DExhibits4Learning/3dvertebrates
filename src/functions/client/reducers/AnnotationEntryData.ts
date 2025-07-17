@@ -26,8 +26,8 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
                 photoChecked: false,
                 videoChecked: false,
                 modelChecked: false,
+                textChecked: false,
                 annotationType: '',
-                mediaType: undefined,
                 imageVisible: undefined,
                 annotationTitle: undefined,
                 url: '',
@@ -80,7 +80,6 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
                 website: photoAnnotation.website as string,
                 annotation: photoAnnotation.annotation,
                 annotationTitle: apData.activeAnnotationTitle,
-                mediaType: 'upload',
                 photoChecked: true,
                 videoChecked: false,
                 modelChecked: false
@@ -100,7 +99,6 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
                 annotationTitle: apData.activeAnnotationTitle,
                 annotation: videoAnnotation.annotation ? videoAnnotation.annotation : '',
                 annotationType: apData.activeAnnotationType as string,
-                mediaType: 'url',
                 videoChecked: true,
                 photoChecked: false,
                 modelChecked: false,
@@ -120,11 +118,21 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
                 annotation: modelAnnotation.annotation,
                 annotationType: apData.activeAnnotationType as string,
                 annotationTitle: apData.activeAnnotationTitle,
-                mediaType: 'model',
                 videoChecked: false,
                 photoChecked: false,
                 modelChecked: true,
                 url: ''
+            }
+
+        case 'textRadioButton':
+
+            return {
+                ...data,
+                annotationType: 'text',
+                photoChecked: false,
+                videoChecked: false,
+                modelChecked: false,
+                textChecked: true,
             }
 
         case 'photoRadioButton':
@@ -135,7 +143,7 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
                 photoChecked: true,
                 videoChecked: false,
                 modelChecked: false,
-                mediaType: 'upload',
+                textChecked: false,
             }
 
         case 'videoRadioButton':
@@ -146,7 +154,7 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
                 photoChecked: false,
                 videoChecked: true,
                 modelChecked: false,
-                mediaType: 'url',
+                textChecked: false,
             }
 
         case 'modelRadioButton':
@@ -157,7 +165,7 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
                 photoChecked: false,
                 videoChecked: false,
                 modelChecked: true,
-                mediaType: 'model',
+                textChecked: false,
             }
 
         case 'setStringValue':

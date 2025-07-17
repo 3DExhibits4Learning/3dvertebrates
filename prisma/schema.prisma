@@ -40,6 +40,7 @@ model annotations {
   photo_annotation photo_annotation?
   video_annotation video_annotation?
   model_annotation model_annotation?
+  text_annotation  text_annotation?
 
   @@index([uid], map: "uid")
   @@unique([uid, annotation_no])
@@ -72,6 +73,20 @@ model model {
   tags                  tags[]
   assignment            assignment?
   model_annotation      model_annotation?
+}
+
+model text_annotation {
+  annotation_id String      @id @db.VarChar(36)
+  annotation    String      @db.VarChar(4000)
+  annotations   annotations @relation(fields: [annotation_id], references: [annotation_id], onDelete: Cascade, map: "textFk1")
+}
+
+model video_annotation {
+  url           String      @db.VarChar(1000)
+  length        String?     @db.VarChar(5)
+  annotation_id String      @id @db.VarChar(36)
+  annotation    String?     @db.VarChar(4000)
+  annotations   annotations @relation(fields: [annotation_id], references: [annotation_id], onDelete: Cascade, map: "videoFk1")
 }
 
 model model_annotation {
@@ -143,14 +158,6 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verificationtokens")
-}
-
-model video_annotation {
-  url           String      @db.VarChar(1000)
-  length        String?     @db.VarChar(5)
-  annotation_id String      @id @db.VarChar(36)
-  annotation    String?     @db.VarChar(4000)
-  annotations   annotations @relation(fields: [annotation_id], references: [annotation_id], onDelete: Cascade, map: "videoFk1")
 }
 
 model authorized {

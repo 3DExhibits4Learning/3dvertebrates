@@ -11,11 +11,12 @@
 
 // Imports
 import { annotationClientSpecimen, annotationEntry, annotationsAndPositions } from "@/interface/interface"
-import { photo_annotation, video_annotation, model_annotation, model } from "@prisma/client"
+import { photo_annotation, video_annotation, model_annotation, model, text_annotation } from "@prisma/client"
 import { SetStateAction, Dispatch, MutableRefObject } from "react"
 import { v4 as uuidv4 } from 'uuid'
 import { annotationEntryAction } from "@/interface/actions"
 import { annotationDataEntryObj, annotationDataEntryUpdateObj } from "@/ts/ts"
+import { ad } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js"
 
 export const allTruthy = (value: any) => value ? true : false
 export const allSame = (originalValues: any[], currentValues: any[]) => JSON.stringify(originalValues) === JSON.stringify(currentValues) ? true : false
@@ -143,6 +144,39 @@ export const annotationItalicization = (
 export function getImagePath(photoAnnotation: photo_annotation) {
     const path = process.env.NEXT_PUBLIC_LOCAL === 'development' ? `X:${photoAnnotation.url.slice(5)}` : `public${photoAnnotation.url}`
     return `/api/nfs?path=${path}`
+}
+
+/**
+ * 
+ * @param apData 
+ * @param aeData 
+ * @param isNewPosition 
+ * @param setSaveDisabled 
+ */
+export const enableTextAnnotationUpdate = (apData: annotationsAndPositions, aeData: annotationEntry, isNewPosition: boolean, setSaveDisabled: Dispatch<SetStateAction<boolean>>) => {
+    // Type assertion, required value arrays
+    const caseAnnotation = apData.activeAnnotation as text_annotation
+    const originalValues = [apData.activeAnnotationTitle, caseAnnotation.annotation]
+    const currentValues = [aeData.annotationTitle, aeData.annotation]
+
+    // If all required fields are populated and: they are different from the original, or there is a new position, then enable "save changes"
+    if (currentValues.every(value => value) && (!allSame(originalValues, currentValues) || isNewPosition)) setSaveDisabled(false)
+    else setSaveDisabled(true)
+}
+
+/**
+ * 
+ * @param aeData 
+ * @param position 
+ * @param setCreateDisabled 
+ */
+export const enableTextAnnotationCreate = (aeData: annotationEntry, position: string, setCreateDisabled: Dispatch<SetStateAction<boolean>>) => {
+    // Required fields
+    const valueArray = [aeData.annotationTitle, aeData.annotation, position]
+
+    // Enable button if all required fields are populated
+    if (valueArray.every(value => value)) setCreateDisabled(false)
+    else setCreateDisabled(true)
 }
 
 
@@ -332,6 +366,13 @@ export const enableSaveOrUpdateButton = (
             default: enableModelAnnotationCreate(aeData, apData.position3D as string, setCreateDisabled)
         }
     }
+
+    else if(aeData.annotationType === 'text') {
+        switch (isNew) {
+            case false: enableTextAnnotationUpdate(apData, aeData, isNewPosition, setSaveDisabled); break
+            default: enableTextAnnotationCreate(aeData, apData.position3D as string, setCreateDisabled)
+        }
+    }
 }
 
 export function sanitizeHtml(htmlString: string): string {
@@ -419,11 +460,13 @@ export const getAnnotationEntryDataObj = (aeData: annotationEntry, uid: string, 
             break
 
         // Photo_annotation table data
-        default:
+        case 'photo':
             entryObject.author = aeData.author
             entryObject.license = aeData.license
             entryObject.photoTitle = aeData.photoTitle ?? (apData.activeAnnotation as photo_annotation).title ?? ''
             entryObject.website = aeData.website ?? (apData.activeAnnotation as photo_annotation).title ?? ''
+
+        default: break
     }
     return entryObject
 }
@@ -466,11 +509,13 @@ export const getAnnotationEntryUpdateDataObj = (aeData: annotationEntry, index: 
             break
 
         // Photo_annotation table data
-        default:
+        case 'photo':
             updateObject.author = aeData.author
             updateObject.license = aeData.license
             updateObject.photoTitle = aeData.photoTitle ?? (apData.activeAnnotation as photo_annotation).title ?? ''
             updateObject.website = aeData.website ?? (apData.activeAnnotation as photo_annotation).title ?? ''
+
+        default: break
     }
 
     // If there is a new photograph file

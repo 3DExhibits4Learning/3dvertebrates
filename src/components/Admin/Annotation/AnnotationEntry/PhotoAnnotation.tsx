@@ -30,7 +30,7 @@ export default function PhotoAnnotationEntry() {
 
     return <>
         {
-            annotationEntryData.annotationType == 'photo' && annotationEntryData.mediaType && annotationEntryData.mediaType === 'upload' &&
+            annotationEntryData.annotationType == 'photo' &&
 
             <section className="mt-4 w-full h-fit">
 

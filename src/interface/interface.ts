@@ -14,62 +14,62 @@ export interface dispatch {
 }
 
 export interface annotationDataTransfer {
-  transferModalOpen: boolean,
-  transferring: boolean,
-  result: string,
+  transferModalOpen: boolean
+  transferring: boolean
+  result: string
   loadingLabel: string
 }
 
 export interface annotationEntryContext {
-  annotationEntryData: annotationEntry,
-  annotationEntryDataDispatch: Dispatch<any>,
-  transferState: annotationDataTransfer,
+  annotationEntryData: annotationEntry
+  annotationEntryDataDispatch: Dispatch<any>
+  transferState: annotationDataTransfer
   transferStateDispatch: Dispatch<annotationDataTransferAction>
 }
 
 export interface annotationEntry {
-  photoChecked: boolean | undefined,
-  videoChecked: boolean | undefined,
-  modelChecked: boolean | undefined,
-  annotationType: string,
-  mediaType: string | undefined,
-  imageVisible: boolean | undefined,
-  annotationTitle: string | undefined,
-  url: string,
-  file: File | undefined,
-  author: string,
-  license: string,
-  photoTitle: string,
-  website: string,
-  annotation: string,
-  length: string,
-  imageSource: string | undefined,
-  videoSource: string,
+  photoChecked: boolean
+  videoChecked: boolean
+  modelChecked: boolean
+  textChecked: boolean
+  annotationType: string
+  imageVisible: boolean | undefined
+  annotationTitle: string | undefined
+  url: string
+  file: File | undefined
+  author: string
+  license: string
+  photoTitle: string
+  website: string
+  annotation: string
+  length: string
+  imageSource: string | undefined
+  videoSource: string
   modelAnnotationUid: string
 }
 
 
 export interface annotationsAndPositions {
-  annotations: fullAnnotation[] | undefined,
-  numberOfAnnotations: number | undefined,
-  cancelledAnnotation: boolean | undefined,
-  position3D: string | undefined,
-  activeAnnotationIndex: number | 'new' | undefined,
-  activeAnnotation: photo_annotation | video_annotation | model_annotation | undefined,
-  activeAnnotationType: 'photo' | 'video' | 'model' | undefined,
-  activeAnnotationTitle: string | undefined,
-  activeAnnotationPosition: string | undefined,
-  firstAnnotationPosition: string | undefined,
-  newAnnotationEnabled: boolean,
-  annotationSavedOrDeleted: boolean,
+  annotations: fullAnnotation[] | undefined
+  numberOfAnnotations: number | undefined
+  cancelledAnnotation: boolean | undefined
+  position3D: string | undefined
+  activeAnnotationIndex: number | 'new' | undefined
+  activeAnnotation: photo_annotation | video_annotation | model_annotation | undefined
+  activeAnnotationType: 'photo' | 'video' | 'model' | undefined
+  activeAnnotationTitle: string | undefined
+  activeAnnotationPosition: string | undefined
+  firstAnnotationPosition: string | undefined
+  newAnnotationEnabled: boolean
+  annotationSavedOrDeleted: boolean
   repositionEnabled: boolean
 }
 
 export interface annotationClientSpecimen {
-  specimenName: string | undefined,
-  uid: string | undefined,
-  annotator: string | undefined,
-  annotated: boolean | undefined,
+  specimenName: string | undefined
+  uid: string | undefined
+  annotator: string | undefined
+  annotated: boolean | undefined
   annotationsApproved: boolean | undefined
 }
 
@@ -81,47 +81,47 @@ export interface annotationClientData {
   admin: boolean
   adminAssigned: boolean
   handlers: {
-    approveAnnotationsHandler: Function,
-    unapproveAnnotationsHandler: Function,
-    assignAnnotationHandler: Function,
-    unassignAnnotationHandler: Function,
+    approveAnnotationsHandler: Function
+    unapproveAnnotationsHandler: Function
+    assignAnnotationHandler: Function
+    unassignAnnotationHandler: Function
     setNameAndEmailStates: Function
   }
   student: {
-    name: string | null | undefined,
+    name: string | null | undefined
     email: string | null | undefined
   }
   setters: {
-    setViewerLoaded: Dispatch<SetStateAction<boolean>>,
-    setSureModalOpen: Dispatch<SetStateAction<boolean>>,
+    setViewerLoaded: Dispatch<SetStateAction<boolean>>
+    setSureModalOpen: Dispatch<SetStateAction<boolean>>
     setReorderModalOpen: Dispatch<SetStateAction<boolean>>
   }
   refs: {
-    modelClicked: RefObject<boolean>,
+    modelClicked: RefObject<boolean>
     newAnnotationEnabled: RefObject<boolean>
   }
   properties: {
-    modelsToAnnotate: model[],
-    admin: boolean, students?:
-    studentsAssignmentsAndModels[],
+    modelsToAnnotate: model[]
+    admin: boolean 
+    students?:studentsAssignmentsAndModels[]
     authorizedUsers?: authorized[]
   }
 }
 
 export interface SearchHeaderProps {
-  headerTitle: string,
+  headerTitle: string
   pageRoute: string;
   searchTerm?: string;
   page?: string;
   hasModel?: boolean
-};
+}
 
 export interface iNatApiResponse {
-  total_results: number;
-  page: number;
-  per_page: number;
-  results: any[];
-};
+  total_results: number
+  page: number
+  per_page: number
+  results: any[]
+}
 
 export interface iNatSpecimenObservation {
   photoUrl: string;
@@ -131,13 +131,13 @@ export interface iNatSpecimenObservation {
   userHrefLink: string;
   observedOnDate: string;
   location: string;
-};
+}
 
 export interface iNatSpecimenLeader {
   count?: number;
   observation_count?: number;
   user: string;
-};
+}
 
 export interface GbifResponse {
   usageKey?: number;
@@ -329,55 +329,55 @@ export interface ModelsWithTagsAndSoftware extends Models {
 }
 
 export interface PublishedModelProps {
-  models: ModelsWithTagsAndSoftware[],
-  setViewerUid: Dispatch<SetStateAction<string>>,
-  selectedKeys: Set<string>,
-  setSelectedKeys: any,
+  models: ModelsWithTagsAndSoftware[]
+  setViewerUid: Dispatch<SetStateAction<string>>
+  selectedKeys: Set<string>
+  setSelectedKeys: any
   setPendingSelectedKeys: Dispatch<SetStateAction<Set<string>>>
   setActiveSpeciesName: Dispatch<SetStateAction<string>>
 }
 
 export interface userUpdateProps {
-  confirmation: string,
-  artist: string,
-  species: string,
-  method: string,
-  mobile: boolean,
-  software: string[],
+  confirmation: string
+  artist: string
+  species: string
+  method: string
+  mobile: boolean
+  software: string[]
 }
 
 export interface PendingModelProps {
-  models: ModelsWithTagsAndSoftware[],
-  setViewerUid: Dispatch<SetStateAction<string>>,
-  selectedKeys: Set<string>,
-  setSelectedKeys: any,
+  models: ModelsWithTagsAndSoftware[]
+  setViewerUid: Dispatch<SetStateAction<string>>
+  selectedKeys: Set<string>
+  setSelectedKeys: any
   setPublishedSelectedKeys: Dispatch<SetStateAction<Set<string>>>
   setActiveSpeciesName: Dispatch<SetStateAction<string>>
 }
 
 export interface modelerInsertion {
-  requestType: 'specimenEntry' | 'imageEntry' | 'modelEntry',
+  requestType: 'specimenEntry' | 'imageEntry' | 'modelEntry'
   species: string
   acquisitionDate: string
 }
 
 export interface specimenInsertion extends modelerInsertion {
-  procurer: string,
-  isLocal: boolean,
+  procurer: string
+  isLocal: boolean
   genus: string
 }
 
 export interface imageInsertion extends modelerInsertion {
-  imagedBy: string,
-  imagedDate: string,
+  imagedBy: string
+  imagedDate: string
   numberOfImages: string
 }
 
 export interface modelInsertion extends modelerInsertion {
-  commonName: string,
-  uid: string,
-  modeler: string,
-  isViable: boolean,
+  commonName: string
+  uid: string
+  modeler: string
+  isViable: boolean
   isBase: boolean
 }
 

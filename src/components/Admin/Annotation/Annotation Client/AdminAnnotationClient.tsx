@@ -13,7 +13,7 @@ import { AnnotationClientData } from "@/components/Admin/Annotation/Annotation C
 import AdminAnnotation from "@/components/Admin/Annotation/Annotation Client/AdminAnnotation"
 import AdminAnnotationButtons from "@/components/Admin/Annotation/Annotation Client/AdminAnnotationButtons"
 import AnnotationEntryWrapper from "@/components/Admin/Annotation/Annotation Client/AnnotationEntryWrapper"
-import BotanistRefWrapper from "@/components/Admin/Annotation/Annotation Model Viwer/AnnotationModelViewerRef"
+import BotanistRefWrapper from "@/components/Admin/Annotation/Annotation Model Viewer/AnnotationModelViewerRef"
 
 // Main JSX
 export default function AdminAnnotationClient(props: {viewerLoaded: boolean}) {

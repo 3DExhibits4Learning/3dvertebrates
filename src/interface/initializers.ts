@@ -39,8 +39,8 @@ export const getInitialAnnotationEntryData = (apData: annotationsAndPositions, n
         photoChecked: false,
         videoChecked: false,
         modelChecked: false,
+        textChecked: false,
         annotationType: '',
-        mediaType: undefined,
         imageVisible: undefined,
         annotationTitle: undefined,
         url: (apData.activeAnnotation as photo_annotation)?.url ?? '',
@@ -59,11 +59,11 @@ export const getInitialAnnotationEntryData = (apData: annotationsAndPositions, n
 
 export const getNewAnnotationEntryData = (): annotationEntry => {
     return ({
-        photoChecked: undefined,
-        videoChecked: undefined,
-        modelChecked: undefined,
+        photoChecked: false,
+        videoChecked: false,
+        modelChecked: false,
+        textChecked: false,
         annotationType: '',
-        mediaType: undefined,
         imageVisible: undefined,
         annotationTitle: undefined,
         url: '',

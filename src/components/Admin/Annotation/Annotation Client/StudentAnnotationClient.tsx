@@ -10,7 +10,7 @@ import { AnnotationClientData } from "@/components/Admin/Annotation/Annotation C
 
 // Default imports
 import AnnotationEntryWrapper from "@/components/Admin/Annotation/Annotation Client/AnnotationEntryWrapper"
-import BotanistRefWrapper from "@/components/Admin/Annotation/Annotation Model Viwer/AnnotationModelViewerRef"
+import BotanistRefWrapper from "@/components/Admin/Annotation/Annotation Model Viewer/AnnotationModelViewerRef"
 import AnnotationButtons from "@/components/Admin/Annotation/Annotation Client/AnnotationButtons"
 
 export default function StudentAnnotationClient(props: {viewerLoaded: boolean}) {

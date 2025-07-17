@@ -15,7 +15,7 @@ import { useState, useEffect, useContext, createContext, useReducer } from "reac
 import { annotationClientData, annotationEntryContext } from "@/interface/interface"
 import { AnnotationClientData } from "@/components/Admin/Annotation/Annotation Client/AnnotationClient"
 import { getInitialAnnotationEntryData } from "@/interface/initializers"
-import { model, photo_annotation } from '@prisma/client'
+import { photo_annotation } from '@prisma/client'
 import { createNewAnnotationEntry, deleteAnnotationEntry, updateAnnotationEntry } from '@/functions/server/admin/annotator'
 
 // Default imports
@@ -29,6 +29,7 @@ import PhotoAnnotationEntry from "./PhotoAnnotation"
 import VideoAnnotationEntry from "./VideoAnnotation"
 import ModelAnnotationEntry from "./ModelAnnotationEntry"
 import AnnotationEntryButtons from "./Buttons"
+import TextAnnotation from '@/components/Admin/Annotation/AnnotationEntry/TextAnnotation'
 
 // Data context initialization
 export const AnnotationEntryData = createContext<annotationEntryContext | ''>('')
@@ -55,6 +56,9 @@ export default function AnnotationEntry(props: { index: number, new: boolean }) 
     // Save/Create button enabled states
     const [createDisabled, setCreateDisabled] = useState<boolean>(true)
     const [saveDisabled, setSaveDisabled] = useState<boolean>(true)
+
+    // Annotation type radio button must be checked for 'create' button to be rendered
+    const isAnnotationRadioChecked = annotationEntryData.modelChecked || annotationEntryData.photoChecked || annotationEntryData.videoChecked || annotationEntryData.textChecked
 
     // New position boolean value; first annotation create/save enabler
     const isNewPosition = apData.position3D !== undefined ? true : false
@@ -100,11 +104,12 @@ export default function AnnotationEntry(props: { index: number, new: boolean }) 
         <div className="w-[98%] min-w-[925px] max-w-[2000px] h-fit flex flex-col border border-[#004C46] dark:border-white mt-4 ml-[1%] rounded-xl">
             <RepositionAndRadio new={props.new} index={props.index} />
             <section className="w-full h-fit">
+                <TextAnnotation />
                 <PhotoAnnotationEntry />
                 <VideoAnnotationEntry />
                 <ModelAnnotationEntry />
             </section>
-            <AnnotationEntryButtons new={props.new} index={props.index} createAnnotation={createAnnotation} updateAnnotation={updateAnnotation} deleteAnnotation={deleteAnnotation} createDisabled={createDisabled} saveDisabled={saveDisabled} />
+            {isAnnotationRadioChecked && <AnnotationEntryButtons new={props.new} index={props.index} createAnnotation={createAnnotation} updateAnnotation={updateAnnotation} deleteAnnotation={deleteAnnotation} createDisabled={createDisabled} saveDisabled={saveDisabled} />}
         </div>
     </AnnotationEntryData.Provider>
 }
