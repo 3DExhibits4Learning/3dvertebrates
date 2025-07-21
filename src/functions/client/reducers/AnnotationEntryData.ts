@@ -7,7 +7,7 @@
 
 // Typical imports
 import { annotationEntry, annotationsAndPositions } from "@/interface/interface"
-import { photo_annotation, video_annotation, model_annotation } from "@prisma/client"
+import { photo_annotation, video_annotation, model_annotation, text_annotation } from "@prisma/client"
 import { annotationEntryAction, setImageSource, setImageVisibility, loadAnnotation, setStringValue, setFile } from "@/interface/actions"
 
 // Main JSX
@@ -82,7 +82,8 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
                 annotationTitle: apData.activeAnnotationTitle,
                 photoChecked: true,
                 videoChecked: false,
-                modelChecked: false
+                modelChecked: false,
+                textChecked: false
             }
 
         case 'loadVideoAnnotation':
@@ -102,6 +103,7 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
                 videoChecked: true,
                 photoChecked: false,
                 modelChecked: false,
+                textChecked: false,
                 url: ''
             }
 
@@ -121,7 +123,26 @@ export default function annotationEntryReducer(data: annotationEntry, action: an
                 videoChecked: false,
                 photoChecked: false,
                 modelChecked: true,
+                textChecked: false,
                 url: ''
+            }
+
+        case 'loadTextAnnotation':
+
+            const loadTextAnnotationAction = action as loadAnnotation
+            if (!loadTextAnnotationAction.apData) throw Error('Missing annotations and positions')
+            apData = loadTextAnnotationAction.apData
+            const textAnnotation = apData.activeAnnotation as text_annotation
+
+            return {
+                ...data,
+                annotationType: apData.activeAnnotationType as string,
+                videoChecked: false,
+                photoChecked: false,
+                modelChecked: false,
+                textChecked: true,
+                annotationTitle: apData.activeAnnotationTitle,
+                annotation: textAnnotation.annotation,
             }
 
         case 'textRadioButton':

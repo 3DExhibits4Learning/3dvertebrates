@@ -38,7 +38,7 @@ export default function AdminAnnotationClient(props: {viewerLoaded: boolean}) {
     const annotationsAndPositionsDispatch = context.annotationsAndPositionsDispatch
     const specimenDataDispatch = context.specimenDataDispatch
 
-    // State 
+    // State setters
     const setViewerLoaded = setters.setViewerLoaded
     const setModalOpen = setters.setSureModalOpen
     const setIsOpen = setters.setReorderModalOpen

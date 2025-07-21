@@ -9,7 +9,7 @@
 
 // Typical imports
 import { useEffect, useState, useRef, Ref, createContext } from 'react'
-import { model, model_annotation, video_annotation } from '@prisma/client'
+import { model, model_annotation, text_annotation, video_annotation } from '@prisma/client'
 import { fullAnnotation, GbifImageResponse, GbifResponse } from '@/interface/interface'
 import { useSearchParams } from 'next/navigation'
 import { annotationSwitchListener, annotationSwitchMobileListener, handleSrcForPhotoAnnotation, initializeAnnotations, initializeExhibit, resizeEventHandler } from '@/functions/client/collections'
@@ -21,6 +21,7 @@ import FirstAnnotation from './3dExhibit/FirstAnnotation'
 import PhotoAnnotation from './3dExhibit/PhotoAnnotation'
 import VideoAnnotation from './3dExhibit/VideoAnnotation'
 import ModelAnnotation from './3dExhibit/ModelAnnotation'
+import TextAnnotation from '@/components/Collections/3dExhibit/TextAnnotation'
 
 export interface collectionsContext {
   state: CollectionState,
@@ -161,6 +162,7 @@ export default function SFAPI(props: CollectionsProps) {
           {!!collectionState.index && collectionState.annotations[collectionState.index - 1].annotation_type === 'photo' && <PhotoAnnotation />}
           {!!collectionState.index && collectionState.annotations[collectionState.index - 1].annotation_type === 'video' && <VideoAnnotation videoAnnotation={collectionState.annotations[collectionState.index - 1].annotation as video_annotation} />}
           {!!collectionState.index && collectionState.annotations[collectionState.index - 1].annotation_type === 'model' && <ModelAnnotation modelAnnotation={collectionState.annotations[collectionState.index - 1].annotation as model_annotation} />}
+          {!!collectionState.index && collectionState.annotations[collectionState.index - 1].annotation_type === 'text' && <TextAnnotation textAnnotation={collectionState.annotations[collectionState.index - 1].annotation as text_annotation} />}
         </div>
       }
 

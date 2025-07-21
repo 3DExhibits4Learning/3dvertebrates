@@ -320,6 +320,7 @@ export const populateFormFields = (apData: annotationsAndPositions, dispatch: Di
 
         else if (apData.activeAnnotationType === 'video') dispatch({ type: 'loadVideoAnnotation', apData: apData })
         else if (apData.activeAnnotationType === 'model') dispatch({ type: 'loadModelAnnotation', apData: apData })
+        else if (apData.activeAnnotationType === 'text') dispatch({ type: 'loadTextAnnotation', apData: apData })
     }
 }
 
@@ -367,7 +368,7 @@ export const enableSaveOrUpdateButton = (
         }
     }
 
-    else if(aeData.annotationType === 'text') {
+    else if (aeData.annotationType === 'text') {
         switch (isNew) {
             case false: enableTextAnnotationUpdate(apData, aeData, isNewPosition, setSaveDisabled); break
             default: enableTextAnnotationCreate(aeData, apData.position3D as string, setCreateDisabled)
@@ -530,14 +531,14 @@ export const getAnnotationEntryUpdateDataObj = (aeData: annotationEntry, index: 
         updateObject.url = `/data/Vertebrates/Annotations/${uid}/${annotationId}/${photo.name}`
 
         // If the annotation being updated was already a photo annotation, delete the previous photograph by adding oldUrl to the update object
-        if (apData.activeAnnotationType === 'photo') updateObject.oldUrl = (apData.activeAnnotation as photo_annotation).url
+        if (apData.activeAnnotationType === 'photo') updateObject.oldUrl = (apData.activeAnnotation as photo_annotation)?.url
     }
 
     // Else if the databased annotation is a photo, the url should be the same
     else if (aeData.photoChecked && apData.activeAnnotation) updateObject.url = (apData.activeAnnotation as photo_annotation)?.url
 
     // If there was a media transition and the original annotation was a photo annotation, delete the original photograph by adding oldUrl to the update object
-    if (updateObject.mediaTransition && apData.activeAnnotationType === 'photo') updateObject.oldUrl = (apData.activeAnnotation as photo_annotation).url
+    if (updateObject.mediaTransition && apData.activeAnnotationType === 'photo') updateObject.oldUrl = (apData.activeAnnotation as photo_annotation)?.url
 
     return updateObject
 }

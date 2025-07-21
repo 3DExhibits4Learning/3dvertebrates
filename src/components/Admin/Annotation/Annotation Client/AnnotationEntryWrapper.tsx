@@ -42,12 +42,12 @@ export default function AnnotationEntryWrapper(props: { modelsToAnnotate: model[
             {
                 // Databased annotation
                 typeof (annotationsAndPositions.activeAnnotationIndex) === 'number' && specimenData.uid && props.viewerLoaded &&
-                <AnnotationEntry index={getIndex(annotationsAndPositions) as number} new={false} key={Math.random()} />
+                <AnnotationEntry index={getIndex(annotationsAndPositions) as number} new={false} />
             }
             {
                 // New annotation
                 typeof (annotationsAndPositions.activeAnnotationIndex) === 'string' && specimenData.uid && props.viewerLoaded &&
-                <AnnotationEntry index={getIndex(annotationsAndPositions) as number} new key={Math.random()} />
+                <AnnotationEntry index={getIndex(annotationsAndPositions) as number} new />
             }
         </section>
     </div>

@@ -13,7 +13,7 @@ import { nonFatalError, serverActionErrorHandler } from "../error"
 import { annotationDataEntryObj, annotationDataEntryUpdateObj, AnnotationNumbers, newAnnotationData } from "@/ts/ts"
 import { v4 as uuidv4 } from 'uuid'
 import { fullAnnotation } from "@/interface/interface"
-import { model, model_annotation, photo_annotation, video_annotation } from "@prisma/client"
+import { model, model_annotation, photo_annotation, PrismaPromise, text_annotation, video_annotation } from "@prisma/client"
 import { unlink } from "fs/promises"
 import { checkEssentialValues, convertCloudPathToLocalPath, convertDbPathToLocalPath, getPathToUnlink, isLocalDevEnv } from "@/functions/server/utils/utils"
 import { autoWriteFile } from "@/functions/server/utils/file"
@@ -49,6 +49,7 @@ export const getMediaAnnotation = async (annotationId: string, annotationType: s
     switch (annotationType) {
         case 'model': return await prisma.model_annotation.findUnique({ where: { annotation_id: annotationId } })
         case 'video': return await prisma.video_annotation.findUnique({ where: { annotation_id: annotationId } })
+        case 'text': return await prisma.text_annotation.findUnique({ where: { annotation_id: annotationId } })
         default: return await prisma.photo_annotation.findUnique({ where: { annotation_id: annotationId } })
     }
 }
@@ -477,7 +478,7 @@ export const updatePhotoAnnotationEntry = async (annotationEntryData: annotation
  * @param entryUpdateObj 
  * @returns 
  */
-export const deletePhotoAnnotationAndPhoto = async (entryUpdateObj: annotationDataEntryUpdateObj) => {
+export const deletePhotoAnnotationAndPhoto = async (entryUpdateObj: annotationDataEntryUpdateObj): Promise<PrismaPromise<photo_annotation>> => {
     const oldUrl = getPathToUnlink(entryUpdateObj.oldUrl)
     await unlink(oldUrl).catch(e => nonFatalError('annotator.ts', e.message, 'unlink'))
     return prisma.photo_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
@@ -490,7 +491,7 @@ export const deletePhotoAnnotationAndPhoto = async (entryUpdateObj: annotationDa
 export const transitionToTextAnnotation = async (entryUpdateObj: annotationDataEntryUpdateObj) => {
     try {
         // Variable for transaction deletion query
-        let deletion
+        let deletion: any
 
         // Delete previous annotation based on previous media type
         if (entryUpdateObj.previousMedia === 'photo') deletion = deletePhotoAnnotationAndPhoto(entryUpdateObj)
@@ -516,9 +517,10 @@ export const transitionToTextAnnotation = async (entryUpdateObj: annotationDataE
             }
         })
         // Await transaction
-        await prisma.$transaction([deletion as any, updatedBaseAnnotation, newTextAnnotation])
+        console.log(deletion, updatedBaseAnnotation, newTextAnnotation)
+        await prisma.$transaction([deletion, updatedBaseAnnotation, newTextAnnotation])
     }
-    catch (e: any) { serverActionErrorHandler(path, e.message, 'updateToVideoAnnotationWithMediaTransition()', "Error: Couldn't update annotation") }
+    catch (e: any) { serverActionErrorHandler(path, e.message, 'transitionToTextAnnotation()', "Error: Couldn't update annotation") }
 }
 
 /**
@@ -558,7 +560,7 @@ export const transitionToVideoAnnotation = async (entryUpdateObj: annotationData
         // Await transaction
         await prisma.$transaction([deletion as any, updatedBaseAnnotation, newVideoAnnotation])
     }
-    catch (e: any) { serverActionErrorHandler(path, e.message, 'updateToVideoAnnotationWithMediaTransition()', "Error: Couldn't update annotation") }
+    catch (e: any) { serverActionErrorHandler(path, e.message, 'transitionToVideoAnnotation()', "Error: Couldn't update annotation") }
 }
 
 /**
@@ -567,43 +569,45 @@ export const transitionToVideoAnnotation = async (entryUpdateObj: annotationData
  * @param email 
  */
 export const transitionToModelAnnotation = async (entryUpdateObj: annotationDataEntryUpdateObj, email: string) => {
-    // Get modeler and annotator
-    const annotator = prisma.authorized.findUnique({ where: { email: email } }).then(user => user?.email)
-    const modeler = prisma.model.findUnique({ where: { uid: entryUpdateObj.modelAnnotationUid } }).then(model => model?.modeled_by)
-    const res = await Promise.all([annotator, modeler])
+    try {
+        // Get modeler and annotator
+        const annotator = prisma.authorized.findUnique({ where: { email: email } }).then(user => user?.email)
+        const modeler = prisma.model.findUnique({ where: { uid: entryUpdateObj.modelAnnotationUid } }).then(model => model?.modeled_by)
+        const res = await Promise.all([annotator, modeler])
 
-    // Variable to story deletion query
-    let deletion
+        // Variable to story deletion query
+        let deletion
 
-    // Delete the photo annotation (if the previous media was a photo)
-    if (entryUpdateObj.previousMedia === 'photo') deletion = deletePhotoAnnotationAndPhoto(entryUpdateObj)
-    else if (entryUpdateObj.previousMedia === 'video') deletion = prisma.video_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
-    else deletion = prisma.text_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
+        // Delete the photo annotation (if the previous media was a photo)
+        if (entryUpdateObj.previousMedia === 'photo') deletion = deletePhotoAnnotationAndPhoto(entryUpdateObj)
+        else if (entryUpdateObj.previousMedia === 'video') deletion = prisma.video_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
+        else deletion = prisma.text_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
 
-    // Base annotation update
-    const updatedBaseAnnotation = prisma.annotations.update({
-        where: { annotation_id: entryUpdateObj.annotationId },
-        data: {
-            uid: entryUpdateObj.uid,
-            position: entryUpdateObj.position,
-            annotation_type: entryUpdateObj.annotationType,
-            title: entryUpdateObj.title
-        },
-    })
+        // Base annotation update
+        const updatedBaseAnnotation = prisma.annotations.update({
+            where: { annotation_id: entryUpdateObj.annotationId },
+            data: {
+                uid: entryUpdateObj.uid,
+                position: entryUpdateObj.position,
+                annotation_type: entryUpdateObj.annotationType,
+                title: entryUpdateObj.title
+            },
+        })
 
-    // Create new model annotation
-    const newModelAnnotation = prisma.model_annotation.create({
-        data: {
-            uid: entryUpdateObj.modelAnnotationUid as string,
-            annotation: entryUpdateObj.annotation,
-            annotation_id: entryUpdateObj.annotationId,
-            annotator: res[0],
-            modeler: res[1]
-        }
-    })
-
-    // Await transaction
-    await prisma.$transaction([deletion as any, updatedBaseAnnotation, newModelAnnotation])
+        // Create new model annotation
+        const newModelAnnotation = prisma.model_annotation.create({
+            data: {
+                uid: entryUpdateObj.modelAnnotationUid as string,
+                annotation: entryUpdateObj.annotation,
+                annotation_id: entryUpdateObj.annotationId,
+                annotator: res[0],
+                modeler: res[1]
+            }
+        })
+        // Await transaction
+        await prisma.$transaction([deletion as any, updatedBaseAnnotation, newModelAnnotation])
+    }
+    catch (e: any) { serverActionErrorHandler(path, e.message, 'transitionToModelAnnotation()', "Error: Couldn't update annotation") }
 }
 
 /**
@@ -760,7 +764,7 @@ export const updateAnnotationEntry = async (updateObject: annotationDataEntryUpd
         switch (updateObject.annotationType) {
             case 'text':
                 // Run update with transition if there is a media transition, then return success 
-                if(updateObject.mediaTransition) {
+                if (updateObject.mediaTransition) {
                     await transitionToTextAnnotation(updateObject)
                     break
                 }
