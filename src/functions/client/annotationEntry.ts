@@ -160,7 +160,7 @@ export const enableTextAnnotationUpdate = (apData: annotationsAndPositions, aeDa
     const currentValues = [aeData.annotationTitle, aeData.annotation]
 
     // If all required fields are populated and: they are different from the original, or there is a new position, then enable "save changes"
-    if (currentValues.every(value => value) && (!allSame(originalValues, currentValues) || isNewPosition)) setSaveDisabled(false)
+    if (currentValues.every(value => value) && (!allSame(originalValues, currentValues) || isNewPosition || aeData.annotationType !== apData.activeAnnotationType)) setSaveDisabled(false)
     else setSaveDisabled(true)
 }
 
@@ -269,7 +269,7 @@ export const enableModelAnnotationUpdate = (aeData: annotationEntry, apData: ann
     const currentValues = [aeData.annotationTitle, aeData.modelAnnotationUid, aeData.annotation]
 
     // If all required fields are populated and: they are different from the original, or there is a new position, then enable "save changes"
-    if (currentValues.every(allTruthy) && (!allSame(originalValues, currentValues) || isNewPosition)) setSaveDisabled(false)
+    if (currentValues.every(value => value) && aeData.modelAnnotationUid !== 'select' && (!allSame(originalValues, currentValues) || isNewPosition)) setSaveDisabled(false)
     else setSaveDisabled(true)
 }
 
@@ -285,7 +285,7 @@ export const enableModelAnnotationCreate = (aeData: annotationEntry, position: s
     const valueArray = [aeData.annotationTitle, aeData.modelAnnotationUid !== 'select', aeData.annotation, position]
 
     // Enable button if all required fields are populated
-    if (valueArray.every(allTruthy)) setCreateDisabled(false)
+    if (valueArray.every(value => value)) setCreateDisabled(false)
     else setCreateDisabled(true)
 }
 
@@ -308,19 +308,23 @@ export const setImageVisibility = (index: number, aeData: annotationEntry, isNew
  * @param dispatch 
  */
 export const populateFormFields = (apData: annotationsAndPositions, dispatch: Dispatch<annotationEntryAction>) => {
+    // Clear the form data
+    dispatch({ type: 'clearAnnotationEntryData' })
 
+    // If the active annotation is new, set the annotation entry data to the initial values
     if (apData.activeAnnotationIndex === 'new') dispatch({ type: 'newAnnotation', apData: apData })
 
+    // If the active annotation is not new, load the relevant data into the form
     else if (apData.activeAnnotationType && apData.activeAnnotation) {
-
-        if (apData.activeAnnotationType === 'photo') {
-            dispatch({ type: 'loadPhotoAnnotation', apData: apData });
-            dispatch({ type: 'setImageSource', path: getImagePath(apData.activeAnnotation as photo_annotation) })
+        switch (apData.activeAnnotationType) {
+            case 'photo':
+                dispatch({ type: 'loadPhotoAnnotation', apData: apData });
+                dispatch({ type: 'setImageSource', path: getImagePath(apData.activeAnnotation as photo_annotation) })
+                break
+            case 'video': dispatch({ type: 'loadVideoAnnotation', apData: apData }); break
+            case 'model': dispatch({ type: 'loadModelAnnotation', apData: apData }); break
+            case 'text': dispatch({ type: 'loadTextAnnotation', apData: apData }); break
         }
-
-        else if (apData.activeAnnotationType === 'video') dispatch({ type: 'loadVideoAnnotation', apData: apData })
-        else if (apData.activeAnnotationType === 'model') dispatch({ type: 'loadModelAnnotation', apData: apData })
-        else if (apData.activeAnnotationType === 'text') dispatch({ type: 'loadTextAnnotation', apData: apData })
     }
 }
 

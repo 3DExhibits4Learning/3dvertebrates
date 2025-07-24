@@ -22,6 +22,7 @@ export default function AnnotationEntryWrapper(props: { modelsToAnnotate: model[
     const context = useContext(AnnotationClientData) as annotationClientData
     const specimenData = context.specimenData
     const annotationsAndPositions = context.annotationsAndPositions
+    const isNew = typeof (annotationsAndPositions.activeAnnotationIndex) === 'number' ? false : true
 
     return <div className="flex flex-col w-4/5">
         <section className="flex w-full h-full flex-col">
@@ -40,14 +41,8 @@ export default function AnnotationEntryWrapper(props: { modelsToAnnotate: model[
                 </div>
             }
             {
-                // Databased annotation
-                typeof (annotationsAndPositions.activeAnnotationIndex) === 'number' && specimenData.uid && props.viewerLoaded &&
-                <AnnotationEntry index={getIndex(annotationsAndPositions) as number} new={false} />
-            }
-            {
-                // New annotation
-                typeof (annotationsAndPositions.activeAnnotationIndex) === 'string' && specimenData.uid && props.viewerLoaded &&
-                <AnnotationEntry index={getIndex(annotationsAndPositions) as number} new />
+                // Annotation entry
+                annotationsAndPositions.activeAnnotationIndex && specimenData.uid && props.viewerLoaded && <AnnotationEntry index={getIndex(annotationsAndPositions) as number} new={isNew} />
             }
         </section>
     </div>

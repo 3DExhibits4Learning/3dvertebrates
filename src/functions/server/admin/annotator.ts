@@ -478,10 +478,9 @@ export const updatePhotoAnnotationEntry = async (annotationEntryData: annotation
  * @param entryUpdateObj 
  * @returns 
  */
-export const deletePhotoAnnotationAndPhoto = async (entryUpdateObj: annotationDataEntryUpdateObj): Promise<PrismaPromise<photo_annotation>> => {
-    const oldUrl = getPathToUnlink(entryUpdateObj.oldUrl)
-    await unlink(oldUrl).catch(e => nonFatalError('annotator.ts', e.message, 'unlink'))
-    return prisma.photo_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
+export const deletePreviousAnnotationPhoto = async (path: string) => {
+    const pathToUnlink = getPathToUnlink(path)
+    await unlink(pathToUnlink).catch(e => nonFatalError('annotator.ts', e.message, 'unlink'))
 }
 
 /**
@@ -490,13 +489,12 @@ export const deletePhotoAnnotationAndPhoto = async (entryUpdateObj: annotationDa
  */
 export const transitionToTextAnnotation = async (entryUpdateObj: annotationDataEntryUpdateObj) => {
     try {
-        // Variable for transaction deletion query
-        let deletion: any
-
         // Delete previous annotation based on previous media type
-        if (entryUpdateObj.previousMedia === 'photo') deletion = deletePhotoAnnotationAndPhoto(entryUpdateObj)
-        else if (entryUpdateObj.previousMedia === 'model') deletion = prisma.model_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
-        else deletion = prisma.video_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
+        if (!entryUpdateObj.previousMedia || !['photo', 'model', 'video'].includes(entryUpdateObj.previousMedia)) throw Error(`Invalid previous media type`)
+
+        const deletion = entryUpdateObj.previousMedia === 'photo' ? prisma.photo_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } }) :
+            entryUpdateObj.previousMedia === 'model' ? prisma.model_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } }) :
+                prisma.video_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
 
         // Base annotation update
         const updatedBaseAnnotation = prisma.annotations.update({
@@ -517,8 +515,8 @@ export const transitionToTextAnnotation = async (entryUpdateObj: annotationDataE
             }
         })
         // Await transaction
-        console.log(deletion, updatedBaseAnnotation, newTextAnnotation)
         await prisma.$transaction([deletion, updatedBaseAnnotation, newTextAnnotation])
+        if (entryUpdateObj.oldUrl) await deletePreviousAnnotationPhoto(entryUpdateObj.oldUrl)
     }
     catch (e: any) { serverActionErrorHandler(path, e.message, 'transitionToTextAnnotation()', "Error: Couldn't update annotation") }
 }
@@ -529,13 +527,12 @@ export const transitionToTextAnnotation = async (entryUpdateObj: annotationDataE
  */
 export const transitionToVideoAnnotation = async (entryUpdateObj: annotationDataEntryUpdateObj) => {
     try {
-        // Variable for transaction deletion query
-        let deletion
-
         // Delete previous annotation based on previous media type
-        if (entryUpdateObj.previousMedia === 'photo') deletion = deletePhotoAnnotationAndPhoto(entryUpdateObj)
-        else if (entryUpdateObj.previousMedia === 'model') deletion = prisma.model_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
-        else deletion = prisma.text_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
+        if (!entryUpdateObj.previousMedia || !['photo', 'model', 'text'].includes(entryUpdateObj.previousMedia)) throw Error(`Invalid previous media type`)
+
+        const deletion = entryUpdateObj.previousMedia === 'photo' ? prisma.photo_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } }) :
+            entryUpdateObj.previousMedia === 'model' ? prisma.model_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } }) :
+                prisma.text_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
 
         // Base annotation update
         const updatedBaseAnnotation = prisma.annotations.update({
@@ -575,13 +572,12 @@ export const transitionToModelAnnotation = async (entryUpdateObj: annotationData
         const modeler = prisma.model.findUnique({ where: { uid: entryUpdateObj.modelAnnotationUid } }).then(model => model?.modeled_by)
         const res = await Promise.all([annotator, modeler])
 
-        // Variable to story deletion query
-        let deletion
+        // Delete previous annotation based on previous media type
+        if (!entryUpdateObj.previousMedia || !['photo', 'video', 'text'].includes(entryUpdateObj.previousMedia)) throw Error(`Invalid previous media type`)
 
-        // Delete the photo annotation (if the previous media was a photo)
-        if (entryUpdateObj.previousMedia === 'photo') deletion = deletePhotoAnnotationAndPhoto(entryUpdateObj)
-        else if (entryUpdateObj.previousMedia === 'video') deletion = prisma.video_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
-        else deletion = prisma.text_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
+        const deletion = entryUpdateObj.previousMedia === 'photo' ? prisma.photo_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } }) :
+            entryUpdateObj.previousMedia === 'video' ? prisma.video_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } }) :
+                prisma.text_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
 
         // Base annotation update
         const updatedBaseAnnotation = prisma.annotations.update({
@@ -616,43 +612,46 @@ export const transitionToModelAnnotation = async (entryUpdateObj: annotationData
  * @param email 
  */
 export const transitionToPhotoAnnotation = async (entryUpdateObj: annotationDataEntryUpdateObj, email: string) => {
-    // Delete previous annotation based on annotation type
-    const deletion = entryUpdateObj.previousMedia === 'video' ?
-        prisma.video_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } }) :
-        entryUpdateObj.previousMedia === 'model' ?
-            prisma.model_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } }) :
-            prisma.text_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
+    try {
+        // Delete previous annotation based on previous media type
+        if (!entryUpdateObj.previousMedia || !['model', 'video', 'text'].includes(entryUpdateObj.previousMedia)) throw Error(`Invalid previous media type`)
 
-    // Update base annotation
-    const updatedAnnotation = prisma.annotations.update({
-        where: { annotation_id: entryUpdateObj.annotationId },
-        data: {
-            uid: entryUpdateObj.uid,
-            position: entryUpdateObj.position,
-            url: entryUpdateObj.url,
-            annotation_type: entryUpdateObj.annotationType,
-            title: entryUpdateObj.title
-        },
-    })
+        const deletion = entryUpdateObj.previousMedia === 'video' ? prisma.video_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } }) :
+            entryUpdateObj.previousMedia === 'model' ? prisma.model_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } }) :
+                prisma.text_annotation.delete({ where: { annotation_id: entryUpdateObj.annotationId } })
 
-    // Get annotator
-    const annotator = await prisma.authorized.findUnique({ where: { email: email } }).then(user => user?.email)
+        // Update base annotation
+        const updatedAnnotation = prisma.annotations.update({
+            where: { annotation_id: entryUpdateObj.annotationId },
+            data: {
+                uid: entryUpdateObj.uid,
+                position: entryUpdateObj.position,
+                url: entryUpdateObj.url,
+                annotation_type: entryUpdateObj.annotationType,
+                title: entryUpdateObj.title
+            },
+        })
 
-    // Create new photo annotation
-    const newPhotoAnnotation = prisma.photo_annotation.create({
-        data: {
-            url: entryUpdateObj.url as string,
-            author: entryUpdateObj.author ?? '',
-            license: entryUpdateObj.license ?? '',
-            annotator: annotator as string ?? '',
-            annotation_id: entryUpdateObj.annotationId,
-            annotation: entryUpdateObj.annotation,
-            website: entryUpdateObj.website ? entryUpdateObj.website as string : '',
-            title: entryUpdateObj.photoTitle ? entryUpdateObj.photoTitle as string : '',
-        }
-    })
+        // Get annotator
+        const annotator = await prisma.authorized.findUnique({ where: { email: email } }).then(user => user?.email)
 
-    await prisma.$transaction([deletion as any, updatedAnnotation, newPhotoAnnotation])
+        // Create new photo annotation
+        const newPhotoAnnotation = prisma.photo_annotation.create({
+            data: {
+                url: entryUpdateObj.url as string,
+                author: entryUpdateObj.author ?? '',
+                license: entryUpdateObj.license ?? '',
+                annotator: annotator as string ?? '',
+                annotation_id: entryUpdateObj.annotationId,
+                annotation: entryUpdateObj.annotation,
+                website: entryUpdateObj.website ? entryUpdateObj.website as string : '',
+                title: entryUpdateObj.photoTitle ? entryUpdateObj.photoTitle as string : '',
+            }
+        })
+        // Await transaction
+        await prisma.$transaction([deletion as any, updatedAnnotation, newPhotoAnnotation])
+    }
+    catch (e: any) { serverActionErrorHandler(path, e.message, 'transitionToPhotoAnnotation()', "Error: Couldn't update annotation") }
 }
 
 /**

@@ -56,7 +56,7 @@ export interface annotationsAndPositions {
   position3D: string | undefined
   activeAnnotationIndex: number | 'new' | undefined
   activeAnnotation: photo_annotation | video_annotation | model_annotation | undefined
-  activeAnnotationType: 'photo' | 'video' | 'model' | undefined
+  activeAnnotationType: 'photo' | 'video' | 'model' | 'text' | undefined
   activeAnnotationTitle: string | undefined
   activeAnnotationPosition: string | undefined
   firstAnnotationPosition: string | undefined
