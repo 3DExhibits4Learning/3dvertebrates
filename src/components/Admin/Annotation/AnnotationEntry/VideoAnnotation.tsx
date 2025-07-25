@@ -23,15 +23,15 @@ export default function VideoAnnotationEntry() {
 
     return <>
         {
-            annotationEntryData.annotationType == 'video' &&
-            <section className="flex my-12 px-12 justify-between">
-                <div className="flex mt-12 flex-col w-1/2 max-w-[750px]">
+            annotationEntryData.annotationType === 'video' &&
+            <section className="flex px-8 justify-between mb-8">
+                <div className="flex flex-col w-1/2 max-w-[750px] pr-6">
                     <TextInput value={annotationEntryData.annotationTitle as string} field='annotationTitle' title='Annotation Title' required />
                     <TextInput value={annotationEntryData.videoSource as string} field='videoSource' title='URL' required />
                     <TextInput value={annotationEntryData.length as string} field='length' title='Length' required />
                     <Annotation annotation={apData.annotationsAndPositions.activeAnnotation?.annotation as string ?? ''} field='annotation' notRequired/>
                 </div>
-                <div className="flex h-[60vh] w-1/2 justify-center pl-12">
+                <div className="flex w-1/2 justify-center pl-6 pt-2">
                     {
                         annotationEntryData.videoSource?.includes('https://www.youtube.com/embed/') &&
                         <div className="flex h-full w-full">

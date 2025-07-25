@@ -280,7 +280,6 @@ export const enableModelAnnotationUpdate = (aeData: annotationEntry, apData: ann
  * @param setCreateDisabled 
  */
 export const enableModelAnnotationCreate = (aeData: annotationEntry, position: string, setCreateDisabled: Dispatch<SetStateAction<boolean>>) => {
-
     // Required fields
     const valueArray = [aeData.annotationTitle, aeData.modelAnnotationUid !== 'select', aeData.annotation, position]
 
@@ -288,7 +287,6 @@ export const enableModelAnnotationCreate = (aeData: annotationEntry, position: s
     if (valueArray.every(value => value)) setCreateDisabled(false)
     else setCreateDisabled(true)
 }
-
 
 /**
  * 
@@ -545,4 +543,33 @@ export const getAnnotationEntryUpdateDataObj = (aeData: annotationEntry, index: 
     if (updateObject.mediaTransition && apData.activeAnnotationType === 'photo') updateObject.oldUrl = (apData.activeAnnotation as photo_annotation)?.url
 
     return updateObject
+}
+
+/**
+ * 
+ * @param url 
+ * @returns 
+ */
+export const convertToYouTubeEmbed = (url: string): string | null => {
+    try {
+        const parsed = new URL(url)
+
+        // Match standard YouTube URL (watch?v=...)
+        if ((parsed.hostname === 'www.youtube.com' || parsed.hostname === 'youtube.com') && parsed.pathname === '/watch') {
+            const videoId = parsed.searchParams.get('v')
+
+            if (videoId) return `https://www.youtube.com/embed/${videoId}`
+        }
+
+        // Match shortened URL (youtu.be/...)
+        if (parsed.hostname === 'youtu.be') {
+            const videoId = parsed.pathname.split('/')[1]
+            if (videoId) return `https://www.youtube.com/embed/${videoId}`
+        }
+
+        // Match already embed URL
+        if (parsed.hostname.includes('youtube.com') && parsed.pathname.startsWith('/embed/')) return url
+
+        return null
+    } catch (err) { return null }
 }

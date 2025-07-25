@@ -40,15 +40,19 @@ export default function ModelAnnotationEntry() {
     return <>
         {
             annotationEntryData.annotationType === 'model' && annotationModels &&
-            <section className="flex my-12 w-full">
-                <div className="flex ml-12 mt-12 flex-col w-3/5 max-w-[750px] mr-12">
-                    <TextInput value={annotationEntryData.annotationTitle as string} field={'annotationTitle'} title='Annotation Title' required />
-                    <ModelAnnotationSelect value={annotationEntryData.modelAnnotationUid} field={'modelAnnotationUid'} modelAnnotations={annotationModels} />
-                    <Annotation annotation={apData.annotationsAndPositions.activeAnnotation?.annotation as string ?? ''} field='annotation' />
+            <section className="flex px-8 w-full mb-8">
+                <div className="flex w-1/2 pr-4">
+                    <div className="flex flex-col w-full max-w-[750px]">
+                        <TextInput value={annotationEntryData.annotationTitle as string} field={'annotationTitle'} title='Annotation Title' required />
+                        <ModelAnnotationSelect value={annotationEntryData.modelAnnotationUid} field={'modelAnnotationUid'} modelAnnotations={annotationModels} />
+                        <Annotation annotation={apData.annotationsAndPositions.activeAnnotation?.annotation as string ?? ''} field='annotation' />
+                    </div>
                 </div>
                 {
                     annotationEntryData.modelAnnotationUid && annotationEntryData.modelAnnotationUid !== 'select' &&
-                    <div className="w-full mr-12"><ModelViewer uid={annotationEntryData.modelAnnotationUid} minHeight="100%" /></div>
+                    <div className="flex w-1/2 pl-4 pt-2">
+                        <div className="w-full"><ModelViewer uid={annotationEntryData.modelAnnotationUid} minHeight="100%" /></div>
+                    </div>
                 }
             </section>
         }

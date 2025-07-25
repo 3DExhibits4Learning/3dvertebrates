@@ -21,7 +21,7 @@ export default function AnnotationEntryButtons(props: AnnotationEntryButtons) {
     const context = useContext(AnnotationClientData) as annotationClientData
     const areSaveAndDeleteDisabled = context.admin && !context.adminAssigned
 
-    return <section className="flex justify-end mb-8">
+    return <section className="flex justify-end mb-4">
         {props.new && <Button onPress={() => props.createAnnotation()} className="text-white text-lg mr-8" isDisabled={props.createDisabled || areSaveAndDeleteDisabled}>Create Annotation</Button>}
         {
             !props.new && props.index !== 1 &&

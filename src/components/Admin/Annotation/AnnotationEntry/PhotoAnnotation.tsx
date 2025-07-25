@@ -32,17 +32,17 @@ export default function PhotoAnnotationEntry() {
         {
             annotationEntryData.annotationType == 'photo' &&
 
-            <section className="mt-4 w-full h-fit">
+            <section className="w-full h-fit px-8 mb-8">
 
                 <div className="flex h-fit w-full">
 
                     <div className="flex flex-col w-1/2 max-w-[700px]">
 
-                        <div className="ml-12"><TextInput value={annotationEntryData.annotationTitle as string} field={'annotationTitle'} title='Annotation Title' required /></div>
+                        <div><TextInput value={annotationEntryData.annotationTitle as string} field={'annotationTitle'} title='Annotation Title' required /></div>
 
-                        <div className="ml-12 mb-4"><FileInput /></div>
+                        <div className="mb-4"><FileInput /></div>
 
-                        <div className="ml-12">
+                        <div>
                             <TextInput value={annotationEntryData.author as string} field={'author'} title='Author' required />
                             <License license={annotationEntryData.license} field='license' />
                             <TextInput value={annotationEntryData.photoTitle as string} field={'photoTitle'} title='Photo Title' />
@@ -53,8 +53,8 @@ export default function PhotoAnnotationEntry() {
 
                     {
                         annotationEntryData.imageVisible &&
-                        <div className="flex w-full justify-center">
-                            <div className="flex w-full max-w-[600px] h-[540px] px-12 pb-4">
+                        <div className="flex w-full justify-center pt-2">
+                            <div className="flex max-w-[600px] h-[530px] px-12 pb-4">
                                 <img className='rounded-sm object-fill w-full h-full' src={photoPath} alt={'Annotation Image'}></img>
                             </div>
                         </div>
@@ -62,7 +62,7 @@ export default function PhotoAnnotationEntry() {
 
                 </div>
 
-                <div className="mx-12"><Annotation annotation={(apData.annotationsAndPositions.activeAnnotation as photo_annotation)?.annotation ?? ''} field='annotation' /></div>
+                <div><Annotation annotation={(apData.annotationsAndPositions.activeAnnotation as photo_annotation)?.annotation ?? ''} field='annotation' /></div>
 
             </section>
         }

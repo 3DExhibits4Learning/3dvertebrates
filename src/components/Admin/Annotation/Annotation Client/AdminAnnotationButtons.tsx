@@ -6,12 +6,14 @@
  * @todo remove 'mark as annotated button' after model has been marked as annotated
  */
 
+// Default imports
+import Link from "next/link"
+
 // Typical imports
 import { Button } from "@heroui/react"
 import { AnnotationClientData } from "./AnnotationClient"
 import { forwardRef, RefObject, SetStateAction, useContext, Dispatch } from "react"
 import { annotationClientData } from "@/interface/interface"
-import Link from "next/link"
 
 // Main JSX
 const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetStateAction<boolean>>, setReorderOpen: Dispatch<SetStateAction<boolean>> }, ref) => {
@@ -20,7 +22,6 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
     const context = useContext(AnnotationClientData) as annotationClientData
     const annotationsAndPositions = context.annotationsAndPositions
     const annotationsAndPositionsDispatch = context.annotationsAndPositionsDispatch
-    const specimenData = context.specimenData
 
     // Ref
     const newAnnotationEnabled = ref as RefObject<boolean>
@@ -57,14 +58,14 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
             {
                 // Renumber annotations button
                 !annotationsAndPositions.newAnnotationEnabled && annotationsAndPositions.activeAnnotationIndex !== 'new' && annotationsAndPositions.firstAnnotationPosition !== undefined &&
-                annotationsAndPositions.annotations && annotationsAndPositions.annotations?.length >= 2 &&
+                annotationsAndPositions.annotations && 
                 <div className="flex justify-start items-center border-r pt-2">
                     <br></br>
                     <Button
                         size='sm'
                         onPress={() => { props.setReorderOpen(true) }}
                         className="text-white text-md min-w-[171px] rounded-md"
-                        isDisabled={annotationsAndPositions.repositionEnabled || !context.adminAssigned}>
+                        isDisabled={annotationsAndPositions.repositionEnabled || !context.adminAssigned || annotationsAndPositions.annotations?.length <= 1} >
                         Reorder Annotations
                     </Button>
                 </div>

@@ -87,9 +87,9 @@ export default function AnnotationEntry(props: { index: number, new: boolean }) 
     annotationEntryData.license, annotationEntryData.annotation, annotationEntryData.file, annotationEntryData.length, annotationEntryData.photoTitle, annotationEntryData.website,
     annotationEntryData.modelAnnotationUid, annotationEntryData.videoSource, annotationEntryData.annotationType]
 
-    // Effects: set whether annotation photo is visible, populate form fields upon annotation selection, enable save/update button, respectively
-    useEffect(() => aeFn.setImageVisibility(props.index, annotationEntryData, props.new, annotationEntryDataDispatch), imageVisibilityDependencies)
+    // Effects: populate form fields upon annotation selection, set whether annotation photo is visible, enable save/update button, and data clearance respectively
     useEffect(() => aeFn.populateFormFields(apData, annotationEntryDataDispatch), [apData.activeAnnotation, apData.activeAnnotationIndex]) // eslint-disable-line react-hooks/exhaustive-deps
+    useEffect(() => aeFn.setImageVisibility(props.index, annotationEntryData, props.new, annotationEntryDataDispatch), imageVisibilityDependencies)
     useEffect(() => aeFn.enableSaveOrUpdateButton(apData, annotationEntryData, enableFirstAnnotation, props.index, props.new, setCreateDisabled, setSaveDisabled, isNewPosition), enableDependencies) // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => annotationEntryDataDispatch({ type: 'clearAnnotationEntryData' }), [apData.annotationSavedOrDeleted]) // eslint-disable-line react-hooks/exhaustive-deps
 

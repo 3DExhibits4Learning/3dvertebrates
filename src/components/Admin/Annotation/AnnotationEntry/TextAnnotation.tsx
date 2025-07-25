@@ -27,9 +27,9 @@ export default function TextAnnotation() {
     return <>
         {
             annotationEntryData.annotationType === 'text' &&
-            <section className="mt-4 w-full h-fit">
-                <div className="ml-12"><TextInput value={annotationEntryData.annotationTitle as string} field={'annotationTitle'} title='Annotation Title' required /></div>
-                <div className="mx-12"><Annotation annotation={(apData.annotationsAndPositions.activeAnnotation as photo_annotation)?.annotation ?? ''} field='annotation' /></div>
+            <section className="w-full h-fit px-8 mb-8">
+                <div><TextInput value={annotationEntryData.annotationTitle as string} field={'annotationTitle'} title='Annotation Title' required /></div>
+                <div><Annotation annotation={(apData.annotationsAndPositions.activeAnnotation as photo_annotation)?.annotation ?? ''} field='annotation' /></div>
             </section>
         }
     </>

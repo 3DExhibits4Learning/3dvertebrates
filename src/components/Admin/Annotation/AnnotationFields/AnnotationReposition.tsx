@@ -11,6 +11,6 @@ export default function AnnotationReposition() {
 
     return <div className="flex items-center">
         <input type='checkbox' checked={apData.repositionEnabled} onChange={() => dispatch({ type: 'switchRepositionAndUndefinePosition' })}></input>
-        <p className="ml-2">Annotation Reposition</p>
+        <p className="ml-2">Reposition Annotation</p>
     </div>
 }

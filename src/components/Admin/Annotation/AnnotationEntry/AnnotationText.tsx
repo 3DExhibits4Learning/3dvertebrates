@@ -19,7 +19,7 @@ export const AnnotationText = forwardRef((props: { setAnnotation?: Dispatch<SetS
         id='divTextArea'
         contentEditable
         suppressContentEditableWarning
-        className="w-full min-w-[300px] min-h-[400px] rounded-xl mb-4 bg-white dark:bg-[#27272a] dark:hover:bg-[#3E3E47] p-4 text-[14px] outline-[#004C46] text-[#004C46] dark:text-white mr-12"
+        className="w-full min-w-[300px] min-h-[500px] rounded-xl bg-white dark:bg-[#27272a] dark:hover:bg-[#3E3E47] p-4 text-[14px] outline-[#004C46] text-[#004C46] dark:text-white mr-12"
         onInput={e => props.setAnnotation ? props.setAnnotation(e.currentTarget.innerHTML) : dispatch ? dispatch({ type: 'setStringValue', field: props.field, string: e.currentTarget.innerHTML }) : null}>
         <br />
     </div>
