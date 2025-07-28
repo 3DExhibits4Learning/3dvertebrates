@@ -50,7 +50,7 @@ export const assignAnnotation = async (student: string, email: string, uid: stri
  * @param uid 
  * @returns 
  */
-export const unassignAnnotation = async (email: string, uid: string) => {
+export const unassignAnnotation = async (email: string, uid: string, dev?: boolean) => {
     try {
         // Throw error if any data is missing
         if (!(email && uid)) throw Error('Input data missing')
@@ -59,8 +59,10 @@ export const unassignAnnotation = async (email: string, uid: string) => {
         const updateAnnotator = prisma.model.update({ where: { uid: uid }, data: { annotator: null } })
         const unassignModelForAnnotation = prisma.assignment.delete({ where: { uid: uid } })
 
+        const tx = dev ? [updateAnnotator, unassignModelForAnnotation] : [updateAnnotator, unassignModelForAnnotation, prisma.annotations.deleteMany({ where: { uid: uid } })]
+
         // Await transaction and inform student of assignment
-        await prisma.$transaction([updateAnnotator, unassignModelForAnnotation])
+        await prisma.$transaction(tx)
             .catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction([updateAnnotator, unassignModelForAnnotation])', "Couldn't unassign model"))
 
         // Success message
