@@ -45,7 +45,7 @@ export default function AdminAnnotationClient(props: {viewerLoaded: boolean}) {
 
     return <div className="flex flex-col w-full h-full text-[#004C46 dark:text-white]">
         <section className="flex">
-            <section className="h-full w-1/5 min-w-[325px]">
+            <section className="h-full w-1/5 min-w-[368px]">
                 <Accordion className="h-full" onSelectionChange={(keys: any) => modelClicked.current = keys.size ? true : false} selectedKeys={["0"]}>
                     {modelsToAnnotate.map((model, i) => <AccordionItem
                         key={i}

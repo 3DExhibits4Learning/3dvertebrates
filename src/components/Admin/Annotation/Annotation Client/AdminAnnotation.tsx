@@ -28,13 +28,11 @@ export default function AdminAnnotation(props: { admin: boolean, authorizedUsers
     const authorizedUsers = props.authorizedUsers.filter(user => ['admin', 'student'].includes(user.role))
     const thumbnail = context.properties.modelsToAnnotate.find(model => model.uid === specimenData.uid)?.thumbnail
 
-    // Modal states
+    // Modal state
     const [isThumbnailPreviewOpen, setIsThumbnailPreviewOpen] = useState(false)
-    const [isUnassignModalOpen, setIsUnassignModalOpen] = useState(false)
 
     return <>
         <ThumbnailPreviewModal path={thumbnail} isOpen={isThumbnailPreviewOpen} setIsOpen={setIsThumbnailPreviewOpen} species={specimenData.specimenName as string} />
-        <UnassignmentModal isOpen={isUnassignModalOpen} setIsOpen={setIsUnassignModalOpen} />
         {
             // Student select and assign
             props.admin && !specimenData.annotator && !annotationsAndPositions.newAnnotationEnabled &&
@@ -55,30 +53,16 @@ export default function AdminAnnotation(props: { admin: boolean, authorizedUsers
         {
             // Assignment data, approve/unapprove buttons, unassign button
             props.admin && specimenData.annotator && !annotationsAndPositions.newAnnotationEnabled &&
-            <div className="w-full mb-4">
-                <table className="w-full overflow-hidden rounded-b-lg bg-[#D5CB9F] dark:bg-[#212121] text-center">
-                    <thead>
-                        <tr>
-                            <td className="py-1 border-b border-r w-1/2">Assigned to</td>
-                            <td className="py-1 border-b">{specimenData.annotator}</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td className="py-1 border-b border-r">Completed</td>
-                            <td className="py-1 border-b">{specimenData.annotated ? 'Yes' : 'No'}</td>
-                        </tr>
-                        <tr>
-                            <td className="py-1 border-r">Thumbnail</td>
-                            <td className="py-1">{thumbnail ? <Button onPress={() => setIsThumbnailPreviewOpen(true)} className="text-white text-sm h-[20px] rounded-md">Preview</Button> : 'N/A'}</td>
-                        </tr>
-                        {/* <tr>
-                            <td className="border-r"><Button onPress={() => setIsUnassignModalOpen(true)} size='sm' className="text-md h-6" isDisabled={!specimenData.annotated}>Mark as incomplete</Button></td>
-                            <td><Button onPress={() => setIsUnassignModalOpen(true)} size='sm' className="text-red-600 text-md" color="danger" variant="light">Unassign Model</Button></td>
-                        </tr> */}
-                    </tbody>
-                </table>
-            </div>
+            <section className="grid grid-cols-2 rounded-b-md w-full bg-[#D5CB9F] dark:bg-[#212121]">
+                        <div className="py-1 border-b border-r w-full text-center">Assigned to</div>
+                        <div className="py-1 border-b text-center">{specimenData.annotator}</div>
+
+                        <div className="py-1 border-b border-r text-center">Completed</div>
+                        <div className="py-1 border-b text-center">{specimenData.annotated ? 'Yes' : 'No'}</div>
+
+                        <div className="py-1 border-r text-center">Thumbnail</div>
+                        <div className="py-1 text-center">{thumbnail ? <Button onPress={() => setIsThumbnailPreviewOpen(true)} className="text-white text-sm h-[20px] rounded-md">Preview</Button> : 'N/A'}</div>
+            </section>
         }
     </>
 }

@@ -57,7 +57,7 @@ model model {
   habitat_string        String?       @db.VarChar(250)
   base_model            Boolean       @default(true)
   annotated             Boolean       @default(false)
-  annotationsApproved   Boolean       @default(false)
+  published             Boolean       @default(false)
   modelApproved         Boolean       @default(false)
   annotationPosition    String?       @db.VarChar(250)
   build_process         String        @default("Photogrammetry") @db.VarChar(50)

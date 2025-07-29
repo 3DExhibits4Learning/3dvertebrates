@@ -58,12 +58,10 @@ export const unassignAnnotation = async (email: string, uid: string, dev?: boole
         // Annotator update + assignment queries
         const updateAnnotator = prisma.model.update({ where: { uid: uid }, data: { annotator: null } })
         const unassignModelForAnnotation = prisma.assignment.delete({ where: { uid: uid } })
-
         const tx = dev ? [updateAnnotator, unassignModelForAnnotation] : [updateAnnotator, unassignModelForAnnotation, prisma.annotations.deleteMany({ where: { uid: uid } })]
 
         // Await transaction and inform student of assignment
-        await prisma.$transaction(tx)
-            .catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction([updateAnnotator, unassignModelForAnnotation])', "Couldn't unassign model"))
+        await prisma.$transaction(tx).catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction([updateAnnotator, unassignModelForAnnotation])', "Couldn't unassign model"))
 
         // Success message
         return `Model unassigned`
@@ -72,15 +70,13 @@ export const unassignAnnotation = async (email: string, uid: string, dev?: boole
 }
 
 /**
- * 
  * @param uid 
  * @returns 
  */
-export const approveAnnotations = async (uid: string) => {
+export const publishModel = async (uid: string) => {
     try {
         // Approve model annotations
-        await prisma.model.update({ where: { uid: uid }, data: { annotationsApproved: true } })
-            .catch(e => serverActionErrorHandler(path, e.message, 'prisma.model.update({ where: { uid: uid }, data: { annotationsApproved: true } })', "Unable to approve model"))
+        await prisma.model.update({ where: { uid: uid }, data: { published: true } }).catch(e => serverActionErrorHandler(path, e.message, 'publishModel()', "Unable to approve model"))
 
         // Return
         return "Annotations approved"
@@ -93,13 +89,10 @@ export const approveAnnotations = async (uid: string) => {
  * @param uid 
  * @returns 
  */
-export const unapproveAnnotations = async (uid: string) => {
+export const markModelAsIncomplete = async (uid: string) => {
     try {
-        // Approve model annotations
-        await prisma.model.update({ where: { uid: uid }, data: { annotationsApproved: false } })
-            .catch(e => serverActionErrorHandler(path, e.message, 'prisma.model.update({ where: { uid: uid }, data: { annotationsApproved: false } })', "Unable to unapprove model"))
-
-        // Return succes message
+        // Mark model as incomplete (or unannotated) and return success
+        await prisma.model.update({ where: { uid: uid }, data: { annotated: false } }).catch(e => serverActionErrorHandler(path, e.message, 'unapproveAnnotations()', "Error marking model as incomplete"))
         return "Annotations unapproved"
     }
     catch (e: any) { return e.message }

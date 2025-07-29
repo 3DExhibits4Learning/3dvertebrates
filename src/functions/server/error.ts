@@ -19,15 +19,13 @@ export const catchMessage = (e: any) => `Error: ${e.message}`
  * @returns formatted string output detailing the error
  */
 export function routeHandlerError(route: string, errorMessage: string, fn: string, method?: string | undefined, nonFatal?: boolean) {
-    return (
-        `Date: ${new Date().toDateString()}\n
+    return `Date: ${new Date().toDateString()}\n
     Time: ${new Date().toTimeString()}\n
     Route: ${route} \n 
     Fatal: ${nonFatal ? "No" : "Yes"}\n
     HTTPMethod: ${method ? method : 'N/A'}\n
     Function: ${fn} \n
     Error Message: ${errorMessage}`
-    )
 }
 
 /**

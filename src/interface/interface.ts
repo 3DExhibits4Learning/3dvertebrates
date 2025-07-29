@@ -81,11 +81,12 @@ export interface annotationClientData {
   admin: boolean
   adminAssigned: boolean
   handlers: {
-    approveAnnotationsHandler: Function
+    publishModelHandler: Function
     unapproveAnnotationsHandler: Function
     assignAnnotationHandler: Function
     unassignAnnotationHandler: Function
     setNameAndEmailStates: Function
+    markAsIncompleteHandler: Function
   }
   student: {
     name: string | null | undefined

@@ -18,7 +18,7 @@ import { annotationsAndPositionsReducer } from "@/functions/client/reducers/anno
 import { annotationClientSpecimenReducer } from "@/functions/client/reducers/annotationClientSpecimen"
 import { activeAnnotationChangeHandler, modelOrAnnotationChangeHandler, modelClickHandler } from "@/functions/client/annotationClient"
 import { initialAnnotationsAndPositions, initialSpecimenData } from "@/interface/initializers"
-import { assignAnnotation, unassignAnnotation, approveAnnotations, unapproveAnnotations, getAssignmentEmail } from "@/functions/server/admin/administrator"
+import { assignAnnotation, unassignAnnotation, publishModel, markModelAsIncomplete, getAssignmentEmail } from "@/functions/server/admin/administrator"
 import { AnnotationNumbers } from "@/ts/ts"
 import { renumberAnnotationsServer } from "@/functions/server/admin/annotator"
 import { StudentTransferContext } from "../../Student/StudentClient"
@@ -71,18 +71,19 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], adm
     const setNameAndEmailStates = (name: string, email: string) => { setEmail(email); setName(name) }
 
     // Approve, Unapprove and renumber annotation handlers
-    const approveAnnotationsHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, approveAnnotations, [specimenData.uid], 'Approving annotations')
-    const unapproveAnnotationsHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unapproveAnnotations, [specimenData.uid], 'Unapproving annotations')
+    const publishModelHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, publishModel, [specimenData.uid], 'Approving annotations')
+    const unapproveAnnotationsHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, markModelAsIncomplete, [specimenData.uid], 'Unapproving annotations')
     const renumberAnnotations = async (annotationNumbers: AnnotationNumbers) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, renumberAnnotationsServer, [annotationNumbers], 'Renumbering annotations')
 
     // Annotation assign and unassign handlers
     const assignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, assignAnnotation, [name, email, specimenData.uid], 'Assigning annotation of model')
+    const markAsIncompleteHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, markModelAsIncomplete, [specimenData.uid], 'Marking model as incomplete')
     const getAnnotationUnassignmentEmail = async () => (props.students as studentsAssignmentsAndModels[]).find(student => student.assignment.find(assignment => assignment.uid === specimenData.uid))?.email
     const unassignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unassignAnnotation, [getAnnotationUnassignmentEmail(), specimenData.uid, true], 'Unassigning annotation of model')
     const setAdminAssignedFn = async () => setAdminAssigned(await getAssignmentEmail(specimenData.uid as string) === userEmail)
 
     // All remaining context objects
-    const handlers = { approveAnnotationsHandler, unapproveAnnotationsHandler, assignAnnotationHandler, unassignAnnotationHandler, setNameAndEmailStates }
+    const handlers = { publishModelHandler, unapproveAnnotationsHandler, assignAnnotationHandler, unassignAnnotationHandler, setNameAndEmailStates, markAsIncompleteHandler }
     const student = { name: name, email: email }
     const admin = props.admin
     const setters = { setViewerLoaded: setViewerLoaded, setSureModalOpen: setModalOpen, setReorderModalOpen: setIsOpen }

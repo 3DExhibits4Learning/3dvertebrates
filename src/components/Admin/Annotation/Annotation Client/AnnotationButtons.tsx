@@ -11,6 +11,8 @@ import { Button } from "@heroui/react"
 import { AnnotationClientData } from "./AnnotationClient"
 import { forwardRef, RefObject, SetStateAction, useContext, Dispatch } from "react"
 import { annotationClientData } from "@/interface/interface"
+
+// Default imports
 import Link from "next/link"
 
 // Main JSX
@@ -48,7 +50,7 @@ const AnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetStateAc
                             onPress={() => console.log('Preview Model Clicked')}
                             size='sm'
                             className="text-white text-md min-w-[171px] rounded-md"
-                            isDisabled={annotationsAndPositions.repositionEnabled}>
+                            isDisabled={annotationsAndPositions.repositionEnabled || !annotationsAndPositions.firstAnnotationPosition}>
                             Preview Annotations
                         </Button>
                     </Link>
@@ -57,28 +59,27 @@ const AnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetStateAc
             {
                 // Renumber annotations button
                 !annotationsAndPositions.newAnnotationEnabled && annotationsAndPositions.activeAnnotationIndex !== 'new' && annotationsAndPositions.firstAnnotationPosition !== undefined &&
-                annotationsAndPositions.annotations && annotationsAndPositions.annotations?.length >= 2 &&
                 <div className="flex justify-start items-center border-r pt-2">
                     <br></br>
                     <Button
                         size='sm'
                         onPress={() => { props.setReorderOpen(true) }}
                         className="text-white text-md min-w-[171px] rounded-md"
-                        isDisabled={annotationsAndPositions.repositionEnabled}>
+                        isDisabled={annotationsAndPositions.repositionEnabled || !(annotationsAndPositions.annotations && annotationsAndPositions.annotations?.length >= 2)}>
                         Reorder Annotations
                     </Button>
                 </div>
             }
             {
                 // 'Mark as annotated' button
-                annotationsAndPositions.annotations && annotationsAndPositions.annotations?.length >= 4 && annotationsAndPositions.activeAnnotationIndex != 'new' &&
+                annotationsAndPositions.annotations && annotationsAndPositions.activeAnnotationIndex !== 'new' &&
                 <div className="flex justify-end items-center pt-2">
                     <br></br>
                     <Button
                         onPress={() => props.setModalOpen(true)}
                         size='sm'
                         className="text-white text-md min-w-[171px] rounded-md"
-                        isDisabled={annotationsAndPositions.repositionEnabled}>
+                        isDisabled={annotationsAndPositions.repositionEnabled || annotationsAndPositions.annotations?.length <= 4}>
                         Mark as Annotated
                     </Button>
                 </div>
