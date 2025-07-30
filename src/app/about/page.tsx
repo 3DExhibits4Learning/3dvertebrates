@@ -10,7 +10,7 @@ import Foot from '@/components/Shared/Foot'
 export default function About(){
   return <>
       <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'></meta>
-      <title>3D Herbarium - About Page</title>
+      <title>3D Vertebrates - About Page</title>
 
       <Header pageRoute='inaturalist' headerTitle='About' />
       <main className='min-h-[calc(100vh-177px)] flex p-2 items-center flex-col'>

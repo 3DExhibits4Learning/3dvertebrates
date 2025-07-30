@@ -58,6 +58,7 @@ model model {
   base_model            Boolean       @default(true)
   annotated             Boolean       @default(false)
   published             Boolean       @default(false)
+  datePublished         DateTime      @default(now())
   modelApproved         Boolean       @default(false)
   annotationPosition    String?       @db.VarChar(250)
   build_process         String        @default("Photogrammetry") @db.VarChar(50)
