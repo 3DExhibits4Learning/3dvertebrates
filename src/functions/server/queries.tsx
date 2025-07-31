@@ -777,16 +777,6 @@ export const getModelsWithAssignments = async () => {
 }
 
 /**
- * @function approveAnnotations
- * @description approve 3d model annotations
- * 
- */
-
-export const approveAnnotations = async (uid: string) => {
-  return await prisma.model.update({ where: { uid: uid }, data: { annotationsApproved: true } })
-}
-
-/**
  * @function rejectAnnotations
  * @description reject 3d model annotations
  * 
@@ -795,14 +785,6 @@ export const rejectAnnotations = async (uid: string) => {
   return await prisma.model.update({ where: { uid: uid }, data: { annotated: false } })
 }
 
-/**
- * @function unapproveAnnotations
- * @description unapprove 3d model annotations
- * 
- */
-export const unapproveAnnotations = async (uid: string) => {
-  return await prisma.model.update({ where: { uid: uid }, data: { annotationsApproved: false } })
-}
 
 /**
  * @function approveModel

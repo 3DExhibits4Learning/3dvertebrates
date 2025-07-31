@@ -87,6 +87,7 @@ export interface annotationClientData {
     unassignAnnotationHandler: Function
     setNameAndEmailStates: Function
     markAsIncompleteHandler: Function
+    markAsAnnotatedHandler: Function
   }
   student: {
     name: string | null | undefined

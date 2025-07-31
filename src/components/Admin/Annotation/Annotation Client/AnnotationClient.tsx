@@ -20,7 +20,7 @@ import { activeAnnotationChangeHandler, modelOrAnnotationChangeHandler, modelCli
 import { initialAnnotationsAndPositions, initialSpecimenData } from "@/interface/initializers"
 import { assignAnnotation, unassignAnnotation, publishModel, markModelAsIncomplete, getAssignmentEmail } from "@/functions/server/admin/administrator"
 import { AnnotationNumbers } from "@/ts/ts"
-import { renumberAnnotationsServer } from "@/functions/server/admin/annotator"
+import { markModelAsAnnotated, renumberAnnotationsServer } from "@/functions/server/admin/annotator"
 import { StudentTransferContext } from "../../Student/StudentClient"
 import { useSession } from "next-auth/react"
 import { simulateAccordionPress } from "@/functions/client/annotationClient"
@@ -75,15 +75,16 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], adm
     const unapproveAnnotationsHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, markModelAsIncomplete, [specimenData.uid], 'Unapproving annotations')
     const renumberAnnotations = async (annotationNumbers: AnnotationNumbers) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, renumberAnnotationsServer, [annotationNumbers], 'Renumbering annotations')
 
-    // Annotation assign and unassign handlers
+    // Handlers and utilities
     const assignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, assignAnnotation, [name, email, specimenData.uid], 'Assigning annotation of model')
     const markAsIncompleteHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, markModelAsIncomplete, [specimenData.uid], 'Marking model as incomplete')
     const getAnnotationUnassignmentEmail = async () => (props.students as studentsAssignmentsAndModels[]).find(student => student.assignment.find(assignment => assignment.uid === specimenData.uid))?.email
     const unassignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unassignAnnotation, [getAnnotationUnassignmentEmail(), specimenData.uid, true], 'Unassigning annotation of model')
     const setAdminAssignedFn = async () => setAdminAssigned(await getAssignmentEmail(specimenData.uid as string) === userEmail)
+    const markAsAnnotatedHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, markModelAsAnnotated, [specimenData.uid], 'Marking model as annotated')
 
     // All remaining context objects
-    const handlers = { publishModelHandler, unapproveAnnotationsHandler, assignAnnotationHandler, unassignAnnotationHandler, setNameAndEmailStates, markAsIncompleteHandler }
+    const handlers = { publishModelHandler, unapproveAnnotationsHandler, assignAnnotationHandler, unassignAnnotationHandler, setNameAndEmailStates, markAsIncompleteHandler, markAsAnnotatedHandler }
     const student = { name: name, email: email }
     const admin = props.admin
     const setters = { setViewerLoaded: setViewerLoaded, setSureModalOpen: setModalOpen, setReorderModalOpen: setIsOpen }

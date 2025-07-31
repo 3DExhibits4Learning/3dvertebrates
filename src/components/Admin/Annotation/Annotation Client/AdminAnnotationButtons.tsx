@@ -76,7 +76,7 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
                     <br></br>
                     <Button
                         size='sm'
-                        onPress={() =>  props.setReorderOpen(true) }
+                        onPress={() => props.setReorderOpen(true)}
                         className="text-white text-md min-w-[171px] rounded-md w-full h-7"
                         isDisabled={annotationsAndPositions.repositionEnabled || !context.adminAssigned || annotationsAndPositions.annotations?.length <= 1} >
                         Reorder Annotations
@@ -92,22 +92,21 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
                         onPress={() => setIsPublishModalOpen(true)}
                         size='sm'
                         className="text-white text-md min-w-[171px] rounded-md w-full h-7"
-                        isDisabled={!specimenData.annotated}>
+                        isDisabled={annotationsAndPositions.annotations?.length < 4}>
                         Publish Model
                     </Button>
                 </div>
             }
             {
                 // Renumber annotations button
-                !annotationsAndPositions.newAnnotationEnabled && annotationsAndPositions.activeAnnotationIndex !== 'new' && annotationsAndPositions.firstAnnotationPosition !== undefined &&
-                annotationsAndPositions.annotations &&
+                !annotationsAndPositions.newAnnotationEnabled && annotationsAndPositions.activeAnnotationIndex !== 'new' && annotationsAndPositions.firstAnnotationPosition !== undefined && annotationsAndPositions.annotations &&
                 <div className="flex justify-start items-center border-r pr-2 pt-2">
                     <br></br>
                     <Button
                         size='sm'
                         onPress={() => setIsMarkAsIncompleteOpen(true)}
                         className="text-white text-md min-w-[171px] rounded-md w-full h-7"
-                        isDisabled={!context.specimenData.annotated} >
+                        isDisabled={!context.specimenData.annotated || context.adminAssigned} >
                         Mark As Incomplete
                     </Button>
                 </div>

@@ -20,6 +20,41 @@ import prisma from "@/functions/utils/prisma"
 
 /**
  * 
+ * @param uid 
+ * @returns 
+ */
+export const getModelAnnotator = async (uid: string) => await prisma.model.findUnique({ where: { uid: uid }, select: { annotator: true } }).then(model => model?.annotator)
+
+/**
+ * 
+ * @param uid 
+ * @returns 
+ */
+export const getModelAnnotations = async (uid: string) => await prisma.annotations.findMany({ where: { uid: uid } })
+
+
+/**
+ * 
+ * @param uid 
+ * @param assignee 
+ * @returns 
+ */
+export const isModelAssignable = async (uid: string, assignee: string) => {
+    const annotator = await getModelAnnotator(uid)
+    const annotations = await getModelAnnotations(uid)
+
+    if ((annotator && annotator.toLowerCase() !== assignee.toLowerCase()) && annotations.length) return false
+    
+    else if ((annotator && annotator.toLowerCase() !== assignee.toLowerCase()) || !annotator) {
+        await prisma.model.update({ where: { uid: uid }, data: { annotator: assignee } }).catch(e => serverActionErrorHandler(path, e.message, 'isModelAssignable()', "Couldn't update model annotator"))
+        return true
+    }
+
+    else return true
+}
+
+/**
+ * 
  * @param student 
  * @param uid 
  * @param email 
@@ -73,10 +108,12 @@ export const unassignAnnotation = async (email: string, uid: string, dev?: boole
  * @param uid 
  * @returns 
  */
-export const publishModel = async (uid: string) => {
+export const publishModel = async (uid: string, adminAssigned?: boolean) => {
     try {
         // Approve model annotations
         await prisma.model.update({ where: { uid: uid }, data: { published: true } }).catch(e => serverActionErrorHandler(path, e.message, 'publishModel()', "Unable to approve model"))
+
+        if (adminAssigned) await prisma.model.update({ where: { uid: uid }, data: { annotated: true } }).catch(e => serverActionErrorHandler(path, e.message, 'publishModel()', "Unable to approve model"))
 
         // Return
         return "Annotations approved"
@@ -200,13 +237,13 @@ export const deleteStudent = async (email: string) => {
  * @param uid 
  * @returns 
  */
-export const getAssignmentEmail = async(uid: string) => await prisma.assignment.findUnique({where: {uid: uid}, select:{email: true}}).then(assignment => assignment?.email)
+export const getAssignmentEmail = async (uid: string) => await prisma.assignment.findUnique({ where: { uid: uid }, select: { email: true } }).then(assignment => assignment?.email)
 
 /**
  * 
  * @returns 
  */
-export const getAllPhotoAnnotations = async(id: string) => await prisma.photo_annotation.findMany({where:{annotation_id: id}})
+export const getAllPhotoAnnotations = async (id: string) => await prisma.photo_annotation.findMany({ where: { annotation_id: id } })
 
 /**
  * 
@@ -214,7 +251,7 @@ export const getAllPhotoAnnotations = async(id: string) => await prisma.photo_an
  * @param annotation 
  */
 export const updatePhotoAnnotation = async (annotation_id: string, annotation: string) => {
-        if (!annotation_id || !annotation) throw Error('No annotation provided')
-        await prisma.photo_annotation.update({ where: { annotation_id: annotation_id }, data: { annotation: annotation } })
+    if (!annotation_id || !annotation) throw Error('No annotation provided')
+    await prisma.photo_annotation.update({ where: { annotation_id: annotation_id }, data: { annotation: annotation } })
 }
 

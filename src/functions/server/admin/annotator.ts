@@ -63,7 +63,8 @@ export const markModelAsAnnotated = async (uid: string) => {
     try {
         // Get session, user's name
         const session = await getServerSession(authOptions).catch(e => serverActionErrorHandler(path, e.message, 'getServerSession(authOptions)', "Coulnd't get server session"))
-        const name = session.user.name
+        const email = session.user.email
+        const name = await prisma.authorized.findUnique({ where: { email: email } }).then(user => user?.name)
 
         // Mark the 3d model as annotated, update the model annotator
         const updateMark = prisma.model.update({ where: { uid: uid }, data: { annotated: true } })

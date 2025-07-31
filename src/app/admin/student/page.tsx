@@ -54,7 +54,7 @@ export default async function Page() {
         // Filter assigned models
         const studentAssignmentUids = assignments.filter(assignment => assignment.email === email).map(assignment => assignment.uid)
         const assignedModels = email === 'ab632@humboldt.edu' ? modelsToAnnotate.filter(model => model.uid === 'ee451c036e3d45398f8a1f2ad78367c3') : modelsToAnnotate.filter(model => studentAssignmentUids.includes(model.uid))
-
+        
         // Typical client
         return <>
             <Header pageRoute="collections" headerTitle="Botany Admin" />
