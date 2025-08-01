@@ -15,6 +15,7 @@ import { authorized } from "@prisma/client"
 import StudentSelect from "../../Administrator/Students/SelectStudents"
 import ThumbnailPreviewModal from "@/components/Admin/Annotation/Annotation Client/ThumbnailModal"
 import UnassignmentModal from "@/components/Admin/Annotation/Annotation Client/UnassignModal"
+import AssignModal from "@/components/Admin/Annotation/Annotation Client/AssignModal"
 
 // Main JSX
 export default function AdminAnnotation(props: { admin: boolean, authorizedUsers: authorized[] }) {
@@ -30,9 +31,11 @@ export default function AdminAnnotation(props: { admin: boolean, authorizedUsers
 
     // Modal state
     const [isThumbnailPreviewOpen, setIsThumbnailPreviewOpen] = useState(false)
+    const [assignModalOpen, setAssignModalOpen] = useState(false)
 
     return <>
         <ThumbnailPreviewModal path={thumbnail} isOpen={isThumbnailPreviewOpen} setIsOpen={setIsThumbnailPreviewOpen} species={specimenData.specimenName as string} />
+        <AssignModal isOpen={assignModalOpen} setIsOpen={setAssignModalOpen} assignee={context.student.name as string} uid={specimenData.uid as string} email={context.student.email as string} />
         {
             // Student select and assign
             props.admin && !specimenData.annotator && !annotationsAndPositions.newAnnotationEnabled &&
