@@ -64,6 +64,7 @@ export const assignAnnotation = async (student: string, email: string, uid: stri
     try {
         // Throw error if any data is missing
         if (!(email && uid && student)) throw Error('Input data missing')
+            console.log(`Assigning model ${uid} to student ${student} with email ${email}`)
 
         // Annotator update + assignment queries
         const deleteAnnotations = previousAnnotator ? prisma.annotations.deleteMany({ where: { uid: uid } }) : undefined

@@ -26,7 +26,6 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
     const context = useContext(AnnotationClientData) as annotationClientData
     const annotationsAndPositions = context.annotationsAndPositions
     const annotationsAndPositionsDispatch = context.annotationsAndPositionsDispatch
-    const specimenData = context.specimenData
 
     // Ref
     const newAnnotationEnabled = ref as RefObject<boolean>
@@ -35,6 +34,9 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
     const [isUnassignModalOpen, setIsUnassignModalOpen] = useState(false)
     const [isMarkAsIncompleteOpen, setIsMarkAsIncompleteOpen] = useState(false)
     const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
+
+    // Top colomn padding is based on the design of AdminAnnotation.tsx which is based on the existence of an annotator
+    const topColumnPadding = context.specimenData.annotator ? 'py-2' : 'pb-2'
 
     return <>
         <UnassignmentModal isOpen={isUnassignModalOpen} setIsOpen={setIsUnassignModalOpen} />
@@ -45,7 +47,7 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
             {
                 // New annotation button
                 !annotationsAndPositions.newAnnotationEnabled && annotationsAndPositions.activeAnnotationIndex !== 'new' && annotationsAndPositions.firstAnnotationPosition !== undefined &&
-                <div className="flex justify-start items-center border-r border-b pr-2 py-2">
+                <div className={`flex justify-start items-center border-r border-b pr-2 ${topColumnPadding}`}>
                     <Button
                         size='sm'
                         onPress={() => { newAnnotationEnabled.current = true; annotationsAndPositionsDispatch({ type: 'newAnnotation' }) }}
@@ -57,12 +59,12 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
             }
             {
                 annotationsAndPositions.activeAnnotationIndex !== 'new' &&
-                <div className="flex justify-end items-center border-b pl-2 py-2 !w-full">
+                <div className={`flex justify-end items-center border-b pl-2 pb-2 !w-full ${topColumnPadding}`}>
                     <Link href={`/collections/${context.specimenData.specimenName}?preview=1`} target='_blank' className="w-full">
                         <Button
                             size='sm'
                             className="text-white text-md min-w-[171px] rounded-md w-full h-7"
-                            isDisabled={annotationsAndPositions.repositionEnabled}>
+                            isDisabled={annotationsAndPositions.repositionEnabled || !context.annotationsAndPositions.firstAnnotationPosition}>
                             Preview Annotations
                         </Button>
                     </Link>
@@ -92,7 +94,7 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
                         onPress={() => setIsPublishModalOpen(true)}
                         size='sm'
                         className="text-white text-md min-w-[171px] rounded-md w-full h-7"
-                        isDisabled={annotationsAndPositions.annotations?.length < 4}>
+                        isDisabled={annotationsAndPositions.annotations?.length < 4 || !(context.specimenData.annotated && context.adminAssigned) }>
                         Publish Model
                     </Button>
                 </div>
