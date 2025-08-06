@@ -94,7 +94,7 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
                         onPress={() => setIsPublishModalOpen(true)}
                         size='sm'
                         className="text-white text-md min-w-[171px] rounded-md w-full h-7"
-                        isDisabled={annotationsAndPositions.annotations?.length < 4 || !(context.specimenData.annotated && context.adminAssigned) }>
+                        isDisabled={annotationsAndPositions.annotations?.length < 4 || (!context.specimenData.annotated && !context.adminAssigned) }>
                         Publish Model
                     </Button>
                 </div>

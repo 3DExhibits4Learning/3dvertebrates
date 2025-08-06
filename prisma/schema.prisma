@@ -165,14 +165,27 @@ model authorized {
   email            String          @id
   role             String          @default("student")
   name             String          @default("Cal Poly Humboldt Verterbrate Museum")
-  assignment       assignment[]    
+  assignment       assignment[]  
+  semester         semester[]  
+}
+
+model semester {
+  email            String          @id
+  semester         String          @db.VarChar(25)
+  studentEmail     authorized      @relation(fields: [email], references: [email], onDelete: Cascade, onUpdate: Cascade, map: "semesterFkEmail" )
+}
+
+model deactivated {
+  email            String          @id
+  role             String          @default("student")
+  name             String          @default("")    
 }
 
 model assignment {
   email               String      
   uid                 String       @unique
   studentEmail        authorized   @relation(fields: [email], references: [email], onDelete: Cascade, onUpdate: Cascade, map: "assignmentFkEmail" )
-  name                String?      
+  name                String?     
   modelUid            model        @relation(fields: [uid], references: [uid], onDelete: Cascade, onUpdate: Cascade, map: "assignmentFkUid" )
 
   @@unique([email, uid])

@@ -1,20 +1,25 @@
 'use client'
 
 // Typical imports
+import { AnnotationClientData } from "@/components/Admin/Annotation/Annotation Client/AnnotationClient"
 import { assignAnnotation, isModelAssignable } from "@/functions/server/admin/administrator"
-import { Modal, ModalContent, ModalBody, ModalFooter, Button, Spinner } from "@heroui/react"
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { annotationClientData } from "@/interface/interface"
+import { Modal, ModalContent, ModalBody, Button, Spinner } from "@heroui/react"
+import { useRouter } from "next/navigation"
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react"
 
 // Main JSX
 export default function AssignModal(props: { isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>, uid: string, assignee: string, email: string }) {
+    const router = useRouter()
+
     // State variables
-    const [isAssignable, setIsAssignable] = useState<boolean | undefined>(false)
+    const [isAssignable, setIsAssignable] = useState<boolean | undefined>()
     const [continueClicked, setContinueClicked] = useState(false)
     const [assignmentResult, setAssignmentResult] = useState('')
     const [assignmentHandled, setAssignmentHandled] = useState(false)
 
     // Handlers
-    const setIsAssignableHandler = async () => { if (props.assignee) setIsAssignable(await isModelAssignable(props.uid, props.assignee)) }
+    const setIsAssignableHandler = async () => setIsAssignable(await isModelAssignable(props.uid, props.assignee))
     const assignmentHandler = async () => { setAssignmentResult(await assignAnnotation(props.assignee, props.email, props.uid)); setAssignmentHandled(true) }
 
     const deleteAnnotationsAndAssignHandler = async () => {
@@ -24,13 +29,13 @@ export default function AssignModal(props: { isOpen: boolean, setIsOpen: Dispatc
         setAssignmentHandled(true)
     }
 
-    // useEffect(() => { setIsAssignableHandler() }, [props.assignee])
-    useEffect(() => { if (isAssignable && !assignmentHandled && props.isOpen) assignmentHandler() }, [isAssignable, assignmentHandled])
+    useEffect(() => { if (props.isOpen && props.assignee) setIsAssignableHandler() }, [props.assignee, props.isOpen])
+    useEffect(() => { if (isAssignable && !assignmentHandled && props.isOpen) assignmentHandler() }, [isAssignable, assignmentHandled, props.isOpen])
 
     return <Modal isOpen={props.isOpen} isDismissable={false} hideCloseButton isKeyboardDismissDisabled={true}>
         <ModalContent className="w-fit min-w-[500px] flex flex-col items-center">
             <ModalBody>
-                {isAssignable === undefined && <div><Spinner className="w-10 h-10" label="Assigning model for annotation" /></div>}
+                {isAssignable === undefined && <div className="m-4"><Spinner size='lg' label="Assigning model for annotation" /></div>}
                 {
                     isAssignable === false && !continueClicked &&
                     <>
@@ -43,13 +48,13 @@ export default function AssignModal(props: { isOpen: boolean, setIsOpen: Dispatc
                         </section>
                     </>
                 }
-                {continueClicked && !assignmentResult && <div><Spinner className="w-10 h-10" label="Assigning model for annotation" /></div>}
-                {isAssignable === true && !assignmentResult && <div className="min-h-[400px]"><Spinner className="w-10 h-10" label="Assigning model for annotation" /></div>}
+                {continueClicked && !assignmentResult && <div className="m-4"><Spinner size='lg' label="Assigning model for annotation" /></div>}
+                {isAssignable === true && !assignmentResult && <div className="m-4"><Spinner size='lg' label="Assigning model for annotation" /></div>}
                 {
                     assignmentResult &&
                     <section className="flex flex-col items-center justify-center p-8 w-fit">
                         <p className="mb-8 text-lg">{assignmentResult}</p>
-                        <Button onPress={() => props.setIsOpen(false)}>OK</Button>
+                        <a href='/admin/management'><Button>OK</Button></a>
                     </section>
                 }
             </ModalBody>
