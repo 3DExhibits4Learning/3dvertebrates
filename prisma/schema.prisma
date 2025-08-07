@@ -165,6 +165,7 @@ model authorized {
   email            String          @id
   role             String          @default("student")
   name             String          @default("Cal Poly Humboldt Verterbrate Museum")
+  active           Boolean         @default(true)
   assignment       assignment[]  
   semester         semester[]  
 }
@@ -173,12 +174,6 @@ model semester {
   email            String          @id
   semester         String          @db.VarChar(25)
   studentEmail     authorized      @relation(fields: [email], references: [email], onDelete: Cascade, onUpdate: Cascade, map: "semesterFkEmail" )
-}
-
-model deactivated {
-  email            String          @id
-  role             String          @default("student")
-  name             String          @default("")    
 }
 
 model assignment {
