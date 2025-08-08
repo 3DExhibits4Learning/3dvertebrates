@@ -23,8 +23,8 @@ export default function LogoAndSignIn() {
                     <Avatar className="cursor-pointer" isFocusable={true} src={session?.user?.image!} name={session?.user?.name!} aria-label="Dropdown Menu Toggle" />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Dropdown menu">
-                    <DropdownItem key="Admin" onClick={() => router.push('/admin')} aria-label='Go to admin page'>3D Models</DropdownItem>
-                    <DropdownItem key="tutorials" onClick={() => router.push('/tutorials')} aria-label='Go to tutorials page'>Tutorials</DropdownItem>
+                    <DropdownItem key="Admin" onClick={() => router.push('/admin')} aria-label='Go to admin page'>My 3D Vertebrates</DropdownItem>
+                    <DropdownItem key="tutorials" onClick={() => router.push('/howTos')} aria-label='Go to tutorials page'>How-To's</DropdownItem>
                     <DropdownItem key="FAQ" onClick={() => router.push('/faq')} aria-label='Go to faq page'>FAQ</DropdownItem>
                     <DropdownItem key="help" onClick={() => router.push('/help')} aria-label='Go to faq page'>Help</DropdownItem>
                     <DropdownItem key="signOut"><button onClick={() => signOut()} aria-label='Sign Out'>Sign Out</button></DropdownItem>

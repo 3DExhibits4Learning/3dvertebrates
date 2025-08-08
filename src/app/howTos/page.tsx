@@ -1,10 +1,11 @@
 import Header from '@/components/Header/Header'
 import Foot from '@/components/Shared/Foot'
+import { hyperlinkClass } from '@/tw'
 
-export default function Tutorials() {
+export default function HowTos() {
     return <>
         <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'></meta>
-        <title>FAQ</title>
+        <title>How To's</title>
 
         <Header pageRoute='collections' headerTitle='Tutorials' />
         <main className='min-h-[calc(100vh-177px)] flex flex-col items-center'>
@@ -13,46 +14,46 @@ export default function Tutorials() {
 
                 <p className='text-3xl mb-1'>Overview</p>
                 <div className='flex flex-col mb-8'>
-                    <p>The general overview of the workflow for your 3D vertebrate is:</p>
+                    <p>The general overview of the workflow for your 3D Vertebrate is:</p>
                     <ul className='ml-8 mt-4 list-disc list-inside'>
                         <li>You create your 3D Vertebrate</li>
                         <li>You upload your 3D Vertebrate to 3dvertebrates.org</li>
-                        <li>Your model gets approved and assigned to you for annotation</li>
-                        <li>You annotate your model</li>
-                        <li>Your model is published to 3Dvertebrates.org</li>
+                        <li>Your 3D Vertebrate gets approved and assigned to you for annotation</li>
+                        <li>You annotate your 3D Vertebrate</li>
+                        <li>Your 3D Vertebrate is published to 3dvertebrates.org</li>
                     </ul>
                     <p className='mt-4'>It's as simple as that!</p>
                 </div>
 
                 <p className='text-3xl mb-1 mt-4'>Creating a 3D Vertebrate</p>
                 <div className='flex flex-col mb-8'>
-                    <p>Creation of your 3D Vertebrate may be easier than you think!</p><br></br>
-                    <p>If you have a larger specimen, say, roughly the size of a baseball or better, you may be able to create a quality 3D Vertebrate with a <b>video</b> from your phone!</p><br></br>
-                    <p>If your specimen is larger and has fairly simple geometry, we recommnend first trying apps such as PhotoCatch (PhotoCatch is only available on IOS or Mac). An example of the level of quality
-                        that the app can produce can be found here: [Link]</p><br></br>
-                    <p>If you're specimen is on the smaller side, has complex geometry or you simply haven't had luck with beginner apps, then create a help ticket and select 'Create 3D Vertebrate' as the subject.
-                        You will get to come to the Innovation Hub to use a professional photogrammetry setup to create your 3D vertebrate.
-                        Note that you will need a flash drive (at least 50 GB), and a block of at least <b>two hours</b> to create your 3D verterbrate.
+                    <p>Creation of your 3D Vertebrate may be easier than you think. For some specimens, you may be able to create a quality 3D Vertebrate with <b>video</b> from your phone!</p><br></br>
+                    <p>If your specimen is larger (roughly the size of a baseball or better) and has fairly simple geometry, we recommend first trying apps such as PhotoCatch. An  excellent example of <i>Aplodontia rufa</i> made
+                        with PhotoCatch from the beta test class can be found <span className={hyperlinkClass}><a href='/collections/Aplodontia%20rufa'>here</a></span>. If you need to borrow a tripod for your phone,
+                        a turntable, etc (and we highly recommend you use these items), create a help ticket to schedule time at the Innovation Hub.</p><br></br>
+                    <p>**Note that PhotoCatch is only available on iOS or Mac, but other similar apps are available for other platforms.</p><br></br>
+                    <p>If you're specimen is on the smaller side, has complex geometry or you simply haven't had luck with beginner apps, then create a help ticket and select 'Create 3D Vertebrate' as the topic.
+                        You will get to come to the Innovation Hub to use professional photogrammetry equipment to create your 3D Vertebrate.
+                        Note that you will need a block of at least <b>three hours</b> to create your 3D Verterbrate.
                     </p>
                 </div>
 
                 <p className='text-3xl mb-1 mt-4'>Uploading a 3D Vertebrate</p>
                 <div className='flex flex-col mb-8'>
-                    <p>Uploading 3D models is pretty straightforward. From your avatar, select '3D Models.' Click 'Submit Model' at the top of the page and fill out the form.</p><br></br>
-                    <p>**Note - 'Base models' are models that are to be annotated, and 'annotation models' are models that will be used as annotations for the base model.
-                    </p>
+                    <p>Uploading a 3D Vertebrate is pretty straightforward. From your avatar, select '3D Models.' Click 'Submit Model' at the top of the page and fill out the form.</p><br></br>
+                    <p>**Note - 'Base models' are models that are to be annotated, and 'annotation models' are models that will be used as annotations for the base model.</p>
                 </div>
 
                 <p className='text-3xl mb-1 mt-4'>Annotation of a 3D Vertebrate</p>
                 <div className='flex flex-col mb-8'>
-                    <p>An annotation is a a note of explanation or comment added to a 3D model. It could explain or elaborate on any aspect of your 3D vertebrate.
-                        The first annotation is always the metadata for the 3D vertebrate itself, which is automatically retrieved.
+                    <p>An annotation is a a note of explanation or comment added to a 3D model. It could explain or elaborate on any aspect of your 3D Vertebrate.
+                        The first annotation is always the metadata for the 3D Vertebrate itself, which is automatically retrieved.
                         After the first annotation, there are four types of annotations to choose from: text, photo, video or model. </p>
                     <ul className='ml-8 mt-4 list-disc list-inside'>
 
                         <li className='text-xl'>First Annotation</li>
                         <p className='ml-12'>For the first annotation, all that needs to be done is placement of the annotation marker. From the annotation portal, click 'New Annotation'
-                            and click the 3D vertebrate where you want the annotation marker to be placed. The metadata will automatically be retrieved and displayed in the annotation portal
+                            and click the 3D Vertebrate where you want the annotation marker to be placed. The metadata will automatically be retrieved and displayed in the annotation portal
                             when the marker is clicked on the collections page (or in preview mode). Click 'Create Annotation' to save the annotation and you're done!</p>
 
                         <li className='text-xl mt-4'>Text Annotation</li>
@@ -65,7 +66,7 @@ export default function Tutorials() {
                             is optional and can be used as a reference to where you found the photo.
                         </p>
                         <br></br>
-                        <p className='ml-12'>The easiest way to find a photo is to use the <a href='https://search.creativecommons.org/' className='text-blue-500 underline'>Creative Commons Search</a> or
+                        <p className='ml-12'>The easiest way to find a photo is to use the <span className={hyperlinkClass}><a href='https://search.creativecommons.org/'>Creative Commons Search</a></span> or
                             Google Images with the usage rights filter set to 'Creative Commons licenses.' You can find that option under 'Tools' in the Google Images search bar.
                         </p>
                         <br></br>
