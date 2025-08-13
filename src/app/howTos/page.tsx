@@ -1,6 +1,7 @@
+import { hyperlinkClass } from '@/tw'
+
 import Header from '@/components/Header/Header'
 import Foot from '@/components/Shared/Foot'
-import { hyperlinkClass } from '@/tw'
 
 export default function HowTos() {
     return <>
@@ -34,7 +35,7 @@ export default function HowTos() {
                     <p>**Note that PhotoCatch is only available on iOS or Mac, but other similar apps are available for other platforms.</p><br></br>
                     <p>If you're specimen is on the smaller side, has complex geometry or you simply haven't had luck with beginner apps, then create a help ticket and select 'Create 3D Vertebrate' as the topic.
                         You will get to come to the Innovation Hub to use professional photogrammetry equipment to create your 3D Vertebrate.
-                        Note that you will need a block of at least <b>three hours</b> to create your 3D Verterbrate.
+                        Note that you will need a block of at least <b>three hours</b> to create your 3D Vertebrate.
                     </p>
                 </div>
 
@@ -47,7 +48,10 @@ export default function HowTos() {
                 <p className='text-3xl mb-1 mt-4'>Annotation of a 3D Vertebrate</p>
                 <div className='flex flex-col mb-8'>
                     <p>An annotation is a a note of explanation or comment added to a 3D model. It could explain or elaborate on any aspect of your 3D Vertebrate.
-                        The first annotation is always the metadata for the 3D Vertebrate itself, which is automatically retrieved.
+                        You can italicize text with the Italic button (or just press Ctrl+I), or embed hyperlinks with the link button.
+                    </p><br></br>
+                        <p>When you have completed enough annotations, a "Mark as Annotated" button will appear. This is how you mark your 3D Vertebrate as complete and ready for publication.
+                            The first annotation is always the metadata for the 3D Vertebrate itself, which is automatically retrieved.
                         After the first annotation, there are four types of annotations to choose from: text, photo, video or model. </p>
                     <ul className='ml-8 mt-4 list-disc list-inside'>
 

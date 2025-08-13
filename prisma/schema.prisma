@@ -164,7 +164,7 @@ model VerificationToken {
 model authorized {
   email            String          @id
   role             String          @default("student")
-  name             String          @default("Cal Poly Humboldt Verterbrate Museum")
+  name             String          @default("Cal Poly Humboldt Vertebrate Museum")
   active           Boolean         @default(true)
   assignment       assignment[]  
   semester         semester[]  
