@@ -5,7 +5,7 @@
 
 import { Dispatch, RefObject } from "react";
 import { SetStateAction } from "react";
-import { annotations, photo_annotation, video_annotation, model, model_annotation, software, tags, authorized, assignment } from "@prisma/client";
+import { annotations, photo_annotation, video_annotation, model, model_annotation, software, tags, authorized } from "@prisma/client"
 import { annotationDataTransferAction } from "./actions";
 import { ChildProcessWithoutNullStreams } from "child_process";
 
@@ -105,7 +105,6 @@ export interface annotationClientData {
   properties: {
     modelsToAnnotate: model[]
     admin: boolean 
-    students?:studentsAssignmentsAndModels[]
     authorizedUsers?: authorized[]
   }
 }
@@ -391,15 +390,14 @@ export interface fullAnnotation extends annotations {
 export interface fullModel extends model {
   software: software[]
   tags: tags[]
-  assignment: assignment
 }
 
 export interface ManagerClientProps {
   models: string
   modelsNeedingThumbnails: string
-  studentsAssignmentsAndModels: string
   admin: boolean
   authorizedUsers: authorized[]
+  assignments: string
 }
 
 export interface UpdateModelFormContainerProps {
@@ -408,22 +406,6 @@ export interface UpdateModelFormContainerProps {
 
 export interface UpdateModelFormProps {
   model: fullModel
-}
-
-export interface studentsAndAssignments extends authorized {
-  assignment: assignment[]
-}
-
-export interface studentsAssignmentsAndModels extends studentsAndAssignments {
-  models: model[]
-}
-
-export interface assignmentsWithName extends assignment {
-  name: string
-}
-
-export interface modelsAndAssignments extends model {
-  assignment: assignment[]
 }
 
 export interface annotationWithModel extends annotations {

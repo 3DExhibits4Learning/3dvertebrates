@@ -72,7 +72,7 @@ export const getAccount = async (id: string, provider: string) => {
  */
 export async function getFullModels() {
   const models = await prisma.model.findMany({
-    include: { software: true, tags: true, assignment: true }
+    include: { software: true, tags: true}
   })
   return models
 }
@@ -689,7 +689,6 @@ export const getModelsToAnnotate = async () => {
     include: {
       software: true,
       tags: true,
-      assignment: true
     }
   })
 
@@ -721,60 +720,6 @@ export const addStudent = async (email: string, name: string) => {
   return remove
 }
 
-/**
- * @function assignModelToStudent
- * @description assign a 3D model to a student for annotation
- * 
- */
-export const assignModelToStudent = async (uid: string, email: string) => {
-  return await prisma.assignment.create({ data: { uid: uid, email: email } })
-}
-
-/**
- * @function unassignModelToStudent
- * @description unassign a 3D model to a student for annotation
- * 
- */
-export const unassignModelToStudent = async (uid: string, email: string) => {
-  return await prisma.assignment.delete({ where: { email_uid: { email: email, uid: uid } } })
-}
-
-/**
- * @function getStudentsAndAssignments
- * @description get an array of authorized students objecets with assignments included
- * 
- */
-export const getStudentsAndAssignments = async () => {
-  return await prisma.authorized.findMany({
-    where: {
-      OR: [
-        { role: 'student' },
-        { role: 'admin' }
-      ]
-    },
-    include: {
-      assignment: true
-    } satisfies Prisma.authorizedInclude
-  })
-}
-
-/**
- * @function getAssignments
- * @description get an array of assignment objects
- * 
- */
-export const getAssignments = async () => {
-  return await prisma.assignment.findMany()
-}
-
-/**
- * @function getModelsWithAssignments
- * @description get an array of assignment objects
- * 
- */
-export const getModelsWithAssignments = async () => {
-  return await prisma.model.findMany({ include: { assignment: true } })
-}
 
 /**
  * @function rejectAnnotations

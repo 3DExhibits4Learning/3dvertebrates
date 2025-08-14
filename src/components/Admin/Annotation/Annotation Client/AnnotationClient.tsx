@@ -12,13 +12,13 @@
 // Typical imports
 import { useEffect, useState, useRef, useContext, createContext, useReducer } from "react"
 import { authorized, model } from "@prisma/client"
-import { studentsAssignmentsAndModels, annotationClientData } from "@/interface/interface"
+import { annotationClientData } from "@/interface/interface"
 import { DataTransferContext } from "@/components/Admin/Administrator/ManagerClient"
 import { annotationsAndPositionsReducer } from "@/functions/client/reducers/annotationsAndPositions"
 import { annotationClientSpecimenReducer } from "@/functions/client/reducers/annotationClientSpecimen"
 import { activeAnnotationChangeHandler, modelOrAnnotationChangeHandler, modelClickHandler } from "@/functions/client/annotationClient"
 import { initialAnnotationsAndPositions, initialSpecimenData } from "@/interface/initializers"
-import { assignAnnotation, unassignAnnotation, publishModel, markModelAsIncomplete, getAssignmentEmail } from "@/functions/server/admin/administrator"
+import { assignAnnotation, unassignAnnotation, publishModel, markModelAsIncomplete, getAssignmentEmail} from "@/functions/server/admin/administrator"
 import { AnnotationNumbers } from "@/ts/ts"
 import { markModelAsAnnotated, renumberAnnotationsServer } from "@/functions/server/admin/annotator"
 import { StudentTransferContext } from "../../Student/StudentClient"
@@ -36,7 +36,7 @@ import StudentAnnotationClient from "@/components/Admin/Annotation/Annotation Cl
 export const AnnotationClientData = createContext<annotationClientData | ''>('')
 
 // Main JSX
-export default function AnnotationClient(props: { modelsToAnnotate: model[], admin: boolean, students?: studentsAssignmentsAndModels[], authorizedUsers?: authorized[] }) {
+export default function AnnotationClient(props: { modelsToAnnotate: model[], admin: boolean, authorizedUsers?: authorized[], assignments?: model[] }) {
     // Session and email
     const { data: session } = useSession()
     const userEmail = session?.user?.email
@@ -78,8 +78,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], adm
     // Handlers and utilities
     const assignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, assignAnnotation, [name, email, specimenData.uid], 'Assigning annotation of model')
     const markAsIncompleteHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, markModelAsIncomplete, [specimenData.uid], 'Marking model as incomplete')
-    const getAnnotationUnassignmentEmail = async () => (props.students as studentsAssignmentsAndModels[]).find(student => student.assignment.find(assignment => assignment.uid === specimenData.uid))?.email
-    const unassignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unassignAnnotation, [getAnnotationUnassignmentEmail(), specimenData.uid, true], 'Unassigning annotation of model')
+    const unassignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unassignAnnotation, [specimenData.uid, true], 'Unassigning annotation of model')
     const setAdminAssignedFn = async () => setAdminAssigned(await getAssignmentEmail(specimenData.uid as string) === userEmail)
     const markAsAnnotatedHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, markModelAsAnnotated, [specimenData.uid], 'Marking model as annotated')
 

@@ -29,7 +29,7 @@ import DataTransferModal from '@/components/Shared/Modals/DataTransferModal'
 export const StudentTransferContext = createContext<any>('')
 
 // Main JSX
-export default function StudentClient(props: { modelsToAnnotate: string, annotationModels: string }) {
+export default function StudentClient(props: { modelsToAnnotate: string, annotationModels: string, assignments: model[] }) {
 
     // Tailwind variables
     const accordionTitlesCss = 'text-[#004C46] text-2xl dark:text-[#F5F3E7]'

@@ -9,18 +9,18 @@
 'use client'
 
 // Typical imports
-import { studentsAssignmentsAndModels } from "@/interface/interface"
 import { Button } from "@heroui/react"
-import { useContext, useMemo, useState } from "react"
+import { useContext, useState } from "react"
 import { deActivateStudent } from "@/functions/server/admin/administrator"
 import { DataTransferContext } from "../ManagerClient"
 
 // Default imports
+import { authorized} from "@prisma/client"
 import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler"
 import DeactivateModal from "@/components/Admin/Administrator/Students/DeactivateModal"
 
 // Main JSX
-export default function StudentTable(props: { studentsAssignmentsAndModels: studentsAssignmentsAndModels[] }) {
+export default function StudentTable(props:{students: authorized[]}) {
     // Data transfer contexts
     const initializeDataTransfer = useContext(DataTransferContext).initializeDataTransferHandler
     const terminateDataTransfer = useContext(DataTransferContext).terminateDataTransferHandler
@@ -28,12 +28,8 @@ export default function StudentTable(props: { studentsAssignmentsAndModels: stud
     const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false)
 
     // Remove student handler
-    const checkAssignmentsBeforeDeactivation = (studentEmail: string) => props.studentsAssignmentsAndModels.find(user => user.email === studentEmail)?.assignment  
-    
+    //const checkAssignmentsBeforeDeactivation = async(studentEmail: string) => await check 
     const deactivateStudentHandler = async (studentEmail: string) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, deActivateStudent, [studentEmail], 'Removing student')
-
-    // Abbreviating prop
-    const sam = useMemo(() => props.studentsAssignmentsAndModels.filter(user => user.role === 'student' && user.active), [props.studentsAssignmentsAndModels])
 
     return <>
     <DeactivateModal isOpen={isDeactivateModalOpen} setIsOpen={setIsDeactivateModalOpen} handler={deactivateStudentHandler} />
@@ -49,11 +45,11 @@ export default function StudentTable(props: { studentsAssignmentsAndModels: stud
                     </thead>
                     <tbody>
                         {
-                            sam.map((student, index) =>
+                            props.students.map((student, index) =>
                                 <tr key={student.email}>
-                                    <td className={index === sam.length - 1 ? "border-[#004C46] py-2 pl-4 border-r" : "border-b border-[#004C46] border-r py-2 pl-4"}>{student.name}</td>
-                                    <td className={index === sam.length - 1 ? "border-[#004C46] py-2 pl-4 border-r" : "border-b border-[#004C46] border-r py-2 pl-4"}>{student.email}</td>
-                                    <td className={index === sam.length - 1 ? "border-[#004C46] py-2 pl-4" : "border-b border-[#004C46] py-2 pl-4"}><Button size="sm" onPress={() => deactivateStudentHandler(student.email)}>Deactivate</Button></td>
+                                    <td className={index === props.students.length - 1 ? "border-[#004C46] py-2 pl-4 border-r" : "border-b border-[#004C46] border-r py-2 pl-4"}>{student.name}</td>
+                                    <td className={index === props.students.length - 1 ? "border-[#004C46] py-2 pl-4 border-r" : "border-b border-[#004C46] border-r py-2 pl-4"}>{student.email}</td>
+                                    <td className={index === props.students.length - 1 ? "border-[#004C46] py-2 pl-4" : "border-b border-[#004C46] py-2 pl-4"}><Button size="sm" onPress={() => deactivateStudentHandler(student.email as string)}>Deactivate</Button></td>
                                 </tr>
                             )
                         }

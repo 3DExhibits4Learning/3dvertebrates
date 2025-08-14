@@ -13,7 +13,7 @@
 import { model } from "@prisma/client"
 import { useState, createContext, useMemo, useEffect } from "react"
 import { Accordion, AccordionItem } from "@heroui/react"
-import { ManagerClientProps, studentsAssignmentsAndModels } from "@/interface/interface"
+import { ManagerClientProps} from "@/interface/interface"
 import { fullModel } from "@/interface/interface"
 import { isMobileOrTablet } from "@/functions/utils/isMobile"
 
@@ -28,7 +28,7 @@ import AddThumbnail from "./Thumbnails/AddThumbnail"
 import UpdateThumbnailContainer from "./Thumbnails/UpdateThumbnailContainer"
 import UpdateModelContainer from "./Model/UpdateModelContainer"
 import DataTransferModal from "../../Shared/Modals/DataTransferModal"
-import StudentTable from "./Students/GetStudents"
+import StudentTable from "@/components/Admin/Administrator/Students/StudentTable"
 import Assignments from "./Assignments/Assignments"
 import FindModel from "./Model/Find"
 import ApproveModel from "./Model/Approve"
@@ -59,9 +59,9 @@ export default function ManagerClient(props: ManagerClientProps) {
     // Variable Declarations 
     const models: fullModel[] = JSON.parse(props.models)
     const modelsNeedingThumbnails: fullModel[] = (JSON.parse(props.modelsNeedingThumbnails) as fullModel[]).filter(model => model.modelApproved)
-    const studentsAssignmentsAndModels: studentsAssignmentsAndModels[] = JSON.parse(props.studentsAssignmentsAndModels)
     const unapprovedModels = useMemo(() => models.filter(model => !model.modelApproved), [props.models])
     const approvedModels = useMemo(() => models.filter(model => model.modelApproved), [props.models])
+    const students = useMemo(() => props.authorizedUsers.filter(user => user.role === 'student'), [props.authorizedUsers])
 
     // Data transfer state variables
     const [openModal, setOpenModal] = useState<boolean>(false)
@@ -104,11 +104,11 @@ export default function ManagerClient(props: ManagerClientProps) {
                     <Accordion>
                         {/* AccordionItem holds nested "Assignments" accordion */}
                         <AccordionItem key={'assignments'} aria-label={'assignments'} title='Assignments' classNames={{ title: accordionTitlesCss }}>
-                            <Assignments studentsAssignmentsAndModels={studentsAssignmentsAndModels} />
+                            <Assignments assignments={JSON.parse(props.assignments)} />
                         </AccordionItem>
                         {/* Active students table */}
                         <AccordionItem key='activeStudents' aria-label='activeStudents' title='Active Students' classNames={{ title: accordionTitlesCss }}>
-                            <StudentTable studentsAssignmentsAndModels={studentsAssignmentsAndModels} />
+                            <StudentTable students={students} />
                         </AccordionItem>
                         {/* Add student form */}
                         <AccordionItem key='addStudent' aria-label='addStudent' title='Add Student' classNames={{ title: accordionTitlesCss }}>
@@ -164,7 +164,7 @@ export default function ManagerClient(props: ManagerClientProps) {
                     {annotationModelUid && <AnnotationClient
                         modelsToAnnotate={approvedModels.filter(model => model.uid === annotationModelUid)}
                         admin={props.admin}
-                        students={studentsAssignmentsAndModels} 
+                        assignments={JSON.parse(props.assignments)} 
                         authorizedUsers={props.authorizedUsers}/>}
                 </AccordionItem>
 

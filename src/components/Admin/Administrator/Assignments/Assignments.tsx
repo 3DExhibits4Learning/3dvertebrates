@@ -7,12 +7,10 @@
 
 'use client'
 
-import { studentsAssignmentsAndModels } from "@/interface/interface"
+import { model } from "@prisma/client"
 import { Fragment } from "react"
 
-export default function Assignments(props: { studentsAssignmentsAndModels: studentsAssignmentsAndModels[] }) {
-    const sam = props.studentsAssignmentsAndModels // sam = students, assignments and models
-
+export default function Assignments(props: { assignments: model[] }) {
     return <section className="flex w-full items-center flex-col mb-16">
         <div className="flex w-3/4 rounded-lg overflow-auto">
             <table className="w-full bg-[#D5CB9F] dark:bg-[#212121] min-w-[800px] text-center">
@@ -25,21 +23,13 @@ export default function Assignments(props: { studentsAssignmentsAndModels: stude
                 </thead>
                 <tbody>
                     {
-                        sam.map((student, index) =>
-                            <Fragment key={student.email}>
+                        props.assignments.map((assignment, index) =>
+                            <Fragment key={assignment.uid}>
                                 <tr>
-                                    <td className={index === sam.length - 1 && sam[index].assignment.length <= 1 ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-[#004C46] border-r py-2 pl-2"}>{student.name}</td>
-                                    <td className={index === sam.length - 1 && sam[index].assignment.length <= 1 ? "py-2 pl-2 border-r border-[#004C46]" : "border-b border-[#004C46] border-r py-2 pl-2"}>{student.assignment.length ? student.models[0].spec_name : 'N/A'}</td>
-                                    <td className={index === sam.length - 1 && sam[index].assignment.length <= 1 ? "py-2 pl-2" : "border-b border-[#004C46] py-2 pl-2"}>{student.assignment.length ? student.assignment[0].uid : 'N/A'}</td>
+                                    <td className={index === props.assignments.length - 1 ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-[#004C46] border-r py-2 pl-2"}>{assignment.annotator}</td>
+                                    <td className={index === props.assignments.length - 1 ? "py-2 pl-2 border-r border-[#004C46]" : "border-b border-[#004C46] border-r py-2 pl-2"}>{assignment.spec_name}</td>
+                                    <td className={index === props.assignments.length - 1 ? "py-2 pl-2" : "border-b border-[#004C46] py-2 pl-2"}>{assignment.uid}</td>
                                 </tr>
-                                {
-                                    student.assignment.length > 1 && student.assignment.slice(1).map((assignment, index) => <tr key={student.email}>
-                                        <td className={!(index === student.assignment.slice(1).length - 1) ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-r border-[#004C46] py-2 pl-2"} >{student.name}</td>
-                                        <td className={!(index === student.assignment.slice(1).length - 1) ? "border-[#004C46] border-r py-2 pl-2" : "border-b border-r border-[#004C46] py-2 pl-2"} >{student.models[index + 1].spec_name}</td>
-                                        <td className={!(index === student.assignment.slice(1).length - 1) ? "py-2 pl-2" : "border-b border-[#004C46] py-2 pl-2"} >{assignment.uid}</td>
-                                    </tr>
-                                    )
-                                }
                             </Fragment>
                         )
                     }

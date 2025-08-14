@@ -18,8 +18,31 @@ import { authorized } from "@prisma/client"
 // Default imports
 import prisma from "@/functions/utils/prisma"
 
+/**
+ * 
+ * @param email 
+ * @returns 
+ */
 export const deActivateStudent = async (email: string) => await prisma.authorized.update({ where: { email: email }, data: { active: false } }).then(() => 'Student deactivated')
     .catch(e => serverActionErrorHandler(path, e.message, 'deActivateStudent()', "Couldn't deactivate student"))
+
+/**
+ * 
+ * @param email 
+ * @returns 
+ */
+export const areThereIncompleteAssignments = async (email: string) => {
+    const assignedModels = await prisma.model.findMany({ where: { assignedEmail: email, annotated: false } })
+
+    if (assignedModels.length) {
+        for (let model of assignedModels) {
+            const annotations = await prisma.annotations.findMany({ where: { uid: model.uid } })
+
+            if (annotations.length) return true
+        }
+    }
+    return false
+}
 
 /**
  * 
@@ -69,10 +92,13 @@ export const assignAnnotation = async (student: string, email: string, uid: stri
         if (!(email && uid && student)) throw Error('Input data missing')
         console.log(`Assigning model ${uid} to student ${student} with email ${email}`)
 
+        // Get annotator name
+        const annotatorName = await prisma.authorized.findUnique({ where: { email: email } }).then(user => user?.name)
+
         // Annotator update + assignment queries
         const deleteAnnotations = previousAnnotator ? prisma.annotations.deleteMany({ where: { uid: uid } }) : undefined
         const updateAnnotator = prisma.model.update({ where: { uid: uid }, data: { annotator: student } })
-        const assignModelForAnnotation = prisma.assignment.create({ data: { uid: uid, email: email } })
+        const assignModelForAnnotation = prisma.model.update({ where: { uid: uid }, data: { assignedEmail: email, annotator: annotatorName } })
         const tx = deleteAnnotations ? [updateAnnotator, assignModelForAnnotation, deleteAnnotations] : [updateAnnotator, assignModelForAnnotation]
 
         // Await transaction and inform student of assignment
@@ -85,20 +111,22 @@ export const assignAnnotation = async (student: string, email: string, uid: stri
     catch (e: any) { return e.message }
 }
 
+export const getAssignmentEmail = async (uid: string) => await prisma.model.findUnique({ where: { uid: uid } }).then(model => model?.assignedEmail)
+
 /**
  * 
  * @param email 
  * @param uid 
  * @returns 
  */
-export const unassignAnnotation = async (email: string, uid: string, dev?: boolean) => {
+export const unassignAnnotation = async (uid: string, dev?: boolean) => {
     try {
         // Throw error if any data is missing
-        if (!(email && uid)) throw Error('Input data missing')
+        if (!uid) throw Error('Uid missing')
 
         // Annotator update + assignment queries
         const updateAnnotator = prisma.model.update({ where: { uid: uid }, data: { annotator: null } })
-        const unassignModelForAnnotation = prisma.assignment.delete({ where: { uid: uid } })
+        const unassignModelForAnnotation = prisma.model.update({ where: { uid: uid }, data: { annotator: null, assignedEmail: null } })
         const tx = dev ? [updateAnnotator, unassignModelForAnnotation] : [updateAnnotator, unassignModelForAnnotation, prisma.annotations.deleteMany({ where: { uid: uid } })]
 
         // Await transaction and inform student of assignment
@@ -211,13 +239,6 @@ export const addStudent = async (email: string, name: string) => {
     // Typical fail response
     catch (e: any) { catchMessage(e.message) }
 }
-
-/**
- * 
- * @param uid 
- * @returns 
- */
-export const getAssignmentEmail = async (uid: string) => await prisma.assignment.findUnique({ where: { uid: uid }, select: { email: true } }).then(assignment => assignment?.email)
 
 /**
  * 

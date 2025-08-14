@@ -7,12 +7,12 @@
  */
 
 // Typical imports
-import { getAllAnnotationModels, getAssignments, getModelsToAnnotate, getModelAnnotations } from "@/functions/server/queries"
+import { getAllAnnotationModels, getModelsToAnnotate, getModelAnnotations } from "@/functions/server/queries"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { getAuthorizedUsers } from "@/functions/server/queries"
 import { serverErrorHandler } from "@/functions/server/error"
-import { model, assignment, authorized } from "@prisma/client"
+import { model, authorized } from "@prisma/client"
 import { annotationWithModel, fullModel } from "@/interface/interface"
 import { isAnnotationModel, isUsedAnnotationModel } from "@/functions/server/utils/filters";
 
@@ -45,7 +45,7 @@ export default async function Page() {
         // Get models to annotate, annotation models (models used as annotations themselves), and assignments
         const modelsToAnnotate = await getModelsToAnnotate().catch(e => serverErrorHandler(path, e.message, "Couldn't get models to annotate", 'getModelsToAnnotate()', false)) as fullModel[]
         const annotationModels = await getAllAnnotationModels().catch(e => serverErrorHandler(path, e.message, "Couldn't get annotation models", 'getModelsToAnnotate()', false)) as model[]
-        const assignments = await getAssignments().catch(e => serverErrorHandler(path, e.message, "Couldn't get assignments", 'getAssignments()', false)) as assignment[]
+        const assignments = modelsToAnnotate.filter(model => model.assignedEmail === email)
 
         // Get modelAnnotations and filter for unused annotations
         const modelAnnotations = await getModelAnnotations().catch(e => serverErrorHandler(path, e.message, "Couldn't get assignments", 'getAssignments()', false)) as annotationWithModel[]
@@ -59,7 +59,7 @@ export default async function Page() {
         return <>
             <Header pageRoute="collections" headerTitle="Botany Admin" />
             <main className="w-full min-h-[calc(100vh-177px)] h-[calc(100vh-177px)] overflow-y-auto">
-                <StudentClient modelsToAnnotate={JSON.stringify(assignedModels)} annotationModels={JSON.stringify(unusedModelAnnotations)} />
+                <StudentClient modelsToAnnotate={JSON.stringify(assignedModels)} annotationModels={JSON.stringify(unusedModelAnnotations)} assignments={assignments} />
             </main>
             <Foot />
         </>

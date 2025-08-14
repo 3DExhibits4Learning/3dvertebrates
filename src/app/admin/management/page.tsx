@@ -8,16 +8,13 @@
 // Typical imports
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
-import { fullModel, studentsAndAssignments } from "@/interface/interface"
-import { getFullModels, getStudentsAndAssignments, getModelAnnotations, getAuthorizedUsers } from "@/functions/server/queries"
-import { authorized, model_annotation } from "@prisma/client"
+import { fullModel } from "@/interface/interface"
 import { serverErrorHandler } from "@/functions/server/error"
 import { annotationWithModel } from "@/interface/interface"
 import { isAnnotationModel, isUsedAnnotationModel } from "@/functions/server/utils/filters"
 
 // Default imports
 import ManagerClient from "@/components/Admin/Administrator/ManagerClient"
-import createStudentsAssignmentsAndModels from "@/functions/client/managerClient/createStudentsAssignmentsAndModels"
 import Header from "@/components/Header/Header"
 import Foot from "@/components/Shared/Foot"
 import FullPageError from "@/components/Error/FullPageError"
@@ -42,21 +39,16 @@ export default async function Page() {
         if (!authorizedUsers.find(user => user.email === email && user.role === 'admin')) return <h1>NOT AUTHORIZED</h1>
 
         // Get all 3D models
-        const models = await prisma.model.findMany({ include: { software: true, tags: true, assignment: true } }) as fullModel[]
+        const models = await prisma.model.findMany({ include: { software: true, tags: true } }) as fullModel[]
 
         // Get model annoations (annotation record with model_annotation record included)
         const modelAnnotations = await prisma.annotations.findMany({ where: { annotation_type: 'model' }, include: { model_annotation: true } }) as annotationWithModel[]
 
-        // Get students and assignments
-        const students = await getStudentsAndAssignments().catch(e => serverErrorHandler(path, e.message, "Couldn't students and assignments", 'getStudetnsAndAssignments()', false)) as studentsAndAssignments[]
-
         // Stringified model filters (decimal objects (which are included in models table) can't be passed directly to client)
         const modelsString = JSON.stringify(models)
         const modelsNeedingThumbnails = JSON.stringify(models.filter(model => model.thumbnail === null))
-        const unusedAnnotationModels = JSON.stringify(models.filter(model => isAnnotationModel(model) && !isUsedAnnotationModel(model, modelAnnotations)))
-
-        // Create and stringify custom data object for admin "current assignments" table
-        const studentsAssignmentsAndModels = JSON.stringify(createStudentsAssignmentsAndModels(students, models))
+        // const unusedAnnotationModels = JSON.stringify(models.filter(model => isAnnotationModel(model) && !isUsedAnnotationModel(model, modelAnnotations)))
+        const assignments = JSON.stringify(models.filter(model => model.assignedEmail))
 
         // Typical client return
         return <>
@@ -65,9 +57,10 @@ export default async function Page() {
                 <ManagerClient
                     models={modelsString}
                     modelsNeedingThumbnails={modelsNeedingThumbnails}
-                    studentsAssignmentsAndModels={studentsAssignmentsAndModels}
                     admin={true}
-                    authorizedUsers={authorizedUsers} />
+                    authorizedUsers={authorizedUsers}
+                    assignments={assignments}
+                />
             </main>
             <Foot />
         </>

@@ -64,7 +64,8 @@ model model {
   build_process         String        @default("Photogrammetry") @db.VarChar(50)
   thumbnail             String?       @db.VarChar(500)
   annotator             String?       @db.VarChar(75)
-  annotatorId           String?       @db.VarChar(50) 
+  annotatorId           String?       @db.VarChar(50)
+  assignedEmail         String?       @db.VarChar(50) 
   lat                   Decimal?      
   lng                   Decimal?
   email                 String        @db.VarChar(100)
@@ -72,8 +73,8 @@ model model {
   annotations           annotations[]
   software              software[]
   tags                  tags[]
-  assignment            assignment?
   model_annotation      model_annotation?
+  authorized            authorized?   @relation(fields: [assignedEmail], references: [email], onDelete: NoAction, onUpdate: NoAction, map: "emailfk1")
 }
 
 model text_annotation {
@@ -166,22 +167,12 @@ model authorized {
   role             String          @default("student")
   name             String          @default("Cal Poly Humboldt Vertebrate Museum")
   active           Boolean         @default(true)
-  assignment       assignment[]  
-  semester         semester[]  
+  semester         semester[]
+  model            model[]  
 }
 
 model semester {
   email            String          @id
   semester         String          @db.VarChar(25)
   studentEmail     authorized      @relation(fields: [email], references: [email], onDelete: Cascade, onUpdate: Cascade, map: "semesterFkEmail" )
-}
-
-model assignment {
-  email               String      
-  uid                 String       @unique
-  studentEmail        authorized   @relation(fields: [email], references: [email], onDelete: Cascade, onUpdate: Cascade, map: "assignmentFkEmail" )
-  name                String?     
-  modelUid            model        @relation(fields: [uid], references: [uid], onDelete: Cascade, onUpdate: Cascade, map: "assignmentFkUid" )
-
-  @@unique([email, uid])
 }
