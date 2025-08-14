@@ -18,6 +18,9 @@ import { authorized } from "@prisma/client"
 // Default imports
 import prisma from "@/functions/utils/prisma"
 
+export const deActivateStudent = async (email: string) => await prisma.authorized.update({ where: { email: email }, data: { active: false } }).then(() => 'Student deactivated')
+    .catch(e => serverActionErrorHandler(path, e.message, 'deActivateStudent()', "Couldn't deactivate student"))
+
 /**
  * 
  * @param uid 
@@ -64,7 +67,7 @@ export const assignAnnotation = async (student: string, email: string, uid: stri
     try {
         // Throw error if any data is missing
         if (!(email && uid && student)) throw Error('Input data missing')
-            console.log(`Assigning model ${uid} to student ${student} with email ${email}`)
+        console.log(`Assigning model ${uid} to student ${student} with email ${email}`)
 
         // Annotator update + assignment queries
         const deleteAnnotations = previousAnnotator ? prisma.annotations.deleteMany({ where: { uid: uid } }) : undefined
@@ -206,32 +209,6 @@ export const addStudent = async (email: string, name: string) => {
         return 'Student added'
     }
     // Typical fail response
-    catch (e: any) { catchMessage(e.message) }
-}
-
-/**
- * 
- * @param email 
- * @returns 
- */
-export const deleteStudent = async (email: string) => {
-    try {
-        if (!email) throw Error('No email provided')
-
-        // Get authorized students, then filter and map to an array of their emails
-        const students = await prisma.authorized.findMany().catch((e) => serverActionErrorHandler(path, e.message, 'getAuthorizedUsers()', "Couldn't get authorized students")) as authorized[]
-        const studentEmails = students.filter(user => user.role === 'student').map(student => student.email)
-
-        // Return a bad request if the student's email is not in the array
-        if (!studentEmails.includes(email)) throw Error('Student is not active on this project')
-
-        // Remove student from authorized table in database
-        await prisma.authorized.delete({ where: { email: email } }).catch((e) => serverActionErrorHandler(path, e.message, 'removeStudent()', "Couldn't remove student"))
-
-        // Typical success response
-        return 'Student deactivated'
-    }
-    // Typical catch
     catch (e: any) { catchMessage(e.message) }
 }
 
