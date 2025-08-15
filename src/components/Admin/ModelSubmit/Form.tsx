@@ -25,6 +25,7 @@ import ModelInput from './ModelInput'
 import LatLng from './LatLng'
 import BaseOrAnnotation from './BaseOrAnnotation'
 import TextInput from '@/components/Shared/Form Fields/TextInput'
+import UploadModal from '@/components/Admin/ModelSubmit/UploadModal'
 
 // Main component
 export default function ModelSubmitForm() {
@@ -50,12 +51,10 @@ export default function ModelSubmitForm() {
     const [success, setSuccess] = useState<boolean>()
 
     // 3D model upload handler
-    const handle3DModelUpload = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handle3DModelUpload = async () => {
 
         try {
-
             // Prevent default and set initial transfer states
-            e.preventDefault()
             setOpen(true)
             setTransferring(true)
 
@@ -107,6 +106,7 @@ export default function ModelSubmitForm() {
 
     return <>
         <DataTransferModal open={open} transferring={transferring} result={result} loadingLabel='Uploading 3D Model' href='/admin' modelUpload success={success} />
+        <UploadModal isOpen={open} setIsOpen={setOpen} />
 
         <form className='w-full lg:w-3/5 lg:border-2 m-auto lg:border-[#004C46] lg:rounded-md bg-[#D5CB9F] dark:bg-[#212121] lg:mb-16 text-[#004C46] dark:text-white'>
 
@@ -139,7 +139,7 @@ export default function ModelSubmitForm() {
             <Button
                 isDisabled={uploadDisabled}
                 color='primary'
-                onClick={handle3DModelUpload}
+                onPress={() => {handle3DModelUpload()}}
                 className='text-white text-xl mb-24 mt-8 ml-12'>Upload 3D Model
             </Button>
 

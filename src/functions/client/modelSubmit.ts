@@ -15,14 +15,14 @@ import { v4 as uuidv4 } from 'uuid'
  * @param zip 
  * @param tmpId 
  */
-export const chunkFileToTmp = async (zip: Blob | File, tmpId: string) => {
+export const chunkFileToTmp = async (model: Blob | File, tmpId: string) => {
     // Declare chunk size and offset
     const chunkSize = 4 * 1024 * 1024 // 4 MB chunks
     var offset = 0
 
     // Fetch chunks until file upload is complete
-    while (offset < zip.size) {
-        const chunk = zip.slice(offset, offset + chunkSize)
+    while (offset < model.size) {
+        const chunk = model.slice(offset, offset + chunkSize)
         offset += chunkSize
 
         // Set form data
