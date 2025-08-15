@@ -16,6 +16,9 @@ import { Accordion, AccordionItem } from "@heroui/react"
 import { ManagerClientProps} from "@/interface/interface"
 import { fullModel } from "@/interface/interface"
 import { isMobileOrTablet } from "@/functions/utils/isMobile"
+import { getAllPhotoAnnotations } from "@/functions/server/admin/administrator"
+import { sanitizeHtml } from "@/functions/client/annotationEntry"
+import { updatePhotoAnnotation } from "@/functions/server/admin/administrator"
 
 // Default imports
 import AnnotationClient from "@/components/Admin/Annotation/Annotation Client/AnnotationClient"
@@ -33,9 +36,6 @@ import Assignments from "./Assignments/Assignments"
 import FindModel from "./Model/Find"
 import ApproveModel from "./Model/Approve"
 import Select from "@/components/Shared/Form Fields/Select"
-import { getAllPhotoAnnotations } from "@/functions/server/admin/administrator"
-import { sanitizeHtml } from "@/functions/client/annotationEntry"
-import { updatePhotoAnnotation } from "@/functions/server/admin/administrator"
 
 // Dynamic imports
 const ModelSubmitForm = dynamic(() => import("@/components/Admin/ModelSubmit/Form"))
@@ -62,6 +62,7 @@ export default function ManagerClient(props: ManagerClientProps) {
     const unapprovedModels = useMemo(() => models.filter(model => !model.modelApproved), [props.models])
     const approvedModels = useMemo(() => models.filter(model => model.modelApproved), [props.models])
     const students = useMemo(() => props.authorizedUsers.filter(user => user.role === 'student'), [props.authorizedUsers])
+    const assignments = useMemo(() => (JSON.parse(props.assignments) as model[]).sort((a: model, b: model) => (a.annotator as string).localeCompare(b.annotator as string)), [props.assignments])
 
     // Data transfer state variables
     const [openModal, setOpenModal] = useState<boolean>(false)
@@ -104,7 +105,7 @@ export default function ManagerClient(props: ManagerClientProps) {
                     <Accordion>
                         {/* AccordionItem holds nested "Assignments" accordion */}
                         <AccordionItem key={'assignments'} aria-label={'assignments'} title='Assignments' classNames={{ title: accordionTitlesCss }}>
-                            <Assignments assignments={JSON.parse(props.assignments)} />
+                            <Assignments assignments={assignments} />
                         </AccordionItem>
                         {/* Active students table */}
                         <AccordionItem key='activeStudents' aria-label='activeStudents' title='Active Students' classNames={{ title: accordionTitlesCss }}>
@@ -164,7 +165,7 @@ export default function ManagerClient(props: ManagerClientProps) {
                     {annotationModelUid && <AnnotationClient
                         modelsToAnnotate={approvedModels.filter(model => model.uid === annotationModelUid)}
                         admin={props.admin}
-                        assignments={JSON.parse(props.assignments)} 
+                        assignments={assignments} 
                         authorizedUsers={props.authorizedUsers}/>}
                 </AccordionItem>
 

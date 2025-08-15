@@ -48,7 +48,7 @@ export default async function Page() {
         const modelsString = JSON.stringify(models)
         const modelsNeedingThumbnails = JSON.stringify(models.filter(model => model.thumbnail === null))
         // const unusedAnnotationModels = JSON.stringify(models.filter(model => isAnnotationModel(model) && !isUsedAnnotationModel(model, modelAnnotations)))
-        const assignments = JSON.stringify(models.filter(model => model.assignedEmail))
+        const assignments = JSON.stringify(models.filter(model => model.assignedEmail && model.base_model))
 
         // Typical client return
         return <>

@@ -31,7 +31,7 @@ export const deActivateStudent = async (email: string) => await prisma.authorize
  * @param email 
  * @returns 
  */
-export const areThereIncompleteAssignments = async (email: string) => {
+export const areThereIncompleteAssignments = async (email: string): Promise<boolean> => {
     const assignedModels = await prisma.model.findMany({ where: { assignedEmail: email, annotated: false } })
 
     if (assignedModels.length) {
@@ -111,7 +111,29 @@ export const assignAnnotation = async (student: string, email: string, uid: stri
     catch (e: any) { return e.message }
 }
 
+/**
+ * 
+ * @param uid 
+ * @returns 
+ */
 export const getAssignmentEmail = async (uid: string) => await prisma.model.findUnique({ where: { uid: uid } }).then(model => model?.assignedEmail)
+
+/**
+ * 
+ * @param email 
+ * @returns 
+ */
+export const unassignAndDeactivate = async (email: string) => {
+    const assignments = await prisma.model.findMany({ where: { assignedEmail: email } })
+
+    for (let assignment of assignments) {
+        const deactivateStudent = prisma.authorized.update({ where: { email: email }, data: { active: false } })
+        const updateAssignment = prisma.model.update({ where: { uid: assignment.uid }, data: { assignedEmail: null, annotator: null } })
+        const deleteAnnotations = prisma.annotations.deleteMany({ where: { uid: assignment.uid } })
+
+        await prisma.$transaction([updateAssignment, deleteAnnotations, deactivateStudent]).catch(e => serverActionErrorHandler(path, e.message, 'unassignAndDeactivate()', "Couldn't unassign model"))
+    }
+}
 
 /**
  * 
