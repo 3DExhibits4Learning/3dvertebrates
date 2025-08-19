@@ -19,7 +19,6 @@ import ArtistName from './ArtistNameField'
 import SpeciesName from './SpeciesNameField'
 import ProcessSelect from './ProcessSelectField'
 import TagInput from './Tags'
-import DataTransferModal from '../../Shared/Modals/DataTransferModal'
 import SpeciesAcquisitionDate from './AcquisitionDate'
 import ModelInput from './ModelInput'
 import LatLng from './LatLng'
@@ -46,9 +45,11 @@ export default function ModelSubmitForm() {
     // Data transfer states
     const [uploadDisabled, setUploadDisabled] = useState<boolean>(true)
     const [open, setOpen] = useState<boolean>(false)
-    const [transferring, setTransferring] = useState<boolean>(false)
     const [result, setResult] = useState<string>('')
     const [success, setSuccess] = useState<boolean>()
+    const [uploadProgress, setUploadProgress] = useState<number>(0)
+    const [writingToDisk, setWritingToDisk] = useState<boolean>(false)
+    const [exportingToSketchfab, setExportingToSketchfab] = useState<boolean>(false)
 
     // 3D model upload handler
     const handle3DModelUpload = async () => {
@@ -56,7 +57,7 @@ export default function ModelSubmitForm() {
         try {
             // Prevent default and set initial transfer states
             setOpen(true)
-            setTransferring(true)
+            setWritingToDisk(true)
 
             // Stringify arrays and object
             const formSoftware = JSON.stringify(software.map(obj => obj.value))
@@ -66,7 +67,9 @@ export default function ModelSubmitForm() {
             // Write file to tmp 
             const model = file as File
             const tmpId = uuidv4()
-            await chunkFileToTmp(model, tmpId).catch(e => { throw Error(e.message) })
+            await chunkFileToTmp(model, tmpId, setUploadProgress).catch(e => { throw Error(e.message) })
+            setExportingToSketchfab(true)
+            setWritingToDisk(false)
 
             // Set form data
             const data = new FormData()
@@ -85,13 +88,14 @@ export default function ModelSubmitForm() {
             // Upload 3d model to sketchfab and insert model data into database via associated route handler
             await fetch('/api/modelSubmit', { method: 'POST', body: data })
                 .then(res => { if (!res.ok) throw Error(res.statusText); return res.json() })
-                .then(json => { setResult(json.data); setTransferring(false) })
+                .then(json => { setResult(json.data); setExportingToSketchfab(false) })
                 .catch(e => { throw Error(e.message) })
         }
         // Typical catch
         catch (e: any) {
             setResult(e.message)
-            setTransferring(false)
+            setWritingToDisk(false)
+            setExportingToSketchfab(false)
             setSuccess(false)
         }
     }
@@ -105,8 +109,8 @@ export default function ModelSubmitForm() {
     }, [species, artist, buildMethod, software.length, file, baseOrAnnotation])
 
     return <>
-        <DataTransferModal open={open} transferring={transferring} result={result} loadingLabel='Uploading 3D Model' href='/admin' modelUpload success={success} />
-        <UploadModal isOpen={open} setIsOpen={setOpen} />
+        {/* <DataTransferModal open={open} transferring={transferring} result={result} loadingLabel='Uploading 3D Model' href='/admin' modelUpload success={success} /> */}
+        <UploadModal isOpen={open} setIsOpen={setOpen} writingToDisk={writingToDisk} exportingToSketchfab={exportingToSketchfab} progress={uploadProgress} result={result} />
 
         <form className='w-full lg:w-3/5 lg:border-2 m-auto lg:border-[#004C46] lg:rounded-md bg-[#D5CB9F] dark:bg-[#212121] lg:mb-16 text-[#004C46] dark:text-white'>
 
@@ -139,7 +143,7 @@ export default function ModelSubmitForm() {
             <Button
                 isDisabled={uploadDisabled}
                 color='primary'
-                onPress={() => {handle3DModelUpload()}}
+                onPress={() => { handle3DModelUpload() }}
                 className='text-white text-xl mb-24 mt-8 ml-12'>Upload 3D Model
             </Button>
 
