@@ -43,7 +43,7 @@ export default function SearchPageModelList(props: {models: model[], selectedMod
       </div>
     }
 
-    <section className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 4xl:grid-cols-5 gap-4 mx-5'>
+    <section className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mx-5'>
       {filteredModels && filteredModels.map((model: model) => <Card key={model.uid} model={model}/>)}
     </section >
   </>

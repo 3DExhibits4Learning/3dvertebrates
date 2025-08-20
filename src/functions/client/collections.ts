@@ -9,6 +9,7 @@ import { model_annotation } from "@prisma/client"
 import Vertebrates from '@/classes/HerbariumClass'
 import Sketchfab from '@sketchfab/viewer-api'
 import { getLocalNfsPrefix, isLocalDevEnvClient } from "@/functions/client/utils"
+import { isMobileOrTablet } from "@/functions/utils/isMobile"
 
 
 /**
@@ -78,7 +79,7 @@ export const addAnnotationEventListener = (collectionState: CollectionState, set
 
         // this event is still triggered even when an annotation is not selected; an index of -1 is returned; also checking that the same index is not selected
         if (index !== -1) setCollectionState(prev => {
-            if(prev.index !== index) return { ...prev, index: index, imgLoading: true }
+            if (prev.index !== index) return { ...prev, index: index, imgLoading: true }
             else return prev
         })
 
@@ -109,7 +110,7 @@ export const initializeAnnotations = (collectionState: CollectionState, annotati
         if (collectionState.s.model.annotationPosition) {
             const position = JSON.parse(collectionState.s.model.annotationPosition)
             collectionState.api.createAnnotationFromScenePosition(position[0], position[1], position[2], 'Taxonomy and Description', '', (err: any) => {
-                if (!annotationUid) collectionState.api.gotoAnnotation(0, { preventCameraAnimation: true, preventCameraMove: false })
+                if (!annotationUid && !isMobileOrTablet()) collectionState.api.gotoAnnotation(0, { preventCameraAnimation: true, preventCameraMove: false })
             })
 
             // Create any futher annotations that exist
@@ -125,8 +126,9 @@ export const initializeAnnotations = (collectionState: CollectionState, annotati
         if (annotationUid) {
             const annotation = collectionState.annotations.find(annotation => annotation.annotation_type === 'model' && (annotation.annotation as model_annotation).uid === annotationUid)
             if (annotation) collectionState.api.gotoAnnotation(annotation.annotation_no - 1, { preventCameraAnimation: true, preventCameraMove: false }, function (err: any, index: any) { })
-            else collectionState.api.gotoAnnotation(0, { preventCameraAnimation: true, preventCameraMove: false })
+            else collectionState.api.gotoAnnotation(0, { preventCameraAnimation: true, preventCameraMove: false }) 
         }
+        else { if (!isMobileOrTablet()) collectionState.api.gotoAnnotation(0, { preventCameraAnimation: true, preventCameraMove: false }) }
 
         // Annotation swtiches
         const annotationSwitch = document.getElementById("annotationSwitch")

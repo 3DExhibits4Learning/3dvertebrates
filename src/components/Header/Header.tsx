@@ -30,7 +30,7 @@ const Header = (props: SearchHeaderProps) => {
 
   // Params, session variables
   const params = useParams()
-  const { data: session } = useSession()
+  //const { data: session } = useSession()
 
   // States
   const [isSelected, setIsSelected] = useState<boolean>(true)

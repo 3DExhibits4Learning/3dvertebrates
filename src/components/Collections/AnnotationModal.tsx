@@ -46,14 +46,13 @@ export default function AnnotationModal(props: annotationModalProps) {
         <ModalContent>
           {(onClose) => (
             <>
-              {/*@ts-ignore*/}
-              <ModalHeader class='fade' className="flex gap-1 w-full items-center">
+              <ModalHeader className="fade flex gap-1 w-full items-center justify-center">
                 <p className="text-center text-2xl pt-[20px]">{props.title}</p>
               </ModalHeader>
               <ModalBody>
                 {props.index == 0 &&
 
-                  <p id="WhyAreThereThreeZedosAf">
+                  <section>
                     <div className="fade w-full flex justify-center items-center pt-[20px] pb-[20px] text-center flex-col">
                       <div className='text-[1.25rem] border-b border-t border-[#004C46] w-full'>
                         <p> Classification </p>
@@ -97,44 +96,44 @@ export default function AnnotationModal(props: annotationModalProps) {
                         <p dangerouslySetInnerHTML={{ __html: s.wikiSummary.extract_html }}></p><br></br>
                         <p className="text-[0.9rem]">from <a href={s.wikiSummary.content_urls.desktop.page} target='_blank'><u>Wikipedia</u></a></p>
                       </div>}
-                  </p>}
+                  </section>}
 
                 {
                   !!props.index && annotations[props.index - 1].annotation_type === 'photo' &&
                   <>
                     {
                       props.imgLoading &&
-                      <p>
+                      <section>
                         <div className="fade w-full h-full text-center">
                           <Skeleton className="w-full h-full" />
                         </div>
-                      </p>
+                      </section>
                     }
                     {
                       !props.imgLoading && props.imgSrc &&
-                      <p id="modalMedia2">
+                      <section id="modalMedia2">
                         <div className="fade w-full h-full text-center">
                           <img className="center w-full h-[50vh]" src={props.imgSrc} alt={`Annotation number ${annotations[props.index - 1].annotation_no}`}></img>
                         </div>
-                      </p>
+                      </section>
                     }
                     <span>
-                      <p id="modalText">
+                      <section id="modalText">
                         <br></br>
                         <p dangerouslySetInnerHTML={{ __html: annotations[props.index - 1].annotation.annotation as string }} className="m-auto text-center fade"></p>
-                      </p>
-                      <p id="modalCitation">
+                      </section>
+                      <section id="modalCitation">
                         <br></br>
                         <p className="fade text-center w-[95%]"> Photo by: {(annotations[props.index - 1].annotation as photo_annotation).author}, licensed under <a href='https://creativecommons.org/share-your-work/cclicenses/' target='_blank'>{(annotations[props.index - 1].annotation as photo_annotation).license}</a></p>
-                      </p>
+                      </section>
                     </span>
                   </>
                 }
                 {
                   !!props.index && annotations[props.index - 1].annotation_type === 'video' &&
-                  <p id="modalVideo">
+                  <section id="modalVideo">
                     <iframe className="w-full h-[77.5vh] fade" src={annotations[props.index - 1].url as string}></iframe>
-                  </p>
+                  </section>
                 }
                 {
                   !!props.index && annotations[props.index - 1].annotation_type === 'model' &&
