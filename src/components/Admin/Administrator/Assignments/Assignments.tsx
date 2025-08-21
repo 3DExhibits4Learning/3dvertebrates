@@ -11,7 +11,7 @@ import { model } from "@prisma/client"
 import { Fragment } from "react"
 
 export default function Assignments(props: { assignments: model[] }) {
-    return <section className="flex w-full items-center flex-col mb-16">
+    return props.assignments.length > 0 ? <section className="flex w-full items-center flex-col mb-16">
         <div className="flex w-3/4 rounded-lg overflow-auto">
             <table className="w-full bg-[#D5CB9F] dark:bg-[#212121] min-w-[800px] text-center">
                 <thead>
@@ -36,5 +36,7 @@ export default function Assignments(props: { assignments: model[] }) {
                 </tbody>
             </table>
         </div>
+    </section> : <section className="flex w-full items-center flex-col mb-16">
+        <p className='text-xl'>No unannotated assignments found</p>
     </section>
 }

@@ -120,18 +120,24 @@ export const getAssignmentEmail = async (uid: string) => await prisma.model.find
 
 /**
  * 
+ * @returns 
+ */
+export const getActiveStudents = async () => await prisma.authorized.findMany({ where: { active: true, role: 'student' } })
+
+/**
+ * 
  * @param email 
  * @returns 
  */
 export const unassignAndDeactivate = async (email: string) => {
     const assignments = await prisma.model.findMany({ where: { assignedEmail: email } })
+    const txArr: any = [prisma.authorized.update({ where: { email: email }, data: { active: false } })]
 
     for (let assignment of assignments) {
-        const deactivateStudent = prisma.authorized.update({ where: { email: email }, data: { active: false } })
-        const updateAssignment = prisma.model.update({ where: { uid: assignment.uid }, data: { assignedEmail: null, annotator: null } })
-        const deleteAnnotations = prisma.annotations.deleteMany({ where: { uid: assignment.uid } })
+        txArr.push(prisma.model.update({ where: { uid: assignment.uid }, data: { assignedEmail: null, annotator: null } }))
+        txArr.push(prisma.annotations.deleteMany({ where: { uid: assignment.uid } }))
 
-        await prisma.$transaction([updateAssignment, deleteAnnotations, deactivateStudent]).catch(e => serverActionErrorHandler(path, e.message, 'unassignAndDeactivate()', "Couldn't unassign model"))
+        await prisma.$transaction(txArr).catch(e => serverActionErrorHandler(path, e.message, 'unassignAndDeactivate()', "Couldn't unassign model"))
     }
 }
 
@@ -248,6 +254,19 @@ export const deleteModel = async (uid: string) => {
 export const addStudent = async (email: string, name: string) => {
     try {
         if (!email || !name) throw Error('Name or email is missing')
+        
+        // Get authorized users and check if user already exists
+        const authorized = await prisma.authorized.findMany()
+        const user = authorized.find(user => user.email === email)
+
+        // Reactivate student if they already exist and are not active, else return they already exist
+        if(user){
+            if(!user.active) {
+                await prisma.authorized.update({ where: { email: email }, data: { active: true } })
+                return 'Student reactivated'
+            }
+            else return 'Student already active'
+        }
 
         // Add student to authorized table in the database
         await prisma.authorized.create({ data: { email: email, name: name } }).catch((e) => serverActionErrorHandler(path, e.message, 'addStudent()', "Couldn't add student"))
