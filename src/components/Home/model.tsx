@@ -39,7 +39,7 @@ export default function HomeModel() {
       <div className="w-full flex justify-center mb-12">
         <figure>
           <img src='/mammologyClass.jpeg' width={500}></img>
-          <figcaption className="text-sm italic">Spring '25 Advanced Mammology Class</figcaption>
+          <figcaption className="text-sm italic">Spring &apos;25 Advanced Mammology Class</figcaption>
         </figure>
       </div>
 

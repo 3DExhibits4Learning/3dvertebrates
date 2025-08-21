@@ -13,9 +13,6 @@ import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/
 // Default imports
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
-import EmailProvider from "next-auth/providers/email"
-import iNaturalistProvider from "@/providers/iNatualistProvider"
-import SketchfabProvider from "@/providers/sketchfabProvider"
 
 // SINGLETON
 import prisma from "@/functions/utils/prisma"
@@ -33,26 +30,7 @@ export const authOptions = {
       clientId: process.env.GOOGLE_ID as string,
       clientSecret: process.env.GOOGLE_SECRET as string,
       allowDangerousEmailAccountLinking: true,
-    }),
-    SketchfabProvider({
-      clientId: process.env.SKETCHFAB_ID as string,
-      clientSecret: process.env.SKETCHFAB_SECRET as string,
-      allowDangerousEmailAccountLinking: true,
-    }),
-    iNaturalistProvider({
-      clientId: process.env.INATURALIST_ID as string,
-      clientSecret: process.env.INATURALIST_SECRET as string,
-      allowDangerousEmailAccountLinking: true,
-    }),
-    EmailProvider({
-      server: {
-        host: process.env.EMAIL_SERVER_HOST,
-        port: parseInt(process.env.EMAIL_SERVER_PORT as string),
-        secure: true,
-        auth: { user: process.env.EMAIL_SERVER_USER, pass: process.env.EMAIL_SERVER_PASSWORD }
-      },
-      from: process.env.EMAIL_FROM,
-    }),
+    })
   ],
   callbacks: {
     
