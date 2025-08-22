@@ -297,3 +297,17 @@ export const updatePhotoAnnotation = async (annotation_id: string, annotation: s
     await prisma.photo_annotation.update({ where: { annotation_id: annotation_id }, data: { annotation: annotation } })
 }
 
+/**
+ * 
+ * @param uid 
+ * @returns 
+ */
+export const unpublishModel = async (uid: string) => {
+    try {
+        // Unpublish model annotations
+        await prisma.model.update({ where: { uid: uid }, data: { published: false } }).catch(e => serverActionErrorHandler(path, e.message, 'unpublishModel()', "Unable to unpublish model"))
+        return "Model unpublished"
+    }
+    catch (e: any) { return e.message }
+}
+

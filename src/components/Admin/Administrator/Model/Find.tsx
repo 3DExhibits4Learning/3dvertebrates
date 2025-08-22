@@ -2,23 +2,34 @@
 
 // Typical imports
 import { model } from "@prisma/client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
+import { DataTransferContext } from "@/components/Admin/Administrator/ManagerClient"
+import { unpublishModel } from "@/functions/server/admin/administrator"
 
 // Default imports
 import Select from "@/components/Shared/Form Fields/Select"
 import dynamic from "next/dynamic"
 import ModelDataTable from "./FindModelData"
 import AdminItemContainer from "../ItemContainer"
+import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler"
 
 // Dynamic imports
 const ModelViewer = dynamic(() => import("@/components/Shared/ModelViewer"), { ssr: false })
 
-// Maim JSX
+// Main JSX
 export default function FindModel(props: { models: model[] }) {
+    // Transfer context
+    const dataTransferContext = useContext(DataTransferContext)
+    const initializeDataTransfer = dataTransferContext.initializeDataTransferHandler
+    const terminateDataTransfer = dataTransferContext.terminateDataTransferHandler
+
     // States
     const [uid, setUid] = useState<string>('')
     const [model, setModel] = useState<model>()
     const [isPublished, setIsPublished] = useState<boolean>(false)
+
+    // Unpublish model handler
+    const unpublishModelHandler = async (uid: string) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unpublishModel, [uid], 'Unpublishing model...')
 
     // Set Model Handler and effect
     const setModelHandler = () => setModel(props.models.find(model => model.uid === uid))
@@ -31,10 +42,6 @@ export default function FindModel(props: { models: model[] }) {
             {uid && <div className="w-full h-full"><ModelViewer uid={uid} minHeight="100%" /></div>}
             {model && <ModelDataTable model={model} />}
         </div>
-        {
-            isPublished && <section>
-                <button className="text-red-600 mt-6">Unpublish 3D Vertebrate</button>
-            </section>
-        }
+        {isPublished && <section><button className="text-red-600 mt-6" onClick={() => unpublishModelHandler(uid)}>Unpublish 3D Vertebrate</button></section>}
     </AdminItemContainer>
 }
