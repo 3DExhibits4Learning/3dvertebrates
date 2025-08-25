@@ -45,7 +45,7 @@ const AnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetStateAc
                 annotationsAndPositions.activeAnnotationIndex !== 'new' &&
                 <div className="flex border-b pb-2 pl-2 w-full">
                     <br></br>
-                    <Link href={`/collections/${context.specimenData.specimenName}?preview=1`} className="block w-full"> 
+                    <Link href={`/collections/${context.specimenData.specimenName}?preview=1`} className="block w-full" target="_blank" rel="noopener noreferrer"> 
                         <Button
                             size='sm'
                             className="text-white text-md min-w-[171px] rounded-md w-full"

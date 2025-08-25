@@ -42,7 +42,7 @@ export default function HowTos() {
 
                 <p className='text-3xl mb-1 mt-4'>Uploading a 3D Vertebrate</p>
                 <div className='flex flex-col mb-8'>
-                    <p>Uploading a 3D Vertebrate is pretty straightforward. From your avatar, select &apos;3D Models.&apos; Click &apos;Submit Model&apos; at the top of the page and fill out the form.</p><br></br>
+                    <p>Uploading a 3D Vertebrate is pretty straightforward. From your avatar, select &apos;My 3D Vertebrates.&apos; Click &apos;Submit Model&apos; at the top of the page and fill out the form.</p><br></br>
                     <p>**Note - &apos;Base models&apos; are models that are to be annotated, and &apos;annotation models&apos; are models that will be used as annotations for the base model.</p>
                 </div>
 

@@ -1,4 +1,5 @@
 import Header from '@/components/Header/Header'
+import HelpTicket from '@/components/Help/Help'
 import Foot from '@/components/Shared/Foot'
 
 export default function Tutorials() {
@@ -7,8 +8,8 @@ export default function Tutorials() {
         <title>FAQ</title>
 
         <Header pageRoute='collections' headerTitle='Help' />
-        <main className='min-h-[calc(100vh-177px)] flex p-2 items-center flex-col'>
-            <p className='text-xl mb-8'>Submit a help ticket</p>
+        <main className='min-h-[calc(100vh-177px)] flex p-2 items-center flex-col justify-center'>
+            <HelpTicket />
         </main>
         <Foot />
     </>

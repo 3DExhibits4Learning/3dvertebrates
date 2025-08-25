@@ -1,3 +1,5 @@
+'use server'
+
 /**
  * @file src\functions\server\email.ts
  * 
@@ -27,5 +29,18 @@ export async function informStudentOfAssignment(email: string, domain: string) {
         html: `You have a new assignment on ${domain}.
         <br><br>
         You can find your assignment at ${domain}/admin/student, remember that you must login with your humboldt.edu email address.`
+    }).catch(e => {throw Error(e.message)})
+}
+
+export async function sendHelpTicketEmail(email: string, topic: string, message: string) {
+    await transporter.sendMail({
+        from: process.env.EMAIL_FROM,
+        to: email,
+        subject: `Help Ticket Received - ${topic}`,
+        html: `New Help Ticket:
+        <br><br>
+        Topic: ${topic}
+        <br>
+        Message: ${message}`
     }).catch(e => {throw Error(e.message)})
 }

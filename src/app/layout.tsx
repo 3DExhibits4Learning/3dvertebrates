@@ -20,7 +20,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   const session = await getServerSession()
   const authorizedUsers = await getAuthorizedUsers()
-  const authorizedUsersMapped = authorizedUsers.map(user => user.email)
+  const authorizedUsersMapped = authorizedUsers.filter(user => user.active).map(user => user.email)
 
   if (session) { if (!session.user?.email || !authorizedUsersMapped.includes(session.user?.email)) return <h1>NOT AUTHORIZED</h1> }
 
@@ -32,7 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     }
   }
 
-  const theme = (await cookies()).get("theme");
+  const theme = (await cookies()).get("theme")
 
   return <html className={`${theme?.value} max-w-[100vw] bg-[#F5F3E7] dark:bg-[#181818] overflow-x-hidden`} lang="en">
     <body className="overflow-hidden min-h-[100vh] dark:bg-[#181818] text-[#004C46] dark:text-[#F5F3E7]">
