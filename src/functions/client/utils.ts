@@ -76,11 +76,3 @@ export const sanitizeFileName = (fileName: string) => fileName
     .trim()
     .replace(/\.+$/, '')
 
-/**
- * 
- * @returns 
- */
-export const isIT = () => {
-    const session = useSession()
-    return session.data?.user?.email === 'ab632@humboldt.edu' ? true : false
-}
