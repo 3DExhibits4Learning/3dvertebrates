@@ -53,7 +53,7 @@ export default function StudentTable(props: { students: authorized[] }) {
                                 <tr key={student.email}>
                                     <td className={index === currentStudents.length - 1 ? "border-[#004C46] py-2 pl-4 border-r" : "border-b border-[#004C46] border-r py-2 pl-4"}>{student.name}</td>
                                     <td className={index === currentStudents.length - 1 ? "border-[#004C46] py-2 pl-4 border-r" : "border-b border-[#004C46] border-r py-2 pl-4"}>{student.email}</td>
-                                    <td className={index === currentStudents.length - 1 ? "border-[#004C46] py-2 pl-4" : "border-b border-[#004C46] py-2 pl-4"}><Button size="sm" onPress={() => deactivateStudentHandler(student.email)}>Deactivate</Button></td>
+                                    <td className={index === currentStudents.length - 1 ? "border-[#004C46] py-2 pl-4" : "border-b border-[#004C46] py-2 pl-4"}><Button size="sm" className="text-white" onPress={() => deactivateStudentHandler(student.email)}>Deactivate</Button></td>
                                 </tr>
                             )
                         }

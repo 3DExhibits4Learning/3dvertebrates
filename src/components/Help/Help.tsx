@@ -23,7 +23,7 @@ export default function HelpTicket() {
         setMessage("")
     }
 
-    return <form className="w-1/3 mx-auto p-12 rounded shadow border" onSubmit={handleSubmit}>
+    return <form className="w-1/3 mx-auto p-12 rounded shadow border border-[#004C46] dark:border-[#F5F3E7]" onSubmit={handleSubmit}>
         <h2 className="text-2xl font-bold mb-4">Submit a Help Ticket</h2>
         <label className="block mb-2 font-semibold">
             Topic

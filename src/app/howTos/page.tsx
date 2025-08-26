@@ -11,7 +11,7 @@ export default function HowTos() {
 
         <Header pageRoute='collections' headerTitle='Tutorials' />
         <main className='min-h-[calc(100vh-177px)] flex flex-col items-center'>
-            <section className='h-full flex flex-col w-1/2 border-x p-8'>
+            <section className='h-full flex flex-col w-1/2 border-x border-x-[#004C46] dark:border-x-[#F5F3E7] p-8'>
                 <p className='text-5xl mb-16'>How-To&apos;s</p>
 
                 <p className='text-3xl mb-1'>Overview</p>

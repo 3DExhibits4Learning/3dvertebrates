@@ -29,7 +29,7 @@ export default function HomeModel() {
     </div>
 
     <div className="hidden lg:flex lg:flex-col lg:w-2/5 p-8 items-center overflow-auto">
-      <p className="text-center text-xl mb-12">Welcome to <span className="text-[#FFC72C]">3D</span> Vertebrates</p>
+      <p className="text-center text-xl mb-12">Welcome to <span className="font-medium dark:text-[#FFC72C]">3D</span> Vertebrates</p>
 
       <p className="mb-12">Welcome to 3D Vertebrates, the second of the 3DExhibits4Learning along with the <Link href='https://3dherbarium.org'><u>3D Herbarium</u></Link>.
         This project is a collaboration of the Cal Poly Humboldt Library and Vertebrate Museum. It began as an idea for a supervised study project (BIOL-499) by student Hannah Wirth.</p>

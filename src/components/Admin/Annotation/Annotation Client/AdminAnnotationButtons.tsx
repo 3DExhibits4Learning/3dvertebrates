@@ -122,7 +122,7 @@ const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetSt
                     <Button
                         size='sm'
                         onPress={() => setIsUnassignModalOpen(true)}
-                        className="text-md min-w-[171px] rounded-md w-full h-7"
+                        className="text-md min-w-[171px] rounded-md w-full h-7 text-white"
                         isDisabled={!context.specimenData.annotator} >
                         Unassign Model
                     </Button>

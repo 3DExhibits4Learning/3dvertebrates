@@ -11,7 +11,7 @@ export default function FAQPage() {
         <Header pageRoute='collections' headerTitle='Faq' />
         <main className='flex h-full justify-center w-full'>
             <div className='min-h-[calc(100vh-177px)] flex flex-col items-center w-full'>
-                <section className='h-full flex flex-col w-1/2 border-x p-8'>
+                <section className='h-full flex flex-col w-1/2 border-x border-x-[#004C46] dark:border-x-[#F5F3E7] p-8'>
                     <p className='text-5xl mb-16'>FAQ</p>
 
                     <p className='text-xl mb-1 font-medium'>What&apos;s a &apos;base&apos; model vs an &apos;annotation&apos; model?</p>
