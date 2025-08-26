@@ -53,17 +53,17 @@ export default function Card(props: { model: model }) {
                     </Link>
                 </section>
             }
-            <section className='bg-[#98B8AD] dark:bg-[#3d3d3d] h-[5rem] max-h-[calc(100vh-300px)*0.2] opacity-[0.99] px-5 py-3 rounded-b-md text-center relative z-10 flex flex-col justify-center items-center space-y-1.5 mt-[-1px]'>
+            <section className='bg-[#CDDAD5] dark:bg-[#3d3d3d] h-[5rem] font-medium max-h-[calc(100vh-300px)*0.2] opacity-[0.99] px-5 py-3 rounded-b-md text-center relative z-10 flex flex-col justify-center items-center space-y-1.5 mt-[-1px]'>
                 <section className='flex items-center space-x-0.5rem'>
                     <Link
                         aria-label={`Go to 3D Model of ${model.pref_comm_name}`}
                         href={"/collections/" + (model).spec_name}
                         rel='noopener noreferrer'
                         className='text-[#004C46] dark:text-[#C3D5D1] text-xl'>
-                        <i className='text-lg'>{model.spec_name.charAt(0).toUpperCase() + model.spec_name.slice(1)}</i>
+                        <i className='text-xl'>{model.spec_name.charAt(0).toUpperCase() + model.spec_name.slice(1)}</i>
                     </Link>
                 </section>
-                <section className='text-sm text-black dark:text-white'>
+                <section className='text-md text-black dark:text-white'>
                     {toUpperFirstLetter(model.pref_comm_name)}
                 </section>
             </section>
