@@ -7,15 +7,13 @@
 
 'use client'
 
+import { isIT } from "@/functions/client/utils"
 import { model } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { Fragment } from "react"
 
 export default function Assignments(props: { assignments: model[] }) {
-    const session = useSession()
-    const isIt = session.data?.user?.email === 'ab632@humboldt.edu' ? true : false
-
-    const assignments = isIt ? props.assignments : props.assignments.filter(assignment => assignment.assignedEmail !== 'ab632@humboldt.edu')
+    const assignments = isIT() ? props.assignments : props.assignments.filter(assignment => assignment.assignedEmail !== 'ab632@humboldt.edu')
 
     return assignments.length > 0 ? <section className="flex w-full items-center flex-col mb-16">
         <div className="flex w-3/4 rounded-lg overflow-auto">

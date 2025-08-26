@@ -46,10 +46,8 @@ export const getCollectionMetadata = async (uid: string, usageKey: number, speci
 export const getCollectionModels = async () => {
     try {
         // Get models and return a stringified, site-ready filtred array of them
-        const models = await prisma.model.findMany({orderBy: {spec_name: 'asc'}}).catch(e => serverActionErrorHandler(path, e.message, 'getAllModels()', "Coulnd't get models")) as model[]
-        const isSiteReadyModel = (model: model) => model.site_ready && model.base_model && model.modelApproved && model.thumbnail && model.annotated
-        const siteReadyModels = models.filter(model => isSiteReadyModel(model))
-        return JSON.stringify(siteReadyModels)
+        const models = await prisma.model.findMany({where: {published: true, base_model: true, NOT: {thumbnail: null}}, orderBy: {spec_name: 'asc'}}).catch(e => serverActionErrorHandler(path, e.message, 'getAllModels()', "Coulnd't get models")) as model[]
+        return JSON.stringify(models)
     }
     // Typical catch
     catch (e: any) { return catchMessage(e.message) }

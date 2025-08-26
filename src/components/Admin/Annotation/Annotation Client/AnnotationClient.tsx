@@ -105,7 +105,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], adm
     // Sets the 'admin assigned' variable, indicating whethere the active specimen is assigned to the administrator using the portal
     useEffect(() => { if (props.admin && specimenData.uid) { setAdminAssignedFn() } }, [specimenData.uid])
 
-    return <AnnotationClientData.Provider value={annotationClientContext} >
+    return <AnnotationClientData.Provider value={annotationClientContext}>
 
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />
         {annotationsAndPositions.annotations && annotationsAndPositions.annotations.length >= 2 && specimenData.uid && <AnnotationReorder isOpen={isOpen} setIsOpen={setIsOpen} renumberAnnotations={renumberAnnotations} />}

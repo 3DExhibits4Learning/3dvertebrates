@@ -1,5 +1,7 @@
 'use client'
 
+import { useSession } from "next-auth/react"
+
 /**
  * @file src\functions\client\utils.ts
  * 
@@ -73,3 +75,12 @@ export const sanitizeFileName = (fileName: string) => fileName
     // Trim spaces and dots
     .trim()
     .replace(/\.+$/, '')
+
+/**
+ * 
+ * @returns 
+ */
+export const isIT = () => {
+    const session = useSession()
+    return session.data?.user?.email === 'ab632@humboldt.edu' ? true : false
+}

@@ -13,9 +13,10 @@
 import { model } from "@prisma/client"
 import { useState, createContext, useMemo, useEffect } from "react"
 import { Accordion, AccordionItem } from "@heroui/react"
-import { ManagerClientProps} from "@/interface/interface"
+import { ManagerClientProps } from "@/interface/interface"
 import { fullModel } from "@/interface/interface"
 import { isMobileOrTablet } from "@/functions/utils/isMobile"
+import { isIT } from "@/functions/client/utils"
 import { getAllPhotoAnnotations } from "@/functions/server/admin/administrator"
 import { sanitizeHtml } from "@/functions/client/annotationEntry"
 import { updatePhotoAnnotation } from "@/functions/server/admin/administrator"
@@ -63,7 +64,9 @@ export default function ManagerClient(props: ManagerClientProps) {
     const approvedModels = useMemo(() => models.filter(model => model.modelApproved), [props.models])
     const students = useMemo(() => props.authorizedUsers.filter(user => user.role === 'student' && user.active), [props.authorizedUsers])
     const assignments = useMemo(() => (JSON.parse(props.assignments) as model[]).filter(assignment => !assignment.annotated).sort((a: model, b: model) => (a.annotator as string).localeCompare(b.annotator as string)), [props.assignments])
-    const modelsToAnnotate = useMemo(() => approvedModels.filter(model => model.base_model && !model.published), [approvedModels])
+    const localIsIT = isIT()
+    const modelsToAnnotate = useMemo(() => localIsIT ? approvedModels.filter(model => model.base_model && !model.published)
+        : approvedModels.filter(model => model.base_model && !model.published && model.assignedEmail !== 'ab632@humboldt.edu'), [approvedModels])
 
     // Data transfer state variables
     const [openModal, setOpenModal] = useState<boolean>(false)
@@ -162,12 +165,12 @@ export default function ManagerClient(props: ManagerClientProps) {
 
                 {/* AccordionItem holds nested "Annotations" accordion */}
                 <AccordionItem key={'adminAnnotations'} aria-label={'New Image Set'} title={"Annotations"} classNames={{ title: 'text-[ #004C46] text-2xl' }}>
-                    <Select value={annotationModelUid} setValue={setAnnotationModelUid} models={modelsToAnnotate} width="w-1/5"  />
+                    <Select value={annotationModelUid} setValue={setAnnotationModelUid} models={modelsToAnnotate} width="w-1/5" />
                     {annotationModelUid && <AnnotationClient
                         modelsToAnnotate={approvedModels.filter(model => model.uid === annotationModelUid)}
                         admin={props.admin}
-                        assignments={assignments} 
-                        authorizedUsers={props.authorizedUsers}/>}
+                        assignments={assignments}
+                        authorizedUsers={props.authorizedUsers} />}
                 </AccordionItem>
 
             </Accordion>

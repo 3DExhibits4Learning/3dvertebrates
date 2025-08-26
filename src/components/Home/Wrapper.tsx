@@ -10,7 +10,7 @@ export default function HomeWrapper() {
     return <>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"></meta>
         <meta name="description" content="An annotated collection of 3D Models by the Cal Poly Humboldt Vertebrate Museum and its students"></meta>
-        <title>3D Vertebrate Museum</title>
+        <title>3D Vertebrates</title>
         <Header headerTitle='Home' pageRoute='collections' />
         <HomeModel />
         <Foot />

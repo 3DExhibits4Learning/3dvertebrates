@@ -32,7 +32,7 @@ export default function ModelAnnotationEntry() {
 
     // Annotation model handlers
     const [annotationModels, setAnnotationModels] = useState<model[]>()
-    const setAnnotationModelsFn = async () => setAnnotationModels(JSON.parse(await getAnnotationModels()))
+    const setAnnotationModelsFn = async () => setAnnotationModels((JSON.parse(await getAnnotationModels()) as model[]).filter(model => model.spec_name === apData.specimenData.specimenName))
 
     // Annotation model effect
     useEffect(() => { setAnnotationModelsFn() }, [apData.annotationsAndPositions.annotationSavedOrDeleted])
