@@ -15,6 +15,7 @@ import { authorized } from "@prisma/client"
 import StudentSelect from "../../Administrator/Students/SelectStudents"
 import ThumbnailPreviewModal from "@/components/Admin/Annotation/Annotation Client/ThumbnailModal"
 import AssignModal from "@/components/Admin/Annotation/Annotation Client/AssignModal"
+import { useSession } from "next-auth/react"
 
 // Main JSX
 export default function AdminAnnotation(props: { admin: boolean, authorizedUsers: authorized[] }) {
@@ -25,7 +26,10 @@ export default function AdminAnnotation(props: { admin: boolean, authorizedUsers
     const specimenData = context.specimenData
     const annotationsAndPositions = context.annotationsAndPositions
     const student = context.student
-    const authorizedUsers = props.authorizedUsers.filter(user => ['admin', 'student'].includes(user.role))
+    const session = useSession()
+    const email = session.data?.user?.email
+    const assignees = email !== 'ab632@humboldt.edu' ? props.authorizedUsers.filter(user => ['student'].includes(user.role) || (email && user.email === email)) // only allow IT to assign to other admins
+    : props.authorizedUsers.filter(user => ['student', 'admin'].includes(user.role)) // Admins can assign to students and themselves
     const thumbnail = context.properties.modelsToAnnotate.find(model => model.uid === specimenData.uid)?.thumbnail
 
     // Modal state
@@ -41,10 +45,10 @@ export default function AdminAnnotation(props: { admin: boolean, authorizedUsers
             <div className="flex flex-col justify-start items-center mt-2 mb-8 w-full">
                 <p className="text-xl font-medium mb-2 w-full text-center">Select an annotator for assignment</p>
                 <div className="flex w-full items-center justify-center">
-                    <StudentSelect authorizedUsers={authorizedUsers} setNameAndEmailStates={handlers.setNameAndEmailStates} />
+                    <StudentSelect authorizedUsers={assignees} setNameAndEmailStates={handlers.setNameAndEmailStates} />
                     <Button
                         size='sm'
-                        onPress={() => setAssignModalOpen(true) }
+                        onPress={() => setAssignModalOpen(true)}
                         className="text-white text-md rounded-md ml-4"
                         isDisabled={!(student.name && student.email)}>
                         Assign

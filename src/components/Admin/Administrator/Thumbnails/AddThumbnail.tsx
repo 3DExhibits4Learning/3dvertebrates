@@ -1,17 +1,22 @@
 'use client'
 
+// Typical imports
 import { model } from "@prisma/client"
-import PhotoInput from "@/components/Shared/Form Fields/PhotoInput";
-import dynamic from "next/dynamic";
+import { Button } from "@heroui/react"
+import { SetStateAction, Dispatch, useState } from "react"
+import { useContext } from "react"
+import { DataTransferContext } from "../ManagerClient"
+
+// Default imports
+import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler"
+import addThumbnail from "@/functions/client/managerClient/addThumbnail"
+import PhotoInput from "@/components/Shared/Form Fields/PhotoInput"
+import dynamic from "next/dynamic"
+
+// Dynamic imports
 const ModelViewer = dynamic(() => import('@/components/Shared/ModelViewer'))
-import { Button } from "@heroui/react";
-import { SetStateAction, Dispatch, useState } from "react";
-import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler";
-import addThumbnail from "@/functions/client/managerClient/addThumbnail";
-import { useContext } from "react";
-import { DataTransferContext } from "../ManagerClient";
 
-
+// Main JSX
 export default function AddThumbnail(props: { modelsNeedingThumbnails: model[] | undefined }) {
 
     const initializeDataTransfer = useContext(DataTransferContext).initializeDataTransferHandler

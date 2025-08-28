@@ -47,21 +47,12 @@ export const DataTransferContext = createContext<any>('')
 // Main JSX component
 export default function ManagerClient(props: ManagerClientProps) {
 
-    // const annotation = async() => await getAllPhotoAnnotations('bf9088e4-b3ab-4818-b9a0-c03dc4bd8cec')
-    // const tempfn = async() => {
-    //     const a = await annotation()
-    //     console.log(a[0].annotation)
-    //     const b = sanitizeHtml(a[0].annotation)
-    //     console.log(b)
-    //     // await updatePhotoAnnotation(a[0].annotation_id, b)
-    // }
-    // tempfn()
-
     // Variable Declarations 
     const models: fullModel[] = JSON.parse(props.models)
-    const modelsNeedingThumbnails: fullModel[] = (JSON.parse(props.modelsNeedingThumbnails) as fullModel[]).filter(model => model.modelApproved)
+    const modelsNeedingThumbnails: fullModel[] = (JSON.parse(props.modelsNeedingThumbnails) as fullModel[]).filter(model => model.modelApproved && model.base_model)
     const unapprovedModels = useMemo(() => models.filter(model => !model.modelApproved), [props.models])
     const approvedModels = useMemo(() => models.filter(model => model.modelApproved), [props.models])
+    const baseModels = useMemo(() => approvedModels.filter(model => model.base_model), [props.models])
     const students = useMemo(() => props.authorizedUsers.filter(user => user.role === 'student' && user.active), [props.authorizedUsers])
     const assignments = useMemo(() => (JSON.parse(props.assignments) as model[]).filter(assignment => !assignment.annotated).sort((a: model, b: model) => (a.annotator as string).localeCompare(b.annotator as string)), [props.assignments])
     const session = useSession()
@@ -159,7 +150,7 @@ export default function ManagerClient(props: ManagerClientProps) {
                         </AccordionItem>
                         {/* Update thumbnail form */}
                         <AccordionItem key='updateThumbnail' aria-label={'updateThumbnail'} title='Update' classNames={{ title: accordionTitlesCss }}>
-                            <UpdateThumbnailContainer modelsWithThumbnails={approvedModels} />
+                            <UpdateThumbnailContainer modelsWithThumbnails={baseModels} />
                         </AccordionItem>
                     </Accordion>
                 </AccordionItem>

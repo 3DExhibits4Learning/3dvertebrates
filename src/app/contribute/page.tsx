@@ -22,7 +22,7 @@ export default function Contribute(){ return <>
     <br></br>
     <p>For code contributions, check out our <Link href='https://github.com/CPH3DH/3dHerbarium' target='_blank'><u>github</u></Link></p>
     <br></br>
-    {process.env.LOCAL_ENV !== 'production' && <p><Link href='/api/auth/signin'><u>admin portal</u></Link></p>}
+    <p><Link href='/api/auth/signin'><u>admin portal</u></Link></p>
   </div>
   <Footer />
 </>

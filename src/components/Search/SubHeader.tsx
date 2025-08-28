@@ -24,7 +24,7 @@ export default function SubHeader(props: SubHeaderProps) {
         <select
           aria-label='Filter by Annotator'
           className={`min-w-[166px] w-fit max-w-[200px] rounded-xl dark:bg-[#27272a] dark:hover:bg-[#43434a] h-[40px] text-[14px] px-2 outline-[#004C46]`}>
-          <option value={'SPRING25'} aria-label={'SPRING25'} selected>Spring '25</option>
+          <option value={'SPRING25'} defaultValue={'SPRING25'} aria-label={'SPRING25'}>Spring '25</option>
         </select>
 
         <select

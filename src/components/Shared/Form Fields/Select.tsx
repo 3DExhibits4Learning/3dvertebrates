@@ -1,6 +1,6 @@
 'use client'
 
-import { SetStateAction, Dispatch } from "react"
+import { SetStateAction, Dispatch, useMemo } from "react"
 import { model } from "@prisma/client"
 import { toUpperFirstLetter } from "@/functions/utils/toUpperFirstLetter"
 import { fullModel } from "@/interface/interface"
@@ -8,6 +8,7 @@ import { fullModel } from "@/interface/interface"
 export default function Select(props: { value: string, setValue: Dispatch<SetStateAction<string>>, models: model[] | fullModel[], title?: string, required?: string, width?: string, maxWidth?: string }) {
     const maxWidth = props.maxWidth ? `max-w-[${props.maxWidth}]` :'max-w-[500px]'
     const width = props.width ? props.width : 'w-4/5'
+    
     return <>
         {
             props.title &&

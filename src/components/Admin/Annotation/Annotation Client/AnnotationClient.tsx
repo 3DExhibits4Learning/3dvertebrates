@@ -78,7 +78,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], adm
     // Handlers and utilities
     const assignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, assignAnnotation, [name, email, specimenData.uid], 'Assigning annotation of model')
     const markAsIncompleteHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, markModelAsIncomplete, [specimenData.uid], 'Marking model as incomplete')
-    const unassignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unassignAnnotation, [specimenData.uid, true], 'Unassigning annotation of model')
+    const unassignAnnotationHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unassignAnnotation, [specimenData.uid, process.env.NEXT_PUBLIC_NODE_ENV === 'development'], 'Unassigning annotation of model')
     const setAdminAssignedFn = async () => setAdminAssigned(await getAssignmentEmail(specimenData.uid as string) === userEmail)
     const markAsAnnotatedHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, markModelAsAnnotated, [specimenData.uid], 'Marking model as annotated')
 

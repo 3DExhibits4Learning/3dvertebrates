@@ -2,7 +2,7 @@
 
 // Typical imports
 import { model } from "@prisma/client"
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect, useContext, useMemo } from "react"
 import { DataTransferContext } from "@/components/Admin/Administrator/ManagerClient"
 import { unpublishModel } from "@/functions/server/admin/administrator"
 
@@ -28,6 +28,9 @@ export default function FindModel(props: { models: model[] }) {
     const [model, setModel] = useState<model>()
     const [isPublished, setIsPublished] = useState<boolean>(false)
 
+    const models = useMemo(() => props.models.sort((a, b) => a.spec_name.localeCompare(b.spec_name)), [props.models])
+    console.log('wtf')
+
     // Unpublish model handler
     const unpublishModelHandler = async (uid: string) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unpublishModel, [uid], 'Unpublishing model...')
 
@@ -37,7 +40,7 @@ export default function FindModel(props: { models: model[] }) {
     useEffect(() => { if (model) setIsPublished(model.published) }, [model])
 
     return <AdminItemContainer>
-        <Select models={props.models} value={uid} setValue={setUid} />
+        <Select models={models} value={uid} setValue={setUid} />
         <div className="flex w-full">
             {uid && <div className="w-full h-full"><ModelViewer uid={uid} minHeight="100%" /></div>}
             {model && <ModelDataTable model={model} />}
