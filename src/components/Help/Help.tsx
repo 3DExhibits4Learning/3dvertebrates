@@ -6,6 +6,7 @@ import { useState } from "react"
 const topics = [
     "General Question",
     "Create 3D Vertebrate",
+    "Metadata",
     "Annotation Help",
     "Account Issue",
     "Bug Report",

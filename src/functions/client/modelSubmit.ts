@@ -16,14 +16,14 @@ import JSZip from 'jszip'
  * @param zip 
  * @param tmpId 
  */
-export const chunkFileToTmp = async (model: Blob | File, tmpId: string, setUploadProgress: (progress: number) => void) => {
+export const chunkFileToTmp = async (model: Blob | File, tmpId: string, setUploadProgress?: (progress: number) => void) => {
     // Declare chunk size and offset
     const chunkSize = 4 * 1024 * 1024 // 4 MB chunks
     var offset = 0
 
     // Fetch chunks until file upload is complete
     while (offset < model.size) {
-        setUploadProgress(Math.min(100, Math.round((offset / model.size) * 100)))
+        if (setUploadProgress) setUploadProgress(Math.min(100, Math.round((offset / model.size) * 100)))
         const chunk = model.slice(offset, offset + chunkSize)
         offset += chunkSize
 

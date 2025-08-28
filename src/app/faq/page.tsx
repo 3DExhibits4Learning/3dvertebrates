@@ -26,7 +26,7 @@ export default function FAQPage() {
                     <p className='mb-8'>Not yet! If you need to cite a specific source, do so in the body of the annotation. Footnotes are a feature that will be coming very soon.</p>
 
                     <p className='text-xl mb-1 font-medium'>Can I reupload a model?</p>
-                    <p className='mb-8'>No, but you can always upload a new model. If you have already completed some annotations, copy/paste them.</p>
+                    <p className='mb-8'>Students cannot reupload a model, but can upload a new model. You can always copy/paste your annotations from the old model to the new one.</p>
 
                     <p className='text-xl mb-1 font-medium'>Where can I request a new feature in the software?</p>
                     <p className='mb-8'>New feature requests are available as a help ticket subject</p>

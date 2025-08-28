@@ -10,7 +10,7 @@
 
 // Typical imports
 import { useState, useEffect } from 'react'
-import { Button } from "@heroui/react"
+import { Button, PressEvent } from "@heroui/react"
 import { Divider } from '@heroui/react'
 import { UpdateModelFormProps } from '@/interface/interface'
 import { v4 as uuidv4 } from 'uuid'
@@ -62,12 +62,11 @@ export default function UpdateModelForm(props: UpdateModelFormProps) {
     const [reRenderKey1, setReRenderKey1] = useState<number>(Math.random())
 
     // Edit handler
-    const edit3DModelHandler = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const edit3DModelHandler = async (e: PressEvent) => {
 
         try {
 
             // Prevent default and set initial data transfer states
-            e.preventDefault()
             setOpen(true)
             setTransferring(true)
 
@@ -182,12 +181,12 @@ export default function UpdateModelForm(props: UpdateModelFormProps) {
             <TextInput value={artist} setValue={setArtist} title='3D Modeler Name' required leftMargin='ml-12' textSize='text-2xl' />
             <ProcessSelect value={buildMethod} setValue={setBuildMethod} defaultValue={model.build_process} />
             <TagInput key={reRenderKey1} value={software} setValue={setSoftware} defaultValues={softwareString} title='Enter any software used to create the model' marginTop='mt-12' marginBottom='mb-4' required />
-            <ModelInput setFile={setFile} />
+            {/* <ModelInput setFile={setFile} /> */}
 
             <Button
                 isDisabled={updateDisabled}
                 color='primary'
-                onClick={edit3DModelHandler}
+                onPress={e => edit3DModelHandler(e)}
                 className='text-white text-xl mb-24 mt-8 ml-12'>Save changes
             </Button>
 
