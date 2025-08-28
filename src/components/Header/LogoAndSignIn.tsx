@@ -27,7 +27,7 @@ export default function LogoAndSignIn() {
                     <DropdownItem key="tutorials" onClick={() => router.push('/howTos')} aria-label='Go to tutorials page'>How-To&apos;s</DropdownItem>
                     <DropdownItem key="FAQ" onClick={() => router.push('/faq')} aria-label='Go to faq page'>FAQ</DropdownItem>
                     <DropdownItem key="help" onClick={() => router.push('/help')} aria-label='Go to faq page'>Help</DropdownItem>
-                    <DropdownItem key="signOut"><button onClick={() => signOut()} aria-label='Sign Out'>Sign Out</button></DropdownItem>
+                    <DropdownItem key="signOut"><button onClick={() => signOut({callbackUrl: '/'})} aria-label='Sign Out'>Sign Out</button></DropdownItem>
                 </DropdownMenu>
             </Dropdown>
         }
