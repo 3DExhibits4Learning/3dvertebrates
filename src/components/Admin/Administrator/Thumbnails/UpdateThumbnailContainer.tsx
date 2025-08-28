@@ -19,7 +19,6 @@ import dynamic from "next/dynamic"
 import UpdateThumbnail from "./UpdateThumbnail"
 import updateThumbnail from "@/functions/client/managerClient/updateThumbnail"
 import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHandler"
-import { useSession } from "next-auth/react"
 
 // Dynamic imports
 const ModelViewer = dynamic(() => import('@/components/Shared/ModelViewer'))
