@@ -66,6 +66,8 @@ model model {
   annotator             String?       @db.VarChar(75)
   annotatorId           String?       @db.VarChar(50)
   assignedEmail         String?       @db.VarChar(50) 
+  semester              String        @default("SPRING25") @db.VarChar(50) 
+  class                 String        @default("Advanced Mammalogy") @db.VarChar(50) 
   lat                   Decimal?      
   lng                   Decimal?
   email                 String        @db.VarChar(100)
@@ -167,12 +169,6 @@ model authorized {
   role             String          @default("student")
   name             String          @default("Cal Poly Humboldt Vertebrate Museum")
   active           Boolean         @default(true)
-  semester         semester[]
   model            model[]  
 }
 
-model semester {
-  email            String          @id
-  semester         String          @db.VarChar(25)
-  studentEmail     authorized      @relation(fields: [email], references: [email], onDelete: Cascade, onUpdate: Cascade, map: "semesterFkEmail" )
-}

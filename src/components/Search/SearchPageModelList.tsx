@@ -10,6 +10,7 @@ import { model } from '@prisma/client'
 // Default imports
 import Card from './Card'
 
+// Main JSX
 export default function SearchPageModelList(props: {models: model[], selectedModeler: string | undefined, selectedAnnotator: string | undefined}){
 
   // Declartations

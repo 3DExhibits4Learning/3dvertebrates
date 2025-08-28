@@ -6,16 +6,19 @@
  * @todo write fileoverview
  * @todo adjust auth logic
  */
+
+// Typical imports
 import { Providers } from "./providers"
 import { cookies } from 'next/headers'
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { getAuthorizedUsers } from "@/functions/server/queries"
 
+// Default imports
 import SessionProvider from '@/components/Shared/SessionProvider'
-
 import './globals.css'
 
+// Main JSX
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
 
   const session = await getServerSession()
