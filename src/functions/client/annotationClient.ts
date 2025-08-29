@@ -10,7 +10,7 @@
 
 // Typical imports
 import { Dispatch, SetStateAction } from "react"
-import { annotationClientSpecimen, annotationsAndPositions, studentsAssignmentsAndModels } from "@/interface/interface"
+import { annotationClientSpecimen, annotationsAndPositions } from "@/interface/interface"
 import { dispatch } from "@/interface/interface"
 import { model } from "@prisma/client"
 import { getFirstAnnotationPosition } from "@/functions/server/admin/annotator"
@@ -52,24 +52,6 @@ export const simulateAccordionPress = (setViewerLoaded: Dispatch<SetStateAction<
     apDataDispatch({ type: 'newModelClicked' })
     specimenDataDispatch({ type: 'newModelClicked', model: model })
 }
-
-/**
- * 
- * @param students array of students, assignments and models (see type)
- * @returns email of student who is assigned the model with uid from specimenData object
- */
-export const findStudentEmail = (students: studentsAssignmentsAndModels[], specimenData: annotationClientSpecimen) =>
-    students.find(student => student.assignment.find(assignment => assignment.uid === specimenData.uid))?.email
-
-/**
- * 
- * @param students array of students, assignments and models (see type)
- * @param email email of student who to be assigned the currently selected model for annotation
- * @returns arguments for assignAnnotation()
- */
-export const getAssignmentArgs = (specimenData: annotationClientSpecimen, name: string | null | undefined, students?: studentsAssignmentsAndModels[], email?: string | null) => specimenData.annotator ?
-    [specimenData.uid, null, findStudentEmail(students as studentsAssignmentsAndModels[], specimenData)] :
-    [specimenData.uid, (students as studentsAssignmentsAndModels[]).find(student => student.email === email)?.name, email]
 
 /**
  * 

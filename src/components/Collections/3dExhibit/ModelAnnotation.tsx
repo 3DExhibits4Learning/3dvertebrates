@@ -3,6 +3,8 @@ import AnnotationModel from "../AnnotationModel"
 
 export default function ModelAnnotation(props: { modelAnnotation: model_annotation }) {
     const modelAnnotation = props.modelAnnotation
+    console.log(modelAnnotation)
+    console.log('Ran0')
     return <>
         {
             <>

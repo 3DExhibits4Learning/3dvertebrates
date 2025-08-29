@@ -7,26 +7,24 @@
 "use client"
 
 // Typical imports
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Skeleton } from "@heroui/react"
-import { boolRinse, addCommas, arrayFromObjects } from './SketchfabDom'
-import { toUpperFirstLetter } from '@/functions/utils/toUpperFirstLetter'
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@heroui/react"
 import { GbifResponse } from "@/interface/interface"
-import { model_annotation, photo_annotation } from "@prisma/client"
 
 // Default imports
 import Herbarium from "@/classes/HerbariumClass"
-import dynamic from "next/dynamic"
+import FirstMobileAnnotation from "@/components/Collections/Mobile3DExhibit/FirstAnnotation"
+import MobilePhotoAnnotation from "@/components/Collections/Mobile3DExhibit/PhotoAnnotation"
+import MobileModelAnnotation from "@/components/Collections/Mobile3DExhibit/ModelAnnotation"
+import MobileVideoAnnotation from "@/components/Collections/Mobile3DExhibit/VideoAnnotations"
+import MobileTextAnnotation from "@/components/Collections/Mobile3DExhibit/TextAnnotation"
 
-// Dynamic imports
-const ModelViewer = dynamic(() => import('../Shared/ModelViewer'), {ssr: false})
-
-// Type of props
-type annotationModalProps = {
-  specimen: Herbarium,
+// Props interface
+interface annotationModalProps {
+  specimen: Herbarium
   gMatch: { hasInfo: boolean, data?: GbifResponse }
   title: string;
   index: number | null
-  imgSrc: string | null,
+  imgSrc: string | null
   imgLoading: boolean
 }
 
@@ -35,7 +33,6 @@ export default function AnnotationModal(props: annotationModalProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
 
   // Declarations
-  const gMatch = props.gMatch.data as GbifResponse
   const s = props.specimen
   const annotations = props.specimen.annotations.annotations
 
@@ -46,117 +43,17 @@ export default function AnnotationModal(props: annotationModalProps) {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="fade flex gap-1 w-full items-center justify-center">
-                <p className="text-center text-2xl pt-[20px]">{props.title}</p>
-              </ModalHeader>
+              <ModalHeader className="fade flex gap-1 w-full items-center justify-center"><p className="text-center text-2xl pt-[20px]">{props.title}</p></ModalHeader>
+
               <ModalBody>
-                {props.index == 0 &&
-
-                  <section>
-                    <div className="fade w-full flex justify-center items-center pt-[20px] pb-[20px] text-center flex-col">
-                      <div className='text-[1.25rem] border-b border-t border-[#004C46] w-full'>
-                        <p> Classification </p>
-                      </div><br></br>
-                      <p>Species: <i><span className='text-[#FFC72C]'>{gMatch.species}</span></i></p>
-                      <p>Kingdom: {gMatch.kingdom}</p>
-                      <p>Phylum: {gMatch.phylum}</p>
-                      <p>Order: {gMatch.order}</p>
-                      <p>Family: {gMatch.family}</p>
-                      <p>Genus: <i>{gMatch.genus}</i></p>
-                    </div>
-
-
-                    <div className='fade flex w-full justify-center items-center pt-[20px] pb-[20px] text-center flex-col'>
-                      <div className='text-[1.25rem] border-b border-t border-[#004C46] w-full'>
-                        <p> Profile </p>
-                      </div><br></br>
-                      {s.commonNames.length > 1 && <p>Common Names: {addCommas(s.commonNames)}</p>}
-                      {s.commonNames.length == 1 && <p>Common Names: {s.commonNames[0]}</p>}
-                      {s.profile.extinct !== '' && <p>Extinct: {boolRinse(s.profile.extinct as string)}</p>}
-                      {s.profile.habitat && <p>Habitat: {toUpperFirstLetter(s.profile.habitat)}</p>}
-                      {s.profile.freshwater !== '' && <p>Freshwater: {boolRinse(s.profile.freshwater as string)}</p>}
-                      {s.profile.marine !== '' && <p>Marine: {boolRinse(s.profile.marine as string)}</p>}
-                    </div>
-
-                    <div className='fade flex w-full justify-center items-center pt-[20px] pb-[20px] text-center flex-col'>
-                      <div className='text-[1.25rem] border-b border-t border-[#004C46] w-full'>
-                        <p> 3D Model</p>
-                      </div><br></br>
-                      <p>Build method: {s.model.build_process}</p>
-                      <p>Created with: {arrayFromObjects(s.software)}</p>
-                      <p>Modeler: {s.model.modeled_by}</p>
-                      <p>Annotator: {s.getAnnotator()}</p>
-                    </div>
-
-                    {s.wikiSummary &&
-                      <div className='fade flex w-full justify-center items-center pt-[20px] pb-[20px] text-center flex-col'>
-                        <div className='text-[1.25rem] border-b border-t border-[#004C46] w-full'>
-                          <p>Description</p>
-                        </div><br></br>
-                        <p dangerouslySetInnerHTML={{ __html: s.wikiSummary.extract_html }}></p><br></br>
-                        <p className="text-[0.9rem]">from <a href={s.wikiSummary.content_urls.desktop.page} target='_blank'><u>Wikipedia</u></a></p>
-                      </div>}
-                  </section>}
-
-                {
-                  !!props.index && annotations[props.index - 1].annotation_type === 'photo' &&
-                  <>
-                    {
-                      props.imgLoading &&
-                      <section>
-                        <div className="fade w-full h-full text-center">
-                          <Skeleton className="w-full h-full" />
-                        </div>
-                      </section>
-                    }
-                    {
-                      !props.imgLoading && props.imgSrc &&
-                      <section id="modalMedia2">
-                        <div className="fade w-full h-full text-center">
-                          <img className="center w-full h-[50vh]" src={props.imgSrc} alt={`Annotation number ${annotations[props.index - 1].annotation_no}`}></img>
-                        </div>
-                      </section>
-                    }
-                    <span>
-                      <section id="modalText">
-                        <br></br>
-                        <p dangerouslySetInnerHTML={{ __html: annotations[props.index - 1].annotation.annotation as string }} className="m-auto text-center fade"></p>
-                      </section>
-                      <section id="modalCitation">
-                        <br></br>
-                        <p className="fade text-center w-[95%]"> Photo by: {(annotations[props.index - 1].annotation as photo_annotation).author}, licensed under <a href='https://creativecommons.org/share-your-work/cclicenses/' target='_blank'>{(annotations[props.index - 1].annotation as photo_annotation).license}</a></p>
-                      </section>
-                    </span>
-                  </>
-                }
-                {
-                  !!props.index && annotations[props.index - 1].annotation_type === 'video' &&
-                  <section id="modalVideo">
-                    <iframe className="w-full h-[77.5vh] fade" src={annotations[props.index - 1].url as string}></iframe>
-                  </section>
-                }
-                {
-                  !!props.index && annotations[props.index - 1].annotation_type === 'model' &&
-                  <>
-                      <section className="fade w-full h-full text-center">
-                        <ModelViewer uid={(annotations[props.index - 1].annotation as model_annotation).uid} minHeight="50vh"/>
-                      </section>
-                      <section id="modalText">
-                        <br></br>
-                        <p dangerouslySetInnerHTML={{ __html: annotations[props.index - 1].annotation.annotation as string }} className="m-auto text-center fade"></p>
-                      </section>
-                      <section id="modalCitation">
-                        <br></br>
-                        <p className="fade text-center w-[95%]"> Photo by: {(annotations[props.index - 1].annotation as photo_annotation).author}, licensed under <a href='https://creativecommons.org/share-your-work/cclicenses/' target='_blank'>{(annotations[props.index - 1].annotation as photo_annotation).license}</a></p>
-                      </section>
-                  </>
-                }
+                {props.index === 0 && <FirstMobileAnnotation gMatch={props.gMatch} s={s} />}
+                {!!props.index && annotations[props.index - 1].annotation_type === 'photo' && <MobilePhotoAnnotation imgSrc={props.imgSrc} annotations={annotations} imgLoading={props.imgLoading} index={props.index} />}
+                {!!props.index && annotations[props.index - 1].annotation_type === 'video' && <MobileVideoAnnotation index={props.index} annotations={annotations} />}
+                {!!props.index && annotations[props.index - 1].annotation_type === 'model' && <MobileModelAnnotation index={props.index} annotations={annotations} />}
+                {!!props.index && annotations[props.index - 1].annotation_type === 'text' && <MobileTextAnnotation textAnnotation={annotations[props.index - 1].annotation.annotation as string} />}
               </ModalBody>
-              <ModalFooter className="justify-center">
-                <Button className="bg-[#004C46] text-white" onPress={onClose}>
-                  Close
-                </Button>
-              </ModalFooter>
+
+              <ModalFooter className="justify-center"><Button className="bg-[#004C46] text-white" onPress={onClose}>Close</Button></ModalFooter>
             </>
           )}
         </ModalContent>
