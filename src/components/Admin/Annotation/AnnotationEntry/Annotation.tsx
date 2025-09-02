@@ -42,6 +42,7 @@ export default function Annotation(props: { annotation: string, setAnnotation?: 
     // Hyperlink wrapper
     const annotationHyperlinkInsertionWrapper = () => insertAnnotationHyperlink(selectionRange, hyperlinkUrl, selectionText, dialog, setSelectionText, divTextArea, setLinkAdded, linkAdded)
 
+    // Italic wrapper
     const italicWrapper = () => {
         const selection = getSelection() as Selection
 

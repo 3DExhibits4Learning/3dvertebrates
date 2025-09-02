@@ -23,6 +23,7 @@ import TextInput from "@/components/Shared/Form Fields/TextInput"
 export default function TextAnnotation() {
     const annotationEntryData = (useContext(AnnotationEntryData) as annotationEntryContext).annotationEntryData
     const apData = useContext(AnnotationClientData) as annotationClientData
+    //console.log(annotationEntryData.annotation)
 
     return <>
         {

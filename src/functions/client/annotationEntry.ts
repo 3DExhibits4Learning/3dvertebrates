@@ -16,8 +16,9 @@ import { SetStateAction, Dispatch, MutableRefObject } from "react"
 import { v4 as uuidv4 } from 'uuid'
 import { annotationEntryAction } from "@/interface/actions"
 import { annotationDataEntryObj, annotationDataEntryUpdateObj } from "@/ts/ts"
-import { ad } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js"
-import { lengthNoWhitespace } from "@/functions/client/utils"
+import { lengthNoWhitespace, sanitizeFileName } from "@/functions/client/utils"
+
+import DOMPurify from "dompurify"
 
 export const allTruthy = (value: any) => value ? true : false
 export const allSame = (originalValues: any[], currentValues: any[]) => JSON.stringify(originalValues) === JSON.stringify(currentValues) ? true : false
@@ -437,16 +438,21 @@ export const getAnnotationEntryDataObj = (aeData: annotationEntry, uid: string, 
         position: position,
         title: aeData.annotationTitle as string,
         annotationId: annotationId,
-        annotation: aeData.annotation
+        annotation: aeData.annotation ? DOMPurify.sanitize(aeData.annotation, {
+            ALLOWED_TAGS: ["p", "a", "i", "span"],
+            ALLOWED_ATTR: ["href", "title", "target", "rel", "class"],
+            ALLOW_DATA_ATTR: false,
+        }) : ''
     }
 
     // Directory, path and url data for photo uploads
     if (aeData.file) {
         const photo = aeData.file as File
+        const sanitizedPhotoName = sanitizeFileName(photo.name)
         entryObject.file = photo
         entryObject.dir = `public/data/Vertebrates/Annotations/${uid}/${annotationId}`
-        entryObject.path = `public/data/Vertebrates/Annotations/${uid}/${annotationId}/${photo.name}`
-        entryObject.url = `/data/Vertebrates/Annotations/${uid}/${annotationId}/${photo.name}`
+        entryObject.path = `public/data/Vertebrates/Annotations/${uid}/${annotationId}/${sanitizedPhotoName}`
+        entryObject.url = `/data/Vertebrates/Annotations/${uid}/${annotationId}/${sanitizedPhotoName}`
     }
 
     // Set relevant data based on annotationType
@@ -474,6 +480,15 @@ export const getAnnotationEntryDataObj = (aeData: annotationEntry, uid: string, 
     return entryObject
 }
 
+/**
+ * 
+ * @param aeData 
+ * @param index 
+ * @param position 
+ * @param apData 
+ * @param specimen 
+ * @returns 
+ */
 export const getAnnotationEntryUpdateDataObj = (aeData: annotationEntry, index: string, position: string, apData: annotationsAndPositions, specimen: annotationClientSpecimen) => {
     // For first annotation
     if (index === '1') return { uid: specimen.uid, position: position, index: index }
@@ -492,7 +507,11 @@ export const getAnnotationEntryUpdateDataObj = (aeData: annotationEntry, index: 
         position: position,
         title: aeData.annotationTitle as string,
         annotationId: apData.activeAnnotation?.annotation_id as string,
-        annotation: aeData.annotation,
+        annotation: aeData.annotation ? DOMPurify.sanitize(aeData.annotation, {
+            ALLOWED_TAGS: ["p", "a", "i", "span"],
+            ALLOWED_ATTR: ["href", "title", "target", "rel", "class"],
+            ALLOW_DATA_ATTR: false,
+        }) : '',
         mediaTransition: apData.activeAnnotationType !== aeData.annotationType,
         previousMedia: apData.activeAnnotationType
     }
@@ -526,11 +545,12 @@ export const getAnnotationEntryUpdateDataObj = (aeData: annotationEntry, index: 
         // Type safe declaration; add photo to object
         const photo = aeData.file as File
         updateObject.file = photo
+        const sanitizedPhotoName = sanitizeFileName(photo.name)
 
         // Add directory, path and url to object
         updateObject.dir = `public/data/Vertebrates/Annotations/${uid}/${annotationId}`
-        updateObject.path = `public/data/Vertebrates/Annotations/${uid}/${annotationId}/${photo.name}`
-        updateObject.url = `/data/Vertebrates/Annotations/${uid}/${annotationId}/${photo.name}`
+        updateObject.path = `public/data/Vertebrates/Annotations/${uid}/${annotationId}/${sanitizedPhotoName}`
+        updateObject.url = `/data/Vertebrates/Annotations/${uid}/${annotationId}/${sanitizedPhotoName}`
 
         // If the annotation being updated was already a photo annotation, delete the previous photograph by adding oldUrl to the update object
         if (apData.activeAnnotationType === 'photo') updateObject.oldUrl = (apData.activeAnnotation as photo_annotation)?.url

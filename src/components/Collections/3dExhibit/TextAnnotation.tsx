@@ -11,6 +11,6 @@ export default function TextAnnotation(props: { textAnnotation: text_annotation 
     
     return <div id="annotationDivText">
         <br></br>
-        <p dangerouslySetInnerHTML={{ __html: textAnnotation.annotation }} className='w-full text-center fade' />
+        <p dangerouslySetInnerHTML={{ __html: textAnnotation.annotation }} className='w-full text-center fade break-words' />
     </div>
 }
