@@ -1,13 +1,18 @@
 'use client'
 
-import { useSession } from "next-auth/react"
-
 /**
  * @file src\functions\client\utils.ts
  * 
  * @fileoverview client utilities
  */
 
+export const lengthNoWhitespace = (s: string) => s.replace(/\s/g, "").length
+
+/**
+ * 
+ * @param email 
+ * @returns 
+ */
 export const isIT = (email: string | undefined | null) => email === process.env.NEXT_PUBLIC_IT_EMAIL
 
 /**

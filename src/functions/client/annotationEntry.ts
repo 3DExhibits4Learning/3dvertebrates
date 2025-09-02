@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { annotationEntryAction } from "@/interface/actions"
 import { annotationDataEntryObj, annotationDataEntryUpdateObj } from "@/ts/ts"
 import { ad } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js"
+import { lengthNoWhitespace } from "@/functions/client/utils"
 
 export const allTruthy = (value: any) => value ? true : false
 export const allSame = (originalValues: any[], currentValues: any[]) => JSON.stringify(originalValues) === JSON.stringify(currentValues) ? true : false
@@ -124,7 +125,6 @@ export const annotationItalicization = (
     selectionText: string,
     divTextArea: MutableRefObject<HTMLDivElement | undefined>,
 ) => {
-    console.log(selectionText)
     const range = selectionRange.current as Range
     const newHtml = `<i>${selectionText}</i>`
     const tempDiv = document.createElement("div")
@@ -160,7 +160,7 @@ export const enableTextAnnotationUpdate = (apData: annotationsAndPositions, aeDa
     const currentValues = [aeData.annotationTitle, aeData.annotation]
 
     // If all required fields are populated and: they are different from the original, or there is a new position, then enable "save changes"
-    if (currentValues.every(value => value) && (!allSame(originalValues, currentValues) || isNewPosition || aeData.annotationType !== apData.activeAnnotationType)) setSaveDisabled(false)
+    if (currentValues.every(value => value) && lengthNoWhitespace(aeData.annotation) > 200 && (!allSame(originalValues, currentValues) || isNewPosition || aeData.annotationType !== apData.activeAnnotationType)) setSaveDisabled(false)
     else setSaveDisabled(true)
 }
 
@@ -175,7 +175,7 @@ export const enableTextAnnotationCreate = (aeData: annotationEntry, position: st
     const valueArray = [aeData.annotationTitle, aeData.annotation, position]
 
     // Enable button if all required fields are populated
-    if (valueArray.every(value => value)) setCreateDisabled(false)
+    if (valueArray.every(value => value) && lengthNoWhitespace(aeData.annotation) > 200) setCreateDisabled(false)
     else setCreateDisabled(true)
 }
 

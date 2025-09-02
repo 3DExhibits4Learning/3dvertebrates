@@ -17,6 +17,7 @@ import { ManagerClientProps } from "@/interface/interface"
 import { fullModel } from "@/interface/interface"
 import { isMobileOrTablet } from "@/functions/utils/isMobile"
 import { useSession } from "next-auth/react"
+import { isIT } from "@/functions/client/utils"
 import { getAllPhotoAnnotations } from "@/functions/server/admin/administrator"
 import { sanitizeHtml } from "@/functions/client/annotationEntry"
 import { updatePhotoAnnotation } from "@/functions/server/admin/administrator"
@@ -56,9 +57,9 @@ export default function ManagerClient(props: ManagerClientProps) {
     const students = useMemo(() => props.authorizedUsers.filter(user => user.role === 'student' && user.active), [props.authorizedUsers])
     const assignments = useMemo(() => (JSON.parse(props.assignments) as model[]).filter(assignment => !assignment.annotated).sort((a: model, b: model) => (a.annotator as string).localeCompare(b.annotator as string)), [props.assignments])
     const session = useSession()
-    const isIT =  session.data?.user?.email === 'ab632@humboldt.edu' ? true : false
-    const modelsToAnnotate = useMemo(() => isIT ? approvedModels.filter(model => model.base_model && !model.published)
-        : approvedModels.filter(model => model.base_model && !model.published && model.assignedEmail !== 'ab632@humboldt.edu'), [approvedModels])
+    const isIt =  isIT(session.data?.user?.email)
+    const modelsToAnnotate = useMemo(() => isIt ? approvedModels.filter(model => model.base_model && !model.published)
+        : approvedModels.filter(model => model.base_model && !model.published && model.assignedEmail !== process.env.NEXT_PUBLIC_IT_EMAIL), [approvedModels])
 
     // Data transfer state variables
     const [openModal, setOpenModal] = useState<boolean>(false)
@@ -115,7 +116,7 @@ export default function ManagerClient(props: ManagerClientProps) {
                 </AccordionItem>
 
                 {/* AccordionItem holds nested "Models" accordion */}
-                <AccordionItem key={'adminModels'} aria-label={'adminModels'} title='Models' classNames={{ title: accordionTitlesCss }}>
+                <AccordionItem key={'3D Vertebrates'} aria-label={'3D Vertebrates'} title='3D Vertebrates' classNames={{ title: accordionTitlesCss }}>
                     {/* "Models" nested accordion */}
                     <Accordion>
                         {/* Model submit form */}
