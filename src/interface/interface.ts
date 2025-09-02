@@ -63,6 +63,7 @@ export interface annotationsAndPositions {
   newAnnotationEnabled: boolean
   annotationSavedOrDeleted: boolean
   repositionEnabled: boolean
+  viewerLoaded: boolean
 }
 
 export interface annotationClientSpecimen {
@@ -94,7 +95,6 @@ export interface annotationClientData {
     email: string | null | undefined
   }
   setters: {
-    setViewerLoaded: Dispatch<SetStateAction<boolean>>
     setSureModalOpen: Dispatch<SetStateAction<boolean>>
     setReorderModalOpen: Dispatch<SetStateAction<boolean>>
   }

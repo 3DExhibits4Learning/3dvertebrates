@@ -53,7 +53,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], adm
 
     // Data transfer state (for 'Are you sure' modal)
     const [modalOpen, setModalOpen] = useState(false)
-    const [viewerLoaded, setViewerLoaded] = useState(false)
+    //const [viewerLoaded, setViewerLoaded] = useState(false)
 
     // Annotation reorder open state, admin assigned state
     const [isOpen, setIsOpen] = useState(false)
@@ -86,7 +86,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], adm
     const handlers = { publishModelHandler, unapproveAnnotationsHandler, assignAnnotationHandler, unassignAnnotationHandler, setNameAndEmailStates, markAsIncompleteHandler, markAsAnnotatedHandler }
     const student = { name: name, email: email }
     const admin = props.admin
-    const setters = { setViewerLoaded: setViewerLoaded, setSureModalOpen: setModalOpen, setReorderModalOpen: setIsOpen }
+    const setters = { setSureModalOpen: setModalOpen, setReorderModalOpen: setIsOpen }
     const refs = { modelClicked: modelClicked, newAnnotationEnabled: newAnnotationEnabled }
     const properties = { ...props }
 
@@ -100,7 +100,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], adm
     useEffect(() => { newAnnotationEnabled.current = false; modelOrAnnotationChangeHandler(specimenData, annotationsAndPositionsDispatch) }, [specimenData.uid, annotationsAndPositions.annotationSavedOrDeleted])
 
     // Simulate a press of the accrodion for the admin portal; only one model is passed from admin via a <select> (There is a large gap between the model and annotation form otherwise)
-    useEffect(() => { if (props.admin) { simulateAccordionPress(setViewerLoaded, annotationsAndPositionsDispatch, specimenDataDispatch, props.modelsToAnnotate[0]) } }, [props.modelsToAnnotate])
+    useEffect(() => { if (props.admin) { simulateAccordionPress(annotationsAndPositionsDispatch, specimenDataDispatch, props.modelsToAnnotate[0]) } }, [props.modelsToAnnotate])
 
     // Sets the 'admin assigned' variable, indicating whethere the active specimen is assigned to the administrator using the portal
     useEffect(() => { if (props.admin && specimenData.uid) { setAdminAssignedFn() } }, [specimenData.uid])
@@ -110,8 +110,8 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], adm
         <AreYouSure uid={specimenData.uid as string} open={modalOpen} setOpen={setModalOpen} />
         {annotationsAndPositions.annotations && annotationsAndPositions.annotations.length >= 2 && specimenData.uid && <AnnotationReorder isOpen={isOpen} setIsOpen={setIsOpen} renumberAnnotations={renumberAnnotations} />}
 
-        {props.admin && <AdminAnnotationClient viewerLoaded={viewerLoaded} />}
-        {!props.admin && <StudentAnnotationClient viewerLoaded={viewerLoaded} />}
+        {props.admin && <AdminAnnotationClient  />}
+        {!props.admin && <StudentAnnotationClient  />}
 
     </AnnotationClientData.Provider>
 }

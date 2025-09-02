@@ -13,7 +13,7 @@ import { Dispatch, forwardRef, lazy, SetStateAction, Suspense } from "react"
 const BotanistModelViewer = lazy(() => import("./AnnotationModelViewer"))
 
 // Forward ref to botanist model viewer
-const BotanistRefWrapper = forwardRef((props: { minHeight?: string, setViewerLoaded: Dispatch<SetStateAction<boolean>> }, ref: any) => <Suspense>
+const BotanistRefWrapper = forwardRef((props: { minHeight?: string }, ref: any) => <Suspense>
     <BotanistModelViewer {...props} ref={ref} />
 </Suspense>)
 

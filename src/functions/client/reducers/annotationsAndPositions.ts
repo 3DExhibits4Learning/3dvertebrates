@@ -49,7 +49,8 @@ export function annotationsAndPositionsReducer(annotationsAndPositions: annotati
 
             return {
                 ...annotationsAndPositions,
-                firstAnnotationPosition: undefined
+                firstAnnotationPosition: undefined,
+                viewerLoaded: false
             }
 
         case 'newAnnotation':
@@ -107,7 +108,15 @@ export function annotationsAndPositionsReducer(annotationsAndPositions: annotati
             return {
                 ...annotationsAndPositions,
                 annotationSavedOrDeleted: !annotationsAndPositions.annotationSavedOrDeleted,
+                newAnnotationEnabled: false,
                 activeAnnotationIndex: undefined,
+            }
+
+        case 'setViewerLoaded':
+
+            return {
+                ...annotationsAndPositions,
+                viewerLoaded: action.loaded
             }
 
         default:

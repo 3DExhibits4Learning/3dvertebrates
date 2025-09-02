@@ -47,8 +47,7 @@ export const getIndex = (apData: annotationsAndPositions) => {
     return index
 }
 
-export const simulateAccordionPress = (setViewerLoaded: Dispatch<SetStateAction<boolean>>, apDataDispatch: Dispatch<any>, specimenDataDispatch: Dispatch<any>, model: model) => {
-    setViewerLoaded(false)
+export const simulateAccordionPress = (apDataDispatch: Dispatch<any>, specimenDataDispatch: Dispatch<any>, model: model) => {
     apDataDispatch({ type: 'newModelClicked' })
     specimenDataDispatch({ type: 'newModelClicked', model: model })
 }
@@ -74,9 +73,10 @@ export const activeAnnotationChangeHandler = (apData: annotationsAndPositions, a
  */
 export const modelOrAnnotationChangeHandler = async (specimenData: annotationClientSpecimen, apDispatch: Dispatch<newModelSelectedOrDbUpdate>) => {
     if (!specimenData.uid) return
-    const modelAnnotations = await ModelAnnotations.retrieve(specimenData.uid as string)
-    const annotationPosition = await getFirstAnnotationPosition(specimenData.uid as string)
-    apDispatch({ type: 'newModelSelectedOrDbUpdate', modelAnnotations: modelAnnotations, firstAnnotationPosition: annotationPosition })
+    const modelAnnotations =  ModelAnnotations.retrieve(specimenData.uid as string)
+    const annotationPosition = getFirstAnnotationPosition(specimenData.uid as string)
+    const res = await Promise.all([modelAnnotations, annotationPosition])
+    apDispatch({ type: 'newModelSelectedOrDbUpdate', modelAnnotations: res[0], firstAnnotationPosition: res[1] })
 }
 
 /**

@@ -89,8 +89,8 @@ export const annotationSelectHandler = (index: any, newAnnotationEnabled: Mutabl
  * @param uid 
  * @param successObj 
  */
-export const initializeViewer = (iframe: HTMLIFrameElement, uid: string, successObj: any, setViewerLoaded: Dispatch<SetStateAction<boolean>>) => {
-    setViewerLoaded(true)
+export const initializeViewer = (iframe: HTMLIFrameElement, uid: string, successObj: any, dispatch: Dispatch<any>) => {
+    dispatch({type: 'setViewerLoaded', loaded: true})
     iframe.src = uid
     const client = new Sketchfab(iframe)
     client.init(uid, successObj)

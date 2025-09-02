@@ -8,7 +8,7 @@
 "use client"
 
 // Typical imports
-import { MutableRefObject, useEffect, useRef, forwardRef, ForwardedRef, useState, useContext, Dispatch, SetStateAction } from 'react'
+import { RefObject, useEffect, useRef, forwardRef, ForwardedRef, useState, useContext } from 'react'
 import { AnnotationClientData } from '../Annotation Client/AnnotationClient'
 import { annotationClientData } from '@/interface/interface'
 
@@ -16,7 +16,7 @@ import { annotationClientData } from '@/interface/interface'
 import * as fn from '@/functions/client/AnnotationModelViewer'
 
 // Main JSX
-const BotanistModelViewer = forwardRef((props: { minHeight?: string, setViewerLoaded: Dispatch<SetStateAction<boolean>> }, ref: ForwardedRef<boolean>) => {
+const BotanistModelViewer = forwardRef((props: { minHeight?: string, }, ref: ForwardedRef<boolean>) => {
 
     // Annotation client context
     const clientData = useContext(AnnotationClientData) as annotationClientData
@@ -25,7 +25,7 @@ const BotanistModelViewer = forwardRef((props: { minHeight?: string, setViewerLo
     const specimen = clientData.specimenData
 
     // Refs
-    const newAnnotationEnabled = ref as MutableRefObject<boolean>
+    const newAnnotationEnabled = ref as RefObject<boolean>
     const modelViewer = useRef<HTMLIFrameElement>(undefined)
     const temporaryAnnotationIndex = useRef<number>(undefined)
     const apiRef = useRef<any>(undefined)
@@ -58,8 +58,8 @@ const BotanistModelViewer = forwardRef((props: { minHeight?: string, setViewerLo
 
     // Initialize the viewer
     useEffect(() => {
-        fn.initializeViewer(modelViewer.current as HTMLIFrameElement, specimen.uid as string, successObj, props.setViewerLoaded)
-        return () => props.setViewerLoaded(false)
+        fn.initializeViewer(modelViewer.current as HTMLIFrameElement, specimen.uid as string, successObj, clientData.annotationsAndPositionsDispatch)
+        return () => clientData.annotationsAndPositionsDispatch({type: 'setViewerLoaded', loaded: false})
     }, 
     [specimen.uid, apData.annotations]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -91,7 +91,7 @@ const BotanistModelViewer = forwardRef((props: { minHeight?: string, setViewerLo
     // Simple iframe with ref
     return <div className={`flex bg-black m-auto min-h-[${minHeight}]`} style={{ height: "100%", width: "100%" }}>
         <iframe
-            ref={modelViewer as MutableRefObject<HTMLIFrameElement>}
+            ref={modelViewer as RefObject<HTMLIFrameElement>}
             frameBorder="0"
             title={"Model Viewer for " + ''}
             allow="autoplay; fullscreen; xr-spatial-tracking"

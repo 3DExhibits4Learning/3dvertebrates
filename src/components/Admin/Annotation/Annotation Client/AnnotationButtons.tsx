@@ -42,7 +42,7 @@ const AnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetStateAc
                 </div>
             }
             {
-                annotationsAndPositions.activeAnnotationIndex !== 'new' &&
+                !annotationsAndPositions.newAnnotationEnabled && annotationsAndPositions.activeAnnotationIndex !== 'new' && annotationsAndPositions.firstAnnotationPosition !== undefined &&
                 <div className="flex border-b pb-2 pl-2 w-full">
                     <br></br>
                     <Link href={`/collections/${context.specimenData.specimenName}?preview=1`} className="block w-full" target="_blank" rel="noopener noreferrer"> 
@@ -71,7 +71,7 @@ const AnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetStateAc
             }
             {
                 // 'Mark as annotated' button
-                annotationsAndPositions.annotations && annotationsAndPositions.activeAnnotationIndex !== 'new' &&
+                annotationsAndPositions.annotations && !annotationsAndPositions.newAnnotationEnabled && annotationsAndPositions.activeAnnotationIndex !== 'new' && annotationsAndPositions.firstAnnotationPosition !== undefined &&
                 <div className="flex w-full pt-2 pl-2">
                     <br></br>
                     <Button
