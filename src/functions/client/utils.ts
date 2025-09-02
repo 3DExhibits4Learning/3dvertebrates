@@ -8,6 +8,8 @@ import { useSession } from "next-auth/react"
  * @fileoverview client utilities
  */
 
+export const isIT = (email: string | undefined | null) => email === process.env.NEXT_PUBLIC_IT_EMAIL
+
 /**
  * 
  * @param url raw photo url from database; should begin with /data

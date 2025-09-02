@@ -60,24 +60,24 @@ export default function StudentClient(props: { modelsToAnnotate: string, annotat
 
         <Accordion className="text-[#004C46] dark:text-[#F5F3E7]">
 
-            <AccordionItem key='modelSumbit' aria-label='Model Sumbit' title='Submit Model' classNames={{ title: accordionTitlesCss }}>
+            <AccordionItem key='Submit 3D Vertebrate' aria-label='Submit 3D Vertebrate' title='Submit 3D Vertebrate' classNames={{ title: accordionTitlesCss }}>
                 <ModelSubmitForm />
             </AccordionItem>
 
-            <AccordionItem key='assignments' aria-label='Assignments' title='Assigned Models' classNames={{ title: accordionTitlesCss }}>
+            <AccordionItem key='Assigned 3D Vertebrates' aria-label='Assigned 3D Vertebrates' title='Assigned 3D Vertebrates' classNames={{ title: accordionTitlesCss }}>
                 <AnnotationClient modelsToAnnotate={modelsToAnnotate} admin={false} />
             </AccordionItem>
 
-            <AccordionItem key='updateModel' aria-label='Update Model' title='Update Model' classNames={{ title: accordionTitlesCss }}>
+            <AccordionItem key='Update 3D Vertebrate' aria-label='Update 3D Vertebrate' title='Update 3D Vertebrate' classNames={{ title: accordionTitlesCss }}>
                 <UpdateModelContainer models={modelsToAnnotate as fullModel[]} />
             </AccordionItem>
 
             {/* AccordionItem holds nested "Thumbnails" accordion */}
-            <AccordionItem key={'adminThumbnails'} aria-label={'New Specimen'} title='Thumbnails' classNames={{ title: accordionTitlesCss }}>
+            <AccordionItem key={'3D Vertebrate Thumbnails'} aria-label={'3D Vertebrate Thumbnails'} title='3D Vertebrate Thumbnails' classNames={{ title: accordionTitlesCss }}>
                 {/* "Thumbnails" nested accordion */}
                 <Accordion>
                     {/* Add thumbnail form */}
-                    <AccordionItem key='modelsWithoutThumbnails' aria-label={'modelsWithoutThumbnails'} title='Models' classNames={{ title: accordionTitlesCss }}>
+                    <AccordionItem key='3D Vertebrates missing thumbnails' aria-label={'3D Vertebrates missing thumbnails'} title='3D Vertebrates w/o Thumbnails' classNames={{ title: accordionTitlesCss }}>
                         <AddThumbnail modelsNeedingThumbnails={modelsNeedingThumbnails as model[] | undefined} />
                     </AccordionItem>
                     {/* Update thumbnail form */}

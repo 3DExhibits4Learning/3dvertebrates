@@ -61,12 +61,12 @@ export default function AddThumbnail(props: { modelsNeedingThumbnails: model[] |
 
             {
                 !props.modelsNeedingThumbnails &&
-                <p className="text-xl"> There are no models without thumbnails </p>
+                <p className="text-xl"> You have no 3D Vertebrates without thumbnails </p>
             }
 
             {
                 props.modelsNeedingThumbnails && props.modelsNeedingThumbnails.length === 0 &&
-                <p className="text-xl"> There are no models without thumbnails </p>
+                <p className="text-xl"> You have no 3D Vertebrates without thumbnails </p>
             }
         </>
     )

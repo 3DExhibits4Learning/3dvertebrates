@@ -11,7 +11,8 @@ import { model } from "@prisma/client"
 import { SetStateAction, Dispatch, useContext, useState, useMemo, } from "react"
 import { StudentTransferContext } from "@/components/Admin/Student/StudentClient"
 import { DataTransferContext } from "@/components/Admin/Administrator/ManagerClient"
-
+import { useSession } from "next-auth/react"
+import { isIT } from "@/functions/client/utils"
 
 // Default imports
 import Select from "@/components/Shared/Form Fields/Select"
@@ -25,15 +26,18 @@ const ModelViewer = dynamic(() => import('@/components/Shared/ModelViewer'))
 
 // Main JSX
 export default function UpdateThumbnailContainer(props: { modelsWithThumbnails: model[] | undefined }) {
-
     // Context
     const dataTransferContext = useContext(DataTransferContext)
     const studentTransferContext = useContext(StudentTransferContext)
     const initializeDataTransfer = dataTransferContext ? dataTransferContext.initializeDataTransferHandler : studentTransferContext.initializeDataTransferHandler
     const terminateDataTransfer = dataTransferContext ? dataTransferContext.terminateDataTransferHandler : studentTransferContext.terminateDataTransferHandler
 
-    // Filter out the home page model
-    const models = useMemo(() => props.modelsWithThumbnails?.filter(model => model.uid !== 'ee451c036e3d45398f8a1f2ad78367c3'), [props.modelsWithThumbnails])
+    // Get sesh for IT check
+    const session = useSession()
+    const isIt = isIT(session.data?.user?.email)
+
+    // Filter out the home page model if you're not IT
+    const models = isIt ? props.modelsWithThumbnails : useMemo(() => props.modelsWithThumbnails?.filter(model => model.uid !== 'ee451c036e3d45398f8a1f2ad78367c3'), [props.modelsWithThumbnails])
 
     // States
     const [file, setFile] = useState<File>()
