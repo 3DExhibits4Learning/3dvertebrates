@@ -109,6 +109,7 @@ export function annotationsAndPositionsReducer(annotationsAndPositions: annotati
                 ...annotationsAndPositions,
                 annotationSavedOrDeleted: !annotationsAndPositions.annotationSavedOrDeleted,
                 newAnnotationEnabled: false,
+                firstAnnotationPosition: undefined, // Force re-load of model viewer (showing spinner while doing so)
                 activeAnnotationIndex: undefined,
             }
 
