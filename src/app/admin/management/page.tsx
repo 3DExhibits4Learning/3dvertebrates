@@ -20,6 +20,7 @@ import Foot from "@/components/Shared/Foot"
 import FullPageError from "@/components/Error/FullPageError"
 
 import prisma from "@/functions/utils/prisma"
+import ManagerClientWrapper from "@/components/Admin/Administrator/ManagerClientWrapper"
 
 // Path
 const path = '/src/app/admin/management/page.tsx'
@@ -54,13 +55,12 @@ export default async function Page() {
         return <>
             <Header pageRoute="collections" headerTitle='Management' />
             <main className="flex flex-col !min-h-[calc(100vh-177px)]">
-                <ManagerClient
+                <ManagerClientWrapper
                     models={modelsString}
                     modelsNeedingThumbnails={modelsNeedingThumbnails}
                     admin={true}
                     authorizedUsers={authorizedUsers}
-                    assignments={assignments}
-                />
+                    assignments={assignments}/>
             </main>
             <Foot />
         </>

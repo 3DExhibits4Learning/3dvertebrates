@@ -18,9 +18,9 @@ import { fullModel } from "@/interface/interface"
 import { isMobileOrTablet } from "@/functions/utils/isMobile"
 import { useSession } from "next-auth/react"
 import { isIT } from "@/functions/client/utils"
-import { getAllPhotoAnnotations } from "@/functions/server/admin/administrator"
-import { sanitizeHtml } from "@/functions/client/annotationEntry"
-import { updatePhotoAnnotation } from "@/functions/server/admin/administrator"
+// import { getAllPhotoAnnotations } from "@/functions/server/admin/administrator"
+// import { sanitizeHtml } from "@/functions/client/annotationEntry"
+// import { updatePhotoAnnotation } from "@/functions/server/admin/administrator"
 
 // Default imports
 import AnnotationClient from "@/components/Admin/Annotation/Annotation Client/AnnotationClient"
@@ -40,13 +40,15 @@ import ApproveModel from "./Model/Approve"
 import Select from "@/components/Shared/Form Fields/Select"
 
 // Dynamic imports
-const ModelSubmitForm = dynamic(() => import("@/components/Admin/ModelSubmit/Form"))
+const ModelSubmitForm = dynamic(() => import("@/components/Admin/ModelSubmit/Form"), { ssr: false })
 
 // Exported context
 export const DataTransferContext = createContext<any>('')
 
 // Main JSX component
 export default function ManagerClient(props: ManagerClientProps) {
+
+    console.log('Manager Client Render')
 
     // Variable Declarations 
     const models: fullModel[] = JSON.parse(props.models)

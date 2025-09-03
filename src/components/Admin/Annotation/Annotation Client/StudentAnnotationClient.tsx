@@ -10,8 +10,11 @@ import { AnnotationClientData } from "@/components/Admin/Annotation/Annotation C
 
 // Default imports
 import AnnotationEntryWrapper from "@/components/Admin/Annotation/Annotation Client/AnnotationEntryWrapper"
-import BotanistRefWrapper from "@/components/Admin/Annotation/Annotation Model Viewer/AnnotationModelViewerRef"
 import AnnotationButtons from "@/components/Admin/Annotation/Annotation Client/AnnotationButtons"
+import dynamic from "next/dynamic"
+
+// Dynamic imports
+const BotanistModelViewer = dynamic(() => import("@/components/Admin/Annotation/Annotation Model Viewer/AnnotationModelViewer"), { ssr: false })
 
 export default function StudentAnnotationClient() {
     // Get context
@@ -36,6 +39,10 @@ export default function StudentAnnotationClient() {
     const setModalOpen = setters.setSureModalOpen
     const setIsOpen = setters.setReorderModalOpen
 
+    console.log(!context.annotationsAndPositions.viewerLoaded)
+    console.log(context.annotationsAndPositions.viewerLoaded)
+    console.log(context.annotationsAndPositions.firstAnnotationPosition)
+
     return <div className="flex flex-col w-full h-full text-[#004C46 dark:text-white]">
         <section className="flex">
             <section className="h-full w-1/5 min-w-[380px]">
@@ -48,7 +55,7 @@ export default function StudentAnnotationClient() {
                         onPress={() => modelClickHandler(modelClicked.current as boolean, model, annotationsAndPositionsDispatch, specimenDataDispatch, false)}>
                         <div className="relative h-[400px] w-full">
                             {!context.annotationsAndPositions.viewerLoaded && <div className="absolute h-full w-full flex justify-center items-center"><Spinner label="Loading Model Viewer" /></div> /* Manual loading screen for model viewer */}
-                            {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px] w-full absolute"><BotanistRefWrapper ref={newAnnotationEnabled} /></div>}
+                            {annotationsAndPositions.firstAnnotationPosition !== undefined && <div className="h-[400px] w-full absolute"><BotanistModelViewer ref={newAnnotationEnabled} /></div>}
                         </div>
                         {context.annotationsAndPositions.viewerLoaded && <AnnotationButtons setModalOpen={setModalOpen} ref={newAnnotationEnabled} setReorderOpen={setIsOpen} />}
                     </AccordionItem>

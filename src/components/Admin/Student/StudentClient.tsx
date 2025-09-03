@@ -31,6 +31,8 @@ export const StudentTransferContext = createContext<any>('')
 // Main JSX
 export default function StudentClient(props: { modelsToAnnotate: string, annotationModels: string, assignments: model[] }) {
 
+    console.log('Student Client Render')
+
     // Tailwind variables
     const accordionTitlesCss = 'text-[#004C46] text-2xl dark:text-[#F5F3E7]'
 

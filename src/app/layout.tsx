@@ -20,7 +20,6 @@ import './globals.css'
 
 // Main JSX
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-
   const session = await getServerSession()
   const authorizedUsers = await getAuthorizedUsers()
   const authorizedUsersMapped = authorizedUsers.filter(user => user.active).map(user => user.email)

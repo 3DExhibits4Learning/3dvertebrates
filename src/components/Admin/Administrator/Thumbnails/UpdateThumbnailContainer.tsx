@@ -37,7 +37,7 @@ export default function UpdateThumbnailContainer(props: { modelsWithThumbnails: 
     const isIt = isIT(session.data?.user?.email)
 
     // Filter out the home page model if you're not IT
-    const models = isIt ? props.modelsWithThumbnails : useMemo(() => props.modelsWithThumbnails?.filter(model => model.uid !== 'ee451c036e3d45398f8a1f2ad78367c3'), [props.modelsWithThumbnails])
+    const models = isIt ? props.modelsWithThumbnails : props.modelsWithThumbnails?.filter(model => model.uid !== 'ee451c036e3d45398f8a1f2ad78367c3')
 
     // States
     const [file, setFile] = useState<File>()
