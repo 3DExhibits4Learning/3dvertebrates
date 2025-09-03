@@ -10,17 +10,14 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { fullModel } from "@/interface/interface"
 import { serverErrorHandler } from "@/functions/server/error"
-import { annotationWithModel } from "@/interface/interface"
-import { isAnnotationModel, isUsedAnnotationModel } from "@/functions/server/utils/filters"
+import { isIT } from "@/functions/server/utils/utils"
 
 // Default imports
 import ManagerClient from "@/components/Admin/Administrator/ManagerClient"
 import Header from "@/components/Header/Header"
 import Foot from "@/components/Shared/Foot"
 import FullPageError from "@/components/Error/FullPageError"
-
 import prisma from "@/functions/utils/prisma"
-import ManagerClientWrapper from "@/components/Admin/Administrator/ManagerClientWrapper"
 
 // Path
 const path = '/src/app/admin/management/page.tsx'
@@ -42,25 +39,27 @@ export default async function Page() {
         // Get all 3D models
         const models = await prisma.model.findMany({ include: { software: true, tags: true } }) as fullModel[]
 
-        // Get model annoations (annotation record with model_annotation record included)
-        const modelAnnotations = await prisma.annotations.findMany({ where: { annotation_type: 'model' }, include: { model_annotation: true } }) as annotationWithModel[]
-
         // Stringified model filters (decimal objects (which are included in models table) can't be passed directly to client)
         const modelsString = JSON.stringify(models)
         const modelsNeedingThumbnails = JSON.stringify(models.filter(model => model.thumbnail === null))
-        // const unusedAnnotationModels = JSON.stringify(models.filter(model => isAnnotationModel(model) && !isUsedAnnotationModel(model, modelAnnotations)))
         const assignments = JSON.stringify(models.filter(model => model.assignedEmail && model.base_model))
+
+        const isIt = isIT(session.user?.email)
+        const modelsToAnnotate = isIt ? models.filter(model => model.base_model && !model.published && model.modelApproved)
+            : models.filter(model => model.base_model && !model.published && model.modelApproved && model.assignedEmail !== process.env.NEXT_PUBLIC_IT_EMAIL)
+        const modelsToAnnotateString = JSON.stringify(modelsToAnnotate)
 
         // Typical client return
         return <>
             <Header pageRoute="collections" headerTitle='Management' />
             <main className="flex flex-col !min-h-[calc(100vh-177px)]">
-                <ManagerClientWrapper
+                <ManagerClient
                     models={modelsString}
+                    modelsToAnnotate={modelsToAnnotateString}
                     modelsNeedingThumbnails={modelsNeedingThumbnails}
                     admin={true}
                     authorizedUsers={authorizedUsers}
-                    assignments={assignments}/>
+                    assignments={assignments} />
             </main>
             <Foot />
         </>

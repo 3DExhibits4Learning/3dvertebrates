@@ -42,3 +42,10 @@ export const convertDbPathToLocalPath = (path: string) => 'X:' + path.slice(5)
  * @returns 
  */
 export const getPathToUnlink = (path?: string) => path ? isLocalDevEnv() ? convertDbPathToLocalPath(path) : path : ''
+
+/**
+ * 
+ * @param email 
+ * @returns 
+ */
+export const isIT = (email: string | undefined | null) => email === process.env.IT_EMAIL

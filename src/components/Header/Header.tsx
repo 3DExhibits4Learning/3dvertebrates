@@ -9,7 +9,6 @@
 'use client'
 
 // Typical imports
-import { useSession, } from "next-auth/react"
 import { useParams } from "next/navigation"
 import { useRef, useState } from "react"
 import { Navbar, NavbarContent, NavbarMenuToggle, NavbarBrand, NavbarMenu, NavbarMenuItem, Divider, Switch } from "@heroui/react"

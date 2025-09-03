@@ -398,6 +398,7 @@ export interface ManagerClientProps {
   admin: boolean
   authorizedUsers: authorized[]
   assignments: string
+  modelsToAnnotate: string
 }
 
 export interface UpdateModelFormContainerProps {

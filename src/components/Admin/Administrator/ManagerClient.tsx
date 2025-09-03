@@ -16,8 +16,6 @@ import { Accordion, AccordionItem } from "@heroui/react"
 import { ManagerClientProps } from "@/interface/interface"
 import { fullModel } from "@/interface/interface"
 import { isMobileOrTablet } from "@/functions/utils/isMobile"
-import { useSession } from "next-auth/react"
-import { isIT } from "@/functions/client/utils"
 // import { getAllPhotoAnnotations } from "@/functions/server/admin/administrator"
 // import { sanitizeHtml } from "@/functions/client/annotationEntry"
 // import { updatePhotoAnnotation } from "@/functions/server/admin/administrator"
@@ -48,8 +46,6 @@ export const DataTransferContext = createContext<any>('')
 // Main JSX component
 export default function ManagerClient(props: ManagerClientProps) {
 
-    console.log('Manager Client Render')
-
     // Variable Declarations 
     const models: fullModel[] = JSON.parse(props.models)
     const modelsNeedingThumbnails: fullModel[] = (JSON.parse(props.modelsNeedingThumbnails) as fullModel[]).filter(model => model.modelApproved && model.base_model)
@@ -58,10 +54,7 @@ export default function ManagerClient(props: ManagerClientProps) {
     const baseModels = useMemo(() => approvedModels.filter(model => model.base_model), [props.models])
     const students = useMemo(() => props.authorizedUsers.filter(user => user.role === 'student' && user.active), [props.authorizedUsers])
     const assignments = useMemo(() => (JSON.parse(props.assignments) as model[]).filter(assignment => !assignment.annotated).sort((a: model, b: model) => (a.annotator as string).localeCompare(b.annotator as string)), [props.assignments])
-    const session = useSession()
-    const isIt =  isIT(session.data?.user?.email)
-    const modelsToAnnotate = useMemo(() => isIt ? approvedModels.filter(model => model.base_model && !model.published)
-        : approvedModels.filter(model => model.base_model && !model.published && model.assignedEmail !== process.env.NEXT_PUBLIC_IT_EMAIL), [approvedModels])
+    const modelsToAnnotate = JSON.parse(props.modelsToAnnotate) as fullModel[]
 
     // Data transfer state variables
     const [openModal, setOpenModal] = useState<boolean>(false)
