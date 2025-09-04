@@ -439,7 +439,7 @@ export const getAnnotationEntryDataObj = (aeData: annotationEntry, uid: string, 
         title: aeData.annotationTitle as string,
         annotationId: annotationId,
         annotation: aeData.annotation ? DOMPurify.sanitize(aeData.annotation, {
-            ALLOWED_TAGS: ["p", "a", "i", "span"],
+            ALLOWED_TAGS: ["p", "a", "i", "span", "div", "br"],
             ALLOWED_ATTR: ["href", "title", "target", "rel", "class"],
             ALLOW_DATA_ATTR: false,
         }) : ''
@@ -497,6 +497,12 @@ export const getAnnotationEntryUpdateDataObj = (aeData: annotationEntry, index: 
     const annotationId = apData.activeAnnotation?.annotation_id as string
     const uid = specimen.uid as string
 
+    console.log(aeData.annotation ? DOMPurify.sanitize(aeData.annotation, {
+            ALLOWED_TAGS: ["p", "a", "i", "span", "div", "br"],
+            ALLOWED_ATTR: ["href", "title", "target", "rel", "class"],
+            ALLOW_DATA_ATTR: false,
+        }) : '')
+
     // Update object initialization
     const updateObject: annotationDataEntryUpdateObj = {
         specimenName: specimen.specimenName as string,
@@ -508,7 +514,7 @@ export const getAnnotationEntryUpdateDataObj = (aeData: annotationEntry, index: 
         title: aeData.annotationTitle as string,
         annotationId: apData.activeAnnotation?.annotation_id as string,
         annotation: aeData.annotation ? DOMPurify.sanitize(aeData.annotation, {
-            ALLOWED_TAGS: ["p", "a", "i", "span"],
+            ALLOWED_TAGS: ["p", "a", "i", "span", "div", "br"],
             ALLOWED_ATTR: ["href", "title", "target", "rel", "class"],
             ALLOW_DATA_ATTR: false,
         }) : '',
