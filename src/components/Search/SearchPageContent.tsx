@@ -7,55 +7,28 @@
 'use client'
 
 // Typical imports
-import { useEffect, useState, useRef } from "react"
+import { useState } from "react"
 import { model } from "@prisma/client"
-import { getCollectionModels } from "@/functions/server/collections"
+import { getUniqueAnnotators, getUniqueModelers } from "@/functions/client/search"
 
 // Default imports
 import SearchPageModelList from "./SearchPageModelList"
 import SubHeader from "./SubHeader"
 
-const getUniqueModelers = (models: model[]): string[] => {
-  const uniqueModelers = new Set<string>()
-  models.forEach(model => uniqueModelers.add(model.modeled_by as string))
-  return Array.from(uniqueModelers)
-}
-
-const getUniqueAnnotators = (models: model[]): string[] => {
-  const uniqueAnnotators = new Set<string>()
-  models.forEach(model => { if (model.annotator) uniqueAnnotators.add(model.annotator as string) })
-  return Array.from(uniqueAnnotators)
-}
-
 // Main Component
-const SearchPageContent = () => {
+export default function SearchPageContent(props: { models: string }) {
+  // Parse models
+  const siteReadyModels = JSON.parse(props.models) as model[]
 
-  const siteReadyModels = useRef<model[]>(undefined)
+  // Get unique modelers and annotators
+  let uniqueModelers = getUniqueModelers(siteReadyModels)
+  let uniqueAnnotators = getUniqueAnnotators(siteReadyModels)
 
-  const [modeledByList, setModeledByList] = useState<string[]>()
-  const [annotatedByList, setAnnotatedByList] = useState<string[]>()
+  // States
+  const modeledByList= ['All', ...uniqueModelers]
+  const annotatedByList = ['All', ...uniqueAnnotators]
   const [selectedModeler, setSelectedModeler] = useState<string>('All')
   const [selectedAnnotator, setSelectedAnnotator] = useState<string>('All')
-
-  useEffect(() => {
-
-    const getModels = async () => {
-      const models = JSON.parse(await getCollectionModels())
-
-      if (typeof models !== 'string') {
-        siteReadyModels.current = models as model[]
-        let a = getUniqueModelers(models)
-        let b = getUniqueAnnotators(models)
-        a.unshift('All')
-        b.unshift('All')
-        setModeledByList(a)
-        setAnnotatedByList(b)
-      }
-    }
-
-    getModels()
-
-  }, [])
 
   return <>
     {
@@ -67,13 +40,11 @@ const SearchPageContent = () => {
           modeler={selectedModeler}
           annotator={selectedAnnotator}
           setSelectedModeler={setSelectedModeler}
-          setSelectedAnnotator={(setSelectedAnnotator)}/>
+          setSelectedAnnotator={(setSelectedAnnotator)} />
         <br />
-        <SearchPageModelList models={siteReadyModels.current as model[]} selectedModeler={selectedModeler} selectedAnnotator={selectedAnnotator} />
+        <SearchPageModelList models={siteReadyModels} selectedModeler={selectedModeler} selectedAnnotator={selectedAnnotator} />
         <br />
       </>
     }
   </>
 }
-
-export default SearchPageContent

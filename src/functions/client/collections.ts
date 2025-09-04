@@ -5,7 +5,6 @@ import { CollectionsProps, CollectionState } from "@/components/Collections/Coll
 import { annotationControl, setViewerWidth } from "@/components/Collections/SketchfabDom"
 import { fullAnnotation } from "@/interface/interface"
 import { Dispatch, RefObject, SetStateAction } from "react"
-import { model_annotation } from "@prisma/client"
 import { getLocalNfsPrefix, isLocalDevEnvClient } from "@/functions/client/utils"
 import { isMobileOrTablet } from "@/functions/utils/isMobile"
 import { ReadonlyURLSearchParams } from "next/navigation"
@@ -126,7 +125,7 @@ export const initializeAnnotations = (
             const position = JSON.parse(collectionState.s.model.annotationPosition)
             collectionState.api.createAnnotationFromScenePosition(position[0], position[1], position[2], 'Taxonomy and Description', '', (err: any) => {
 
-
+                // Go to first annotation if not mobile and there is no annotation param
                 if (!isMobile && !annotationNumberParam) collectionState.api.gotoAnnotation(0, { preventCameraAnimation: true, preventCameraMove: false })
                 else if (annotationNumberParam) collectionState.api.gotoAnnotation(parseInt(annotationNumberParam) - 1, { preventCameraAnimation: true, preventCameraMove: false })
             })
