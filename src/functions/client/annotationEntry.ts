@@ -379,47 +379,17 @@ export const enableSaveOrUpdateButton = (
     }
 }
 
-export function sanitizeHtml(htmlString: string): string {
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = htmlString;
-
-    const allowedTags = ['SPAN', 'A', 'I'];
-
-    function clean(node: Node) {
-        const children = Array.from(node.childNodes);
-
-        for (let child of children) {
-            if (child.nodeType === 1) { // Element node
-                const element = child as HTMLElement;
-                const tag = element.tagName.toUpperCase();
-                const isAllowed =
-                    allowedTags.includes(tag) &&
-                    (
-                        (tag !== 'SPAN' || element.classList.contains('hyperlink')) || // Allow <span class="hyperlink">
-                        //@ts-ignore
-                        (tag === 'A' && element.closest('span.hyperlink')) // Allow <a> only if inside <span class="hyperlink">
-                    );
-
-                if (!isAllowed) {
-                    // Remove tag but keep contents
-                    clean(child); // Clean nested children before removing the tag
-                    child.replaceWith(...child.childNodes);
-                } else {
-                    clean(child); // Recurse into allowed tags
-                }
-            } else if (child.nodeType === 3) {
-                // Text node, do nothing
-                continue;
-            } else {
-                // Remove non-element and non-text nodes
-                child.remove()
-            }
-        }
-    }
-
-    clean(wrapper)
-
-    return wrapper.innerHTML
+/**
+ * 
+ * @param annotation 
+ * @returns 
+ */
+export const sanitizeAnnotation = (annotation: string) => {
+    return DOMPurify.sanitize(annotation, {
+        ALLOWED_TAGS: ["p", "a", "i", "span", "div", "br"],
+        ALLOWED_ATTR: ["href", "title", "target", "rel", "class"],
+        ALLOW_DATA_ATTR: false,
+    })
 }
 
 export const getAnnotationEntryDataObj = (aeData: annotationEntry, uid: string, index: string, position: string, apData: annotationsAndPositions) => {
@@ -438,11 +408,7 @@ export const getAnnotationEntryDataObj = (aeData: annotationEntry, uid: string, 
         position: position,
         title: aeData.annotationTitle as string,
         annotationId: annotationId,
-        annotation: aeData.annotation ? DOMPurify.sanitize(aeData.annotation, {
-            ALLOWED_TAGS: ["p", "a", "i", "span", "div", "br"],
-            ALLOWED_ATTR: ["href", "title", "target", "rel", "class"],
-            ALLOW_DATA_ATTR: false,
-        }) : ''
+        annotation: aeData.annotation ? sanitizeAnnotation(aeData.annotation) : ''
     }
 
     // Directory, path and url data for photo uploads
@@ -497,12 +463,6 @@ export const getAnnotationEntryUpdateDataObj = (aeData: annotationEntry, index: 
     const annotationId = apData.activeAnnotation?.annotation_id as string
     const uid = specimen.uid as string
 
-    console.log(aeData.annotation ? DOMPurify.sanitize(aeData.annotation, {
-            ALLOWED_TAGS: ["p", "a", "i", "span", "div", "br"],
-            ALLOWED_ATTR: ["href", "title", "target", "rel", "class"],
-            ALLOW_DATA_ATTR: false,
-        }) : '')
-
     // Update object initialization
     const updateObject: annotationDataEntryUpdateObj = {
         specimenName: specimen.specimenName as string,
@@ -513,11 +473,7 @@ export const getAnnotationEntryUpdateDataObj = (aeData: annotationEntry, index: 
         position: position,
         title: aeData.annotationTitle as string,
         annotationId: apData.activeAnnotation?.annotation_id as string,
-        annotation: aeData.annotation ? DOMPurify.sanitize(aeData.annotation, {
-            ALLOWED_TAGS: ["p", "a", "i", "span", "div", "br"],
-            ALLOWED_ATTR: ["href", "title", "target", "rel", "class"],
-            ALLOW_DATA_ATTR: false,
-        }) : '',
+        annotation: aeData.annotation ? sanitizeAnnotation(aeData.annotation) : '',
         mediaTransition: apData.activeAnnotationType !== aeData.annotationType,
         previousMedia: apData.activeAnnotationType
     }

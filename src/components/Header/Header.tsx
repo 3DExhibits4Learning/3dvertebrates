@@ -10,7 +10,7 @@
 
 // Typical imports
 import { useParams } from "next/navigation"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Navbar, NavbarContent, NavbarMenuToggle, NavbarBrand, NavbarMenu, NavbarMenuItem, Divider, Switch } from "@heroui/react"
 import { toUpperFirstLetter } from "@/functions/utils/toUpperFirstLetter"
 import { SearchIcon } from "./SearchIcon"
@@ -24,12 +24,13 @@ import Links from "./Links"
 import MobileModelOptions from "./MobileModelOptions"
 import MobileMenuOptions from "./MobileMenuOptions"
 import windowMethods from "./WindowMethods"
+import { addDarkThemeListener, detectDarkTheme, removeDarkThemeListener } from "@/functions/client/header"
 
-const Header = (props: SearchHeaderProps) => {
+// Main JSX
+export default function Header(props: SearchHeaderProps) {
 
   // Params, session variables
   const params = useParams()
-  //const { data: session } = useSession()
 
   // States
   const [isSelected, setIsSelected] = useState<boolean>(true)
@@ -51,6 +52,10 @@ const Header = (props: SearchHeaderProps) => {
       .then(res => res.json()).then(json => json.results)
     setAutocompleteOptions(autocompleteOptions)
   }
+
+  // Dark theme effects
+  useEffect(() => detectDarkTheme(), [])
+  useEffect(() => { addDarkThemeListener(); return () => removeDarkThemeListener() }, [])
 
   return <Navbar isBordered className="justify-between max-w-none bg-[#004C46] dark:bg-[#212121] text-white dark:text-white">
 
@@ -83,7 +88,7 @@ const Header = (props: SearchHeaderProps) => {
     {/* Large screen link section */}
 
     <NavbarContent className="hidden lg:flex gap-4" justify="center">
-      <Links/>
+      <Links />
     </NavbarContent>
 
     {/* Mobile search button/icon */}
@@ -124,5 +129,3 @@ const Header = (props: SearchHeaderProps) => {
     </NavbarMenu>
   </Navbar >
 }
-
-export default Header
