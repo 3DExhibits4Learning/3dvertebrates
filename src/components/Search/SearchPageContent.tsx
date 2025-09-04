@@ -14,11 +14,15 @@ import { getUniqueAnnotators, getUniqueModelers } from "@/functions/client/searc
 // Default imports
 import SearchPageModelList from "./SearchPageModelList"
 import SubHeader from "./SubHeader"
+import { useSearchParams } from "next/navigation"
 
 // Main Component
 export default function SearchPageContent(props: { models: string }) {
   // Parse models
   const siteReadyModels = JSON.parse(props.models) as model[]
+  const searchParams = useSearchParams()
+  const annotator = searchParams.get('annotator')
+  const modeler = searchParams.get('modeler')
 
   // Get unique modelers and annotators
   let uniqueModelers = getUniqueModelers(siteReadyModels)
@@ -27,8 +31,8 @@ export default function SearchPageContent(props: { models: string }) {
   // States
   const modeledByList= ['All', ...uniqueModelers]
   const annotatedByList = ['All', ...uniqueAnnotators]
-  const [selectedModeler, setSelectedModeler] = useState<string>('All')
-  const [selectedAnnotator, setSelectedAnnotator] = useState<string>('All')
+  const [selectedModeler, setSelectedModeler] = useState<string>(uniqueModelers.includes(modeler as string) ? modeler as string : 'All')
+  const [selectedAnnotator, setSelectedAnnotator] = useState<string>(uniqueAnnotators.includes(annotator as string) ? annotator as string : 'All')
 
   return <>
     {

@@ -11,7 +11,6 @@ import { serverActionErrorHandler, catchMessage } from "./error"
 import { fetchGbifVernacularNames, fetchGbifProfile, fetchWikiSummary } from "./fetchFunctions"
 import { getSoftwares } from "./queries"
 import { model } from "@prisma/client"
-import { annotationWithModel } from "@/interface/interface"
 
 // SINGLETON
 import prisma from "../utils/prisma"
