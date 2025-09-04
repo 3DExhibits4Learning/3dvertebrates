@@ -10,6 +10,8 @@
 
 // Typical Imports
 import { GbifResponse, GbifImageResponse } from '@/interface/interface'
+import { annotations } from '@prisma/client'
+import { number } from 'framer-motion'
 
 // Default Imports
 import dynamic from 'next/dynamic'
@@ -23,6 +25,8 @@ export default function ClientWrapper(props: {
   gMatch: { hasInfo: boolean, data?: GbifResponse },
   specimenName: string,
   noModelData: { title: string, images: GbifImageResponse[] }
+  numberOfAnnotations: number
+  annotations: annotations[]
 }) {
   return <MainWrap {...props}/>
 }

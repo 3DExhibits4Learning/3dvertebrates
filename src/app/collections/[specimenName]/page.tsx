@@ -74,12 +74,23 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   // If there is no model or GBIF record of the specimen, we test for a common name
   if (!_3dmodel.length) return <CollectionsError specimenName={parameters.specimenName} />
 
+  const model = _3dmodel[0] as model
+  const annotations = await prisma.annotations.findMany({ where: { uid: model.uid } })
+  const numberOfAnnotations = annotations.length
+
   return <>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
     {isPreview && <meta name="robots" content="noindex, nofollow" />} {/* No indexing for the preview query string as it's only for authed users */}
     <title>3D Vertebrates Collections</title>
     <Header searchTerm={parameters.specimenName} headerTitle={parameters.specimenName} hasModel={!!_3dmodel.length} pageRoute="collections" />
-    <ClientWrapper model={JSON.stringify(_3dmodel)} gMatch={gMatch} specimenName={parameters.specimenName} noModelData={noModelData as { title: string, images: GbifImageResponse[] }} />
+    <ClientWrapper
+      model={JSON.stringify(_3dmodel)}
+      gMatch={gMatch}
+      specimenName={parameters.specimenName}
+      noModelData={noModelData as { title: string, images: GbifImageResponse[] }}
+      numberOfAnnotations={numberOfAnnotations} 
+      annotations={annotations}
+      />
   </>
 }
 

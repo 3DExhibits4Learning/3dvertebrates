@@ -1,15 +1,19 @@
 'use client'
 
+// Typical imports
 import { CollectionsProps, CollectionState } from "@/components/Collections/Collections"
 import { annotationControl, setViewerWidth } from "@/components/Collections/SketchfabDom"
 import { fullAnnotation } from "@/interface/interface"
 import { Dispatch, RefObject, SetStateAction } from "react"
 import { model_annotation } from "@prisma/client"
-
-import Vertebrates from '@/classes/HerbariumClass'
-import Sketchfab from '@sketchfab/viewer-api'
 import { getLocalNfsPrefix, isLocalDevEnvClient } from "@/functions/client/utils"
 import { isMobileOrTablet } from "@/functions/utils/isMobile"
+import { ReadonlyURLSearchParams } from "next/navigation"
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
+
+// Default imports
+import Vertebrates from '@/classes/HerbariumClass'
+import Sketchfab from '@sketchfab/viewer-api'
 
 
 /**
@@ -70,7 +74,7 @@ export const initializeExhibit = (props: CollectionsProps, modelViewer: RefObjec
  * @param collectionState 
  * @param setCollectionState 
  */
-export const addAnnotationEventListener = (collectionState: CollectionState, setCollectionState: Dispatch<SetStateAction<CollectionState>>) => {
+export const addAnnotationEventListener = (collectionState: CollectionState, setCollectionState: Dispatch<SetStateAction<CollectionState>>, params: ReadonlyURLSearchParams, path: string, router: AppRouterInstance) => {
     // Set index when an annotation is selected
     collectionState.api.addEventListener('annotationSelect', (index: number) => {
 
@@ -79,6 +83,7 @@ export const addAnnotationEventListener = (collectionState: CollectionState, set
 
         // this event is still triggered even when an annotation is not selected; an index of -1 is returned; also checking that the same index is not selected
         if (index !== -1) setCollectionState(prev => {
+            replaceAnnotationNumberInPath(index + 1, params, path, router)
             if (prev.index !== index) return { ...prev, index: index, imgLoading: true }
             else return prev
         })
@@ -102,15 +107,28 @@ export const addAnnotationEventListener = (collectionState: CollectionState, set
  * @param annotationSwitchListenerWrapper 
  * @param annotationSwitchMobileListenerWrapper 
  */
-export const initializeAnnotations = (collectionState: CollectionState, annotationUid: string | null, setCollectionState: Dispatch<SetStateAction<CollectionState>>, annotationSwitchListenerWrapper: (this: HTMLInputElement, ev: Event) => any, annotationSwitchMobileListenerWrapper: (this: HTMLInputElement, ev: Event) => any) => {
+export const initializeAnnotations = (
+    collectionState: CollectionState, 
+    setCollectionState: Dispatch<SetStateAction<CollectionState>>, 
+    annotationSwitchListenerWrapper: (this: HTMLInputElement, ev: Event) => any, 
+    annotationSwitchMobileListenerWrapper: (this: HTMLInputElement, ev: Event) => any,
+    params: ReadonlyURLSearchParams,
+    path: string,
+    router: AppRouterInstance,
+    annotationNumberParam: string | undefined
+) => {
 
     if (collectionState.s && collectionState.annotations && collectionState.api) {
+        const isMobile = isMobileOrTablet()
 
         // Create and go to the first annotation if it exists
         if (collectionState.s.model.annotationPosition) {
             const position = JSON.parse(collectionState.s.model.annotationPosition)
             collectionState.api.createAnnotationFromScenePosition(position[0], position[1], position[2], 'Taxonomy and Description', '', (err: any) => {
-                if (!annotationUid && !isMobileOrTablet()) collectionState.api.gotoAnnotation(0, { preventCameraAnimation: true, preventCameraMove: false })
+
+
+                if (!isMobile && !annotationNumberParam) collectionState.api.gotoAnnotation(0, { preventCameraAnimation: true, preventCameraMove: false })
+                else if (annotationNumberParam) collectionState.api.gotoAnnotation(parseInt(annotationNumberParam) - 1, { preventCameraAnimation: true, preventCameraMove: false })
             })
 
             // Create any futher annotations that exist
@@ -122,14 +140,6 @@ export const initializeAnnotations = (collectionState: CollectionState, annotati
             }
         }
 
-        // Go to specific annotation if it was present in the query string
-        if (annotationUid) {
-            const annotation = collectionState.annotations.find(annotation => annotation.annotation_type === 'model' && (annotation.annotation as model_annotation).uid === annotationUid)
-            if (annotation) collectionState.api.gotoAnnotation(annotation.annotation_no - 1, { preventCameraAnimation: true, preventCameraMove: false }, function (err: any, index: any) { })
-            else collectionState.api.gotoAnnotation(0, { preventCameraAnimation: true, preventCameraMove: false }) 
-        }
-        else { if (!isMobileOrTablet()) collectionState.api.gotoAnnotation(0, { preventCameraAnimation: true, preventCameraMove: false }) }
-
         // Annotation swtiches
         const annotationSwitch = document.getElementById("annotationSwitch")
         const annotationSwitchMobile = document.getElementById("annotationSwitchMobileHidden");
@@ -137,7 +147,7 @@ export const initializeAnnotations = (collectionState: CollectionState, annotati
         // Add event listeners
         (annotationSwitch as HTMLInputElement).addEventListener("change", annotationSwitchListenerWrapper);
         (annotationSwitchMobile as HTMLInputElement).addEventListener("change", annotationSwitchMobileListenerWrapper)
-        addAnnotationEventListener(collectionState, setCollectionState)
+        addAnnotationEventListener(collectionState, setCollectionState, params, path, router)
     }
 }
 
@@ -224,6 +234,27 @@ export const resizeEventHandler = (collectionsDiv: RefObject<HTMLDivElement | un
         else setCollectionState(prev => ({ ...prev, imgHeightGtRect: false, imgWidthGtRect: false }))
 
     }
+}
+
+/**
+ * 
+ * @param sketchfabApi 
+ * @returns 
+ */
+export const isAnnotationParamValid = (param: string, numberOfAnnotations: number) => {
+    const re = /[1-9]+/
+    if (re.test(param) && parseInt(param) <= numberOfAnnotations + 1) return true
+    return false
+}
+
+/**
+ * 
+ * @param annotationNumber 
+ */
+export const replaceAnnotationNumberInPath = (annotationNumber: number, params: ReadonlyURLSearchParams, path: string, router: AppRouterInstance) => {
+    const writeParams = new URLSearchParams(params)
+    writeParams.set('annotation', annotationNumber.toString())
+    router.replace(`${path}?${writeParams.toString()}`)
 }
 
 

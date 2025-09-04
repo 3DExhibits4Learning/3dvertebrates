@@ -17,6 +17,7 @@ import { GbifResponse, GbifImageResponse } from '@/interface/interface'
 // Default Imports
 import dynamic from 'next/dynamic'
 import Foot from '@/components/Shared/Foot'
+import { annotations } from '@prisma/client'
 
 // Dynamic Imports
 const SketchfabApi = dynamic(() => import('@/components/Collections/Collections'), { ssr: false })
@@ -27,6 +28,8 @@ export default function MainWrap(props: {
   gMatch: { hasInfo: boolean, data?: GbifResponse },
   specimenName: string,
   noModelData: { title: string, images: GbifImageResponse[] }
+  numberOfAnnotations: number
+  annotations: annotations[]
 }) {
 
   // Parse model (decimals can't be passed to client from server)
@@ -63,7 +66,10 @@ export default function MainWrap(props: {
               model={model[1] ?? model[0]}
               gMatch={props.gMatch}
               images={props.noModelData.images}
-              imageTitle={props.noModelData.title} />
+              imageTitle={props.noModelData.title} 
+              numberOfAnnotations={props.numberOfAnnotations}
+              annotations={props.annotations}
+              />
           </div>
           <Foot />
         </div>

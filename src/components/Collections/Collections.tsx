@@ -9,10 +9,10 @@
 
 // Typical imports
 import { useEffect, useState, useRef, Ref, createContext } from 'react'
-import { model, model_annotation, text_annotation, video_annotation } from '@prisma/client'
+import { annotations, model, model_annotation, text_annotation, video_annotation } from '@prisma/client'
 import { fullAnnotation, GbifImageResponse, GbifResponse } from '@/interface/interface'
-import { useSearchParams } from 'next/navigation'
-import { annotationSwitchListener, annotationSwitchMobileListener, handleSrcForPhotoAnnotation, initializeAnnotations, initializeExhibit, resizeEventHandler } from '@/functions/client/collections'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { annotationSwitchListener, annotationSwitchMobileListener, handleSrcForPhotoAnnotation, initializeAnnotations, initializeExhibit, isAnnotationParamValid, resizeEventHandler } from '@/functions/client/collections'
 
 // Default imports
 import AnnotationModal from '@/components/Collections/AnnotationModal'
@@ -52,12 +52,25 @@ export interface CollectionsProps {
   model: model,
   images: GbifImageResponse[]
   imageTitle: string
+  numberOfAnnotations: number
+  annotations: annotations[]
 }
 
 export const CollectionsContext = createContext<collectionsContext | null>(null)
 
 // Main JSX
 export default function SFAPI(props: CollectionsProps) {
+
+  // Get path, router
+  const path = usePathname()
+  const router = useRouter()
+
+  const params = useSearchParams()
+  const annotationParam = params.get('annotation')
+  const annotationNumberParam = annotationParam && isAnnotationParamValid(annotationParam, props.numberOfAnnotations) ? annotationParam : undefined
+
+  // Determine if url param is a model annotation
+  const isModelParam = annotationNumberParam && props.annotations.find(annotation => annotation.annotation_no === parseInt(annotationNumberParam))?.annotation_type === 'model' ? true : false
 
   // Variable Declarations
   const gMatch = props.gMatch.data as GbifResponse
@@ -106,6 +119,7 @@ export default function SFAPI(props: CollectionsProps) {
 
   // Sketchfab viewer desktop success object
   const successObjDesktop = { ...successObj, annotation: 1, ui_fadeout: 1 }
+  if (isModelParam) Object.assign(successObj, { annotation: parseInt(annotationNumberParam as string) })
 
   // Context value
   const value = { state: collectionState, props: { ...props } }
@@ -119,17 +133,17 @@ export default function SFAPI(props: CollectionsProps) {
 
   // Effect chain initializes exhibit, then annotations and various listeners
   useEffect(() => { initializeExhibit(props, modelViewer, successObj, successObjDesktop, setCollectionState, sRef) }, []) // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => initializeAnnotations(collectionState, annotationUid, setCollectionState, annotationSwitchListenerWrapper, annotationSwitchMobileListenerWrapper),
+  useEffect(() => initializeAnnotations(collectionState, setCollectionState, annotationSwitchListenerWrapper, annotationSwitchMobileListenerWrapper, params, path, router, annotationNumberParam),
     [collectionState.api, collectionState.annotations, collectionState.s])
 
   // Set imgSrc if necessary upon selection of a new annotaion
-  useEffect(() => {handleSrcForPhotoAnnotation(collectionState, setCollectionState, collectionsDiv)}, [collectionState.index]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { handleSrcForPhotoAnnotation(collectionState, setCollectionState, collectionsDiv) }, [collectionState.index]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle window resize wrt annotation div for photo annotations
   useEffect(() => {
     window.addEventListener('resize', resizeEventHandlerWrapper)
     return () => window.removeEventListener('resize', resizeEventHandlerWrapper)
-  }, [collectionState.imgWidth]) 
+  }, [collectionState.imgWidth])
 
   return <CollectionsContext.Provider value={value}>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta>

@@ -16,6 +16,7 @@ import { toUpperFirstLetter } from "@/functions/utils/toUpperFirstLetter"
 import { SearchIcon } from "./SearchIcon"
 import { MobileSearch } from "./MobileSearch"
 import { SearchHeaderProps } from "@/interface/interface"
+import { addDarkThemeListener, detectDarkTheme, removeDarkThemeListener } from "@/functions/client/header"
 
 // Default imports
 import LogoAndSignIn from "./LogoAndSignIn"
@@ -24,7 +25,6 @@ import Links from "./Links"
 import MobileModelOptions from "./MobileModelOptions"
 import MobileMenuOptions from "./MobileMenuOptions"
 import windowMethods from "./WindowMethods"
-import { addDarkThemeListener, detectDarkTheme, removeDarkThemeListener } from "@/functions/client/header"
 
 // Main JSX
 export default function Header(props: SearchHeaderProps) {
