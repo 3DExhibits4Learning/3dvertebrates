@@ -12,7 +12,7 @@ import { fetchGbifVernacularNames, fetchGbifProfile, fetchWikiSummary } from "./
 import { getSoftwares } from "./queries"
 import { model } from "@prisma/client"
 
-// SINGLETON
+// Default imports
 import prisma from "../utils/prisma"
 
 // PATH

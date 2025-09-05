@@ -3,13 +3,16 @@
 import { Navbar, NavbarContent } from "@heroui/react"
 import { Dispatch, SetStateAction } from "react"
 
-type SubHeaderProps = {
+interface SubHeaderProps {
   modeledByList: string[]
   annotatedByList: string[]
   modeler: string
   setSelectedModeler: Dispatch<SetStateAction<string>>
   annotator: string
+  semester: string
   setSelectedAnnotator: Dispatch<SetStateAction<string>>
+  setSelectedSemester: Dispatch<SetStateAction<string>>
+  semesters: string[]
 }
 
 export default function SubHeader(props: SubHeaderProps) {
@@ -23,8 +26,10 @@ export default function SubHeader(props: SubHeaderProps) {
 
         <select
           aria-label='Filter by Annotator'
+          value={props.semester}
+          onChange={e => props.setSelectedSemester(e.target.value)}
           className={`min-w-[166px] w-fit max-w-[200px] rounded-xl dark:bg-[#27272a] dark:hover:bg-[#43434a] h-[40px] text-[14px] px-2 outline-[#004C46]`}>
-          <option value={'SPRING25'} defaultValue={'SPRING25'} aria-label={'SPRING25'}>Spring &apos;25</option>
+          {props.semesters.map(sem => <option key={sem} value={sem} aria-label={sem}>{sem === 'FALL24' ? "Fall '24" : sem === 'SPRING25' ? "Spring '25" : sem}</option>)}
         </select>
 
         <select

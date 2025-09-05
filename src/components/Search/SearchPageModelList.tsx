@@ -6,34 +6,19 @@
 
 // Typical imports
 import { model } from '@prisma/client'
+import { getFilteredModels } from '@/functions/client/search'
 
 // Default imports
 import Card from './Card'
 
 // Main JSX
-export default function SearchPageModelList(props: {models: model[], selectedModeler: string | undefined, selectedAnnotator: string | undefined}){
+export default function SearchPageModelList(props: {models: model[], selectedModeler: string | undefined, selectedAnnotator: string | undefined, selectedSemester: string | undefined}) {
 
   // Declartations
   const models = props.models
-  const selectedModeler: string | undefined = props.selectedModeler
+  const selectedModeler = props.selectedModeler
   const selectedAnnotator = props.selectedAnnotator
-  var filteredModels: model[]
-
-  /**
-   * 
-   * @param selection 
-   * @returns 
-   */
-  const selectionCheck = (selection: string | undefined) => {
-    if (selection === 'All' || selection === '' || selection === undefined) return true
-    else return false
-  }
-
-  // Convert this to function and export
-  filteredModels = models.filter(model =>
-    (selectionCheck(props.selectedModeler) || model.modeled_by === selectedModeler) &&
-    (selectionCheck(props.selectedAnnotator) || model.annotator === selectedAnnotator)
-  )
+  const filteredModels = getFilteredModels(models, selectedModeler, selectedAnnotator)
 
   // Extract sub components
   return <>

@@ -7,48 +7,49 @@
 'use client'
 
 // Typical imports
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { model } from "@prisma/client"
-import { getUniqueAnnotators, getUniqueModelers } from "@/functions/client/search"
+import { useSearchParams } from "next/navigation"
+import { filterModelsBySemester, getUniqueAnnotators, getUniqueModelers } from "@/functions/client/search"
 
 // Default imports
 import SearchPageModelList from "./SearchPageModelList"
 import SubHeader from "./SubHeader"
-import { useSearchParams } from "next/navigation"
 
 // Main Component
-export default function SearchPageContent(props: { models: string }) {
+export default function SearchPageContent(props: { models: string, semesters: string[] }) {
   // Parse models
   const siteReadyModels = JSON.parse(props.models) as model[]
   const searchParams = useSearchParams()
-  const annotator = searchParams.get('annotator')
+  const semesterParameter = searchParams.get('semester')
   const modeler = searchParams.get('modeler')
-
-  // Get unique modelers and annotators
-  let uniqueModelers = getUniqueModelers(siteReadyModels)
-  let uniqueAnnotators = getUniqueAnnotators(siteReadyModels)
+  const annotator = searchParams.get('annotator')
+  const semesterFilteredModels = semesterParameter && props.semesters.includes(semesterParameter) ? siteReadyModels.filter(m => m.semester.toLowerCase() === semesterParameter.toLowerCase()) : siteReadyModels
+  const modelers = ["All", ...getUniqueModelers(semesterFilteredModels)]
+  const annotators = ["All", ...getUniqueAnnotators(semesterFilteredModels)]
 
   // States
-  const modeledByList= ['All', ...uniqueModelers]
-  const annotatedByList = ['All', ...uniqueAnnotators]
-  const [selectedModeler, setSelectedModeler] = useState<string>(uniqueModelers.includes(modeler as string) ? modeler as string : 'All')
-  const [selectedAnnotator, setSelectedAnnotator] = useState<string>(uniqueAnnotators.includes(annotator as string) ? annotator as string : 'All')
+  const [modelsFilteredBySemester, setModelsFilteredBySemester] = useState<model[]>(semesterFilteredModels)
+  const [selectedSemester, setSelectedSemester] = useState<string>(props.semesters.includes(semesterParameter as string) ? semesterParameter as string : 'All')
+  const [selectedModeler, setSelectedModeler] = useState<string>(modeler && modelers.includes(modeler) ? modeler : 'All')
+  const [selectedAnnotator, setSelectedAnnotator] = useState<string>(annotator && annotators.includes(annotator) ? annotator : 'All')
+
+  // Reset filtered models by semester (thus updating the modelers and annotators) when the semester changes
+  useEffect(() => setModelsFilteredBySemester(props.semesters.includes(selectedSemester) ? filterModelsBySemester(siteReadyModels, selectedSemester) : siteReadyModels), [selectedSemester])
 
   return <>
-    {
-      modeledByList && annotatedByList &&
-      <>
-        <SubHeader
-          modeledByList={modeledByList}
-          annotatedByList={annotatedByList}
-          modeler={selectedModeler}
-          annotator={selectedAnnotator}
-          setSelectedModeler={setSelectedModeler}
-          setSelectedAnnotator={(setSelectedAnnotator)} />
-        <br />
-        <SearchPageModelList models={siteReadyModels} selectedModeler={selectedModeler} selectedAnnotator={selectedAnnotator} />
-        <br />
-      </>
-    }
+    <SubHeader
+      modeledByList={modelers}
+      annotatedByList={annotators}
+      modeler={selectedModeler}
+      annotator={selectedAnnotator}
+      semester={selectedSemester}
+      setSelectedModeler={setSelectedModeler}
+      setSelectedAnnotator={setSelectedAnnotator}
+      setSelectedSemester={setSelectedSemester} 
+      semesters={props.semesters}/>
+    <br />
+    <SearchPageModelList models={modelsFilteredBySemester} selectedModeler={selectedModeler} selectedAnnotator={selectedAnnotator} selectedSemester={selectedSemester} />
+    <br />
   </>
 }
