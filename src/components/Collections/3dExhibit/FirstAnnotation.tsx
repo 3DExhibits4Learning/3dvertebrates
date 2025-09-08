@@ -4,12 +4,15 @@
  * @fileoverview first annotation metadata
  */
 
+// Typical imports
 import { GbifResponse } from "@/interface/interface"
 import { addCommas, boolRinse, arrayFromObjects } from "../SketchfabDom"
 import { toUpperFirstLetter } from "@/functions/utils/toUpperFirstLetter"
 
+// Default imports
 import Vertebrates from '@/classes/HerbariumClass'
 
+// Main JSX
 export default function FirstAnnotation(props: {gMatch: GbifResponse, s: Vertebrates}) {
     const gMatch = props.gMatch
     const s = props.s // s = specimen
@@ -50,10 +53,10 @@ export default function FirstAnnotation(props: {gMatch: GbifResponse, s: Vertebr
                 <p> 3D Model </p>
             </div>
             <div className='w-[65%] py-[20px] justify-center items-center text-center'>
-                <p>Build method: {s.model.build_process}</p>
+                <p>Build method: {toUpperFirstLetter(s.model.build_process)}</p>
                 <p>Created with: {arrayFromObjects(s.software)}</p>
-                <p>Modeler: {s.model.modeled_by}</p>
-                <p>Annotator: {s.getAnnotator()}</p>
+                <p>Modeler: {toUpperFirstLetter(s.model.modeled_by)}</p>
+                <p>Annotator: {toUpperFirstLetter(s.getAnnotator() as string)}</p>
             </div>
         </div>
 

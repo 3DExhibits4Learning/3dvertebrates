@@ -12,7 +12,7 @@ import { useEffect, useState, useRef, Ref, createContext } from 'react'
 import { annotations, model, model_annotation, text_annotation, video_annotation } from '@prisma/client'
 import { fullAnnotation, GbifImageResponse, GbifResponse } from '@/interface/interface'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { annotationSwitchListener, annotationSwitchMobileListener, handleSrcForPhotoAnnotation, initializeAnnotations, initializeExhibit, isAnnotationParamValid, resizeEventHandler } from '@/functions/client/collections'
+import { annotationSwitchListener, annotationSwitchMobileListener, handleSrcForPhotoAnnotation, initializeAnnotations, initializeExhibit, isAnnotationParamValid, replaceAnnotationNumberInPath, resizeEventHandler } from '@/functions/client/collections'
 
 // Default imports
 import AnnotationModal from '@/components/Collections/AnnotationModal'
@@ -42,6 +42,7 @@ export interface CollectionState {
   imgGtRect: boolean
   imgHeightGtRect: boolean
   imgWidthGtRect: boolean
+  urlChange: boolean
 }
 
 export interface CollectionsProps {
@@ -59,7 +60,7 @@ export interface CollectionsProps {
 export const CollectionsContext = createContext<collectionsContext | null>(null)
 
 // Main JSX
-export default function SFAPI(props: CollectionsProps) {
+export default function Collection(props: CollectionsProps) {
 
   // Get path, router, params
   const path = usePathname()
@@ -75,8 +76,6 @@ export default function SFAPI(props: CollectionsProps) {
 
   // Variable Declarations
   const gMatch = props.gMatch.data as GbifResponse
-  const searchParams = useSearchParams()
-  const annotationUid = searchParams.get('annotation')
 
   // State
   const [collectionState, setCollectionState] = useState<CollectionState>({
@@ -92,7 +91,8 @@ export default function SFAPI(props: CollectionsProps) {
     imgWidth: undefined,
     imgGtRect: false,
     imgHeightGtRect: false,
-    imgWidthGtRect: false
+    imgWidthGtRect: false,
+    urlChange: false
   })
 
   // Refs
@@ -115,7 +115,9 @@ export default function SFAPI(props: CollectionsProps) {
     ui_watermark: 0,
     ui_annotations: 0,
     ui_color: "004C46",
-    ui_fadeout: 0
+    ui_fadeout: 0,
+    orbit_constraint_zoom_in: props.model.max_zoom_in ?? 1,
+    orbit_constraint_zoom_out: props.model.max_zoom_out ?? 30
   }
 
   // Sketchfab viewer desktop success object
@@ -145,6 +147,9 @@ export default function SFAPI(props: CollectionsProps) {
     window.addEventListener('resize', resizeEventHandlerWrapper)
     return () => window.removeEventListener('resize', resizeEventHandlerWrapper)
   }, [collectionState.imgWidth])
+
+  // Replace annotation number in path when index changes
+  useEffect(() => { if (collectionState.index) replaceAnnotationNumberInPath(collectionState.index + 1, params, path, router) }, [collectionState.index]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return <CollectionsContext.Provider value={value}>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta>

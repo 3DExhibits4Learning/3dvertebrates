@@ -82,7 +82,6 @@ export const addAnnotationEventListener = (collectionState: CollectionState, set
 
         // this event is still triggered even when an annotation is not selected; an index of -1 is returned; also checking that the same index is not selected
         if (index !== -1) setCollectionState(prev => {
-            replaceAnnotationNumberInPath(index + 1, params, path, router)
             if (prev.index !== index) return { ...prev, index: index, imgLoading: true }
             else return prev
         })

@@ -24,7 +24,7 @@ export default function SearchPageContent(props: { models: string, semesters: st
   const semesterParameter = searchParams.get('semester')
   const modeler = searchParams.get('modeler')
   const annotator = searchParams.get('annotator')
-  const semesterFilteredModels = semesterParameter && props.semesters.includes(semesterParameter) && semesterParameter !== "All" ?
+  const semesterFilteredModels = semesterParameter && props.semesters.filter(semester => semester !== 'All').includes(semesterParameter) ?
     siteReadyModels.filter(m => m.semester.toLowerCase() === semesterParameter.toLowerCase()) : siteReadyModels
   const modelers = ["All", ...getUniqueModelers(semesterFilteredModels)]
   const annotators = ["All", ...getUniqueAnnotators(semesterFilteredModels)]

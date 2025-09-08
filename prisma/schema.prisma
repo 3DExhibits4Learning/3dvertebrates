@@ -66,8 +66,10 @@ model model {
   annotator             String?       @db.VarChar(75)
   annotatorId           String?       @db.VarChar(50)
   assignedEmail         String?       @db.VarChar(50) 
-  semester              String        @default("SPRING25") @db.VarChar(50) 
-  class                 String        @default("Advanced Mammalogy") @db.VarChar(50) 
+  semester              String        @default("FALL25") @db.VarChar(50) 
+  class                 String        @default("BIOL-499") @db.VarChar(50) 
+  max_zoom_in           String?       @db.Char(1)
+  max_zoom_out          String?       @db.Char(2) 
   lat                   Decimal?      
   lng                   Decimal?
   email                 String        @db.VarChar(100)

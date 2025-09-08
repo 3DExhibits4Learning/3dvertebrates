@@ -47,6 +47,12 @@ export const getIndex = (apData: annotationsAndPositions) => {
     return index
 }
 
+/**
+ * 
+ * @param apDataDispatch 
+ * @param specimenDataDispatch 
+ * @param model 
+ */
 export const simulateAccordionPress = (apDataDispatch: Dispatch<any>, specimenDataDispatch: Dispatch<any>, model: model) => {
     apDataDispatch({ type: 'newModelClicked' })
     specimenDataDispatch({ type: 'newModelClicked', model: model })

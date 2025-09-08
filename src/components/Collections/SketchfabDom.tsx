@@ -1,5 +1,7 @@
 "use client"
 
+import { toUpperFirstLetter } from "@/functions/utils/toUpperFirstLetter";
+
 export const boolRinse = (bool: boolean | string) => {
   var rinsed = bool || bool ==='true' ? "Yes" : "No";
   return rinsed
@@ -14,10 +16,8 @@ export const addCommas = (stringArray: Array<string>) => {
 }
 
 export const arrayFromObjects = (objectArray: Array<any>) => {
-  var softwareArray: string[] = [];
-  for (let obj of objectArray) {
-    softwareArray.push(obj.software)
-  }
+  const softwareArray: string[] = []
+  for (let obj of objectArray) softwareArray.push(toUpperFirstLetter(obj.software))
   return addCommas(softwareArray)
 }
 
@@ -40,7 +40,7 @@ export function annotationControl(api: any, annotations: any, annotationsChecked
     }
     api.showAnnotationTooltips(function (err: any) {
       if (!err) { }
-    });
+    })
   }
   else {
     for (let i = 0; i <= annotations.length; i++) {
