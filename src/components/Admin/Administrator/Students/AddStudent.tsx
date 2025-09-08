@@ -18,15 +18,18 @@ import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHan
 
 // Main JSX
 export default function AddStudent() {
+    // Context
+    const context = useContext(DataTransferContext)
+    const initializeDataTransfer = context.initializeDataTransferHandler
+    const terminateDataTransfer = context.terminateDataTransferHandler
+    const adminEmail = context.userEmail
 
-    const initializeDataTransfer = useContext(DataTransferContext).initializeDataTransferHandler
-    const terminateDataTransfer = useContext(DataTransferContext).terminateDataTransferHandler
-
+    // States
     const [email, setEmail] = useState<string>('')
     const [name, setName] = useState<string>('')
     const [buttonDisabled, setButtonDiabled] = useState<boolean>(true)
 
-    const addStudentHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, addStudent, [email, name], 'Adding student')
+    const addStudentHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, addStudent, [email, name, adminEmail], 'Adding student')
 
     useEffect(() => {
         if (email.includes("@humboldt.edu") && name) setButtonDiabled(false)

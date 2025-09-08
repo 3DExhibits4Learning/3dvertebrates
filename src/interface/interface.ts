@@ -400,6 +400,7 @@ export interface ManagerClientProps {
   authorizedUsers: authorized[]
   assignments: string
   modelsToAnnotate: string
+  email: string
 }
 
 export interface UpdateModelFormContainerProps {

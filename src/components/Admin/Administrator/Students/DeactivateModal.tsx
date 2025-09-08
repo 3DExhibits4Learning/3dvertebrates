@@ -1,19 +1,26 @@
 // Typical imports
+import { DataTransferContext } from "@/components/Admin/Administrator/ManagerClient"
 import { areThereIncompleteAssignments, deActivateStudent, unassignAndDeactivate } from "@/functions/server/admin/administrator"
 import { Modal, ModalContent, ModalBody, Button, Spinner } from "@heroui/react"
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react"
 
 // Main JSX
 export default function DeactivateModal(props: { isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>, email: string, setActiveStudentsUpdated: Dispatch<SetStateAction<boolean | undefined>> }) {
+    // Get email
+    const adminEmail = useContext(DataTransferContext).userEmail
+
+    // States
     const [incompleteAssignments, setIncompleteAssignments] = useState<boolean>()
     const [unassignWithAssignments, setUnassignWithAssingments] = useState(false)
     const [studentDeactivated, setStudentDeactivated] = useState(false)
 
+    // Handlers
     const incompleteAssignmentsHandler = async () => setIncompleteAssignments(await areThereIncompleteAssignments(props.email))
-    const deactivateStudent = async () => { await deActivateStudent(props.email); setStudentDeactivated(true) }
-    const unassignAndDeactivateHandler = async () => { await unassignAndDeactivate(props.email); setStudentDeactivated(true) }
+    const deactivateStudent = async () => { await deActivateStudent(props.email, adminEmail); setStudentDeactivated(true) }
+    const unassignAndDeactivateHandler = async () => { await unassignAndDeactivate(props.email, adminEmail); setStudentDeactivated(true) }
     const setUpdatedActiveStudentHandler = () => props.setActiveStudentsUpdated(prev => prev === undefined ? true : !prev)
 
+    // Use effects
     useEffect(() => { if (props.isOpen) incompleteAssignmentsHandler() }, [props.isOpen])
     useEffect(() => { if (incompleteAssignments === false) deactivateStudent() }, [incompleteAssignments])
     useEffect(() => { if (unassignWithAssignments) unassignAndDeactivateHandler() }, [unassignWithAssignments])

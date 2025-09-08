@@ -22,13 +22,17 @@ import dataTransferHandler from "@/functions/client/dataTransfer/dataTransferHan
 
 // Main JSX
 export default function DeleteModel(props: { models: fullModel[] | undefined }) {
-
-    const initializeDataTransfer = useContext(DataTransferContext).initializeDataTransferHandler
-    const terminateDataTransfer = useContext(DataTransferContext).terminateDataTransferHandler
-
+    // Context
+    const context = useContext(DataTransferContext)
+    const adminEmail = context.adminEmail
+    const initializeDataTransfer = context.initializeDataTransferHandler
+    const terminateDataTransfer = context.terminateDataTransferHandler
+    
+    // State
     const [uid, setUid] = useState<string>('')
 
-    const deleteModelHandler = async (uid: string) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, deleteModel, [uid], "Deleting Model and Annotations")
+    // Handlers
+    const deleteModelHandler = async (uid: string) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, deleteModel, [uid, adminEmail], "Deleting Model and Annotations")
 
     return <section className="w-full flex justify-center">
             <div className="w-1/2 flex flex-col border-2 border-[#00856A] rounded-xl bg-[#D5CB9F] dark:bg-[#212121]">

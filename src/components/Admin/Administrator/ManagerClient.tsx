@@ -16,9 +16,6 @@ import { Accordion, AccordionItem } from "@heroui/react"
 import { ManagerClientProps } from "@/interface/interface"
 import { fullModel } from "@/interface/interface"
 import { isMobileOrTablet } from "@/functions/utils/isMobile"
-// import { getAllPhotoAnnotations } from "@/functions/server/admin/administrator"
-// import { sanitizeHtml } from "@/functions/client/annotationEntry"
-// import { updatePhotoAnnotation } from "@/functions/server/admin/administrator"
 
 // Default imports
 import AnnotationClient from "@/components/Admin/Annotation/Annotation Client/AnnotationClient"
@@ -86,7 +83,7 @@ export default function ManagerClient(props: ManagerClientProps) {
         <DataTransferModal open={openModal} setOpen={setOpenModal} transferring={transferring} loadingLabel={loadingLabel as string} result={result} href='/admin/management' />
 
         {/* Data transfer handlers context provider */}
-        <DataTransferContext.Provider value={{ initializeDataTransferHandler, terminateDataTransferHandler }}>
+        <DataTransferContext.Provider value={{ initializeDataTransferHandler, terminateDataTransferHandler, userEmail: props.email }}>
 
             {/* Main admin Accordion */}
             <Accordion className="text-[#004C46] dark:text-[#F5F3E7]">

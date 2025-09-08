@@ -41,9 +41,6 @@ export default async function Page() {
         // Check authorization
         if (!(email || authorizedUsers.some(user => user.email === email))) return <h1>NOT AUTHORIZED</h1>
 
-        // Log access
-        console.log(`User ${email} accessed the student client`)
-
         // Get models to annotate, annotation models (models used as annotations themselves), and assignments
         const modelsToAnnotate = await getModelsToAnnotate().catch(e => serverErrorHandler(path, e.message, "Couldn't get models to annotate", 'getModelsToAnnotate()', false)) as fullModel[]
         const annotationModels = await getAllAnnotationModels().catch(e => serverErrorHandler(path, e.message, "Couldn't get annotation models", 'getModelsToAnnotate()', false)) as model[]

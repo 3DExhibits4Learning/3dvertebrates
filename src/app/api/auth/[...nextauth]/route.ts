@@ -13,8 +13,6 @@ import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/
 // Default imports
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
-
-// SINGLETON
 import prisma from "@/functions/utils/prisma"
 
 // ROUTE
@@ -44,6 +42,7 @@ export const authOptions = {
         token.id = user.id
         token.provider = account.provider
         token.accessToken = account.access_token
+        console.log(`User ${user.email} signed in with provider ${account.provider}`)
 
         // If the user is in the database (has signed in before), and logged in with an oauth provider (not email), update their account data upon sign-in
         try {

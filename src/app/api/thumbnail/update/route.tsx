@@ -16,6 +16,7 @@ import routeHandlerTypicalResponse from '@/functions/server/typicalSuccessRespon
 
 // SINGLETON
 import prisma from '@/functions/utils/prisma'
+import { getServerSession } from 'next-auth'
 
 // PATH
 const path = 'src/app/api/thumbnail/update/route.tsx'
@@ -27,6 +28,11 @@ export async function POST(request: Request) {
         const formData = await request.formData().catch(e => routeHandlerErrorHandler(e.message, path, 'request.formData()', "Couldn't get form data")) as FormData
         const file = formData.get('file') as File
         const uid = formData.get('uid') as string
+
+        // Get session and email
+        const session = await getServerSession()
+        if (!session) throw Error('No session found')
+        const email = session.user?.email
 
         // Return if any data is missing
         if (!file || !uid) throw Error('File or UID is missing')
@@ -55,9 +61,10 @@ export async function POST(request: Request) {
         // Delete old thumbnail
         await unlink(process.env.LOCAL_ENV === 'development' ? `X:${oldThumbnailObject?.thumbnail?.slice(4)}` : 'public/' + oldThumbnailObject?.thumbnail).catch(e => console.log(routeHandlerError(path, e.message, 'unlink', 'POST', true)))
 
-        //Return Successful
+        // Log and return
+        console.log(`User ${email} updated thumbnail for model ${uid} in the database. Path: ${dbUrl}`)
         return routeHandlerTypicalResponse('Thumbnail Updated', update)
     }
     // Typical catch
-    catch (e: any) {routeHandlerTypicalCatch(e.message)}
+    catch (e: any) { routeHandlerTypicalCatch(e.message) }
 }

@@ -63,7 +63,8 @@ export async function POST(request: Request) {
         // Obtain model blob from tmp
         const modelPath = await getTmpPath(tmpId)
         const modelBuffer = await readFile(modelPath).catch(e => routeHandlerErrorHandler(route, e.message, 'readFile(modelPath)', "Couldn't read model file")) as Buffer
-        const blob = new Blob([modelBuffer])
+        const modelArray = new Uint8Array(modelBuffer)
+        const blob = new Blob([modelArray])
 
         // Form and fetch Variables 
         const formData = new FormData
@@ -114,6 +115,7 @@ export async function POST(request: Request) {
         await unlink(modelPath).catch(e => nonFatalError(route, e.message, `unlink(${tmpId})`, 'POST'))
 
         // Typical success return
+        console.log(`User ${email} added model ${modelUid} to the database.`)
         return routeHandlerTypicalResponse('Model added successfully', transaction)
     }
 
@@ -122,6 +124,7 @@ export async function POST(request: Request) {
 }
 
 /**
+ * @deprecated This function is deprecated and will be removed in future versions. Please use the PATCH method to update model details.
  * @function PUT
  * @description This is the PUT route handler, used to replace the model file in sketchfab
  * 
@@ -141,7 +144,8 @@ export async function PUT(request: Request) {
         // Obtain model blob from tmp
         const modelPath = await getTmpPath(tmpId)
         const modelBuffer = await readFile(modelPath).catch(e => routeHandlerErrorHandler(route, e.message, 'readFile(modelPath)', "Couldn't read model file")) as Buffer
-        const blob = new Blob([modelBuffer])
+        const modelArray = new Uint8Array(modelBuffer)
+        const blob = new Blob([modelArray])
 
         // Set reupload form data
         const reuploadData = new FormData()
@@ -157,7 +161,7 @@ export async function PUT(request: Request) {
                 return res.json()
             })
             .then(json => json).catch(e => routeHandlerErrorHandler(route, e.message, "fetch(orgModelUploadEnd", "Couldn't reupload model"))
-        
+
         // Delete tmp file
         await unlink(modelPath).catch(e => nonFatalError(route, e.message, `unlink(${tmpId})`, 'PUT'))
 
@@ -202,21 +206,24 @@ export async function PATCH(request: Request) {
 
         // Transaction array
         const transaction = []
+        
+        // Update object
+        const updateObject = {
+            modeled_by: artist,
+            spec_name: species,
+            build_process: buildMethod,
+            lat: position.lat ? position.lat : null,
+            lng: position.lng ? position.lng : null,
+            spec_acquis_date: speciesAcquisitionDate ? speciesAcquisitionDate : null,
+            email: email,
+            user: user,
+            pref_comm_name: commonName
+        }
 
         // Insert data into database
         transaction.push(prisma.model.update({
             where: { uid: uid },
-            data: {
-                modeled_by: artist,
-                spec_name: species,
-                build_process: buildMethod,
-                lat: position.lat ? position.lat : null,
-                lng: position.lng ? position.lng : null,
-                spec_acquis_date: speciesAcquisitionDate ? speciesAcquisitionDate : null,
-                email: email,
-                user: user,
-                pref_comm_name: commonName
-            }
+            data: updateObject
         }))
 
         // Push sofware + tag deletions
@@ -230,8 +237,9 @@ export async function PATCH(request: Request) {
         // Await transaction
         const update = await prisma.$transaction(transaction).catch(e => routeHandlerErrorHandler(route, e.message, "prisma.$transaction(transaction)", "Couldn't update model data"))
 
-        // Typical response
-        return routeHandlerTypicalResponse('Model added.', update)
+        // Log and return
+        console.log(`User ${email} updated model ${uid} in the database. Data: ${JSON.stringify(updateObject)}`)
+        return routeHandlerTypicalResponse('Model updated.', update)
     }
     // Typical catch
     catch (e: any) { return routeHandlerTypicalCatch(e.message) }

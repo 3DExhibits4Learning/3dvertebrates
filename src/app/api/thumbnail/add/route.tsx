@@ -10,11 +10,10 @@
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from '@/functions/server/error'
+import { getServerSession } from 'next-auth'
 
 // Default imports
 import routeHandlerTypicalResponse from '@/functions/server/typicalSuccessResponse'
-
-// SINGLETON
 import prisma from '@/functions/utils/prisma'
 
 // PATH
@@ -31,6 +30,11 @@ export async function POST(request: Request) {
 
         // Get form data and variables
         const formData = await request.formData().catch(e => routeHandlerErrorHandler(e.message, path, 'request.formData()', "Couldn't get form data")) as FormData
+
+        // Get session and email
+        const session = await getServerSession()
+        if (!session) throw Error('No session found')
+        const email = session.user?.email
 
         // Variable declarations
         const file = formData.get('file') as File
@@ -55,7 +59,8 @@ export async function POST(request: Request) {
         const dbUrl = `data/Vertebrates/Thumbnails/${uid}/${file.name}`
         const update = await prisma.model.update({ where: { uid: uid }, data: { thumbnail: dbUrl.replaceAll('/', '\\') } }).catch(e => routeHandlerErrorHandler(e.message, path, 'prisma.model.update()', "Couldn't update thumbnail in database"))
 
-        //Return Successful
+        // Log and return
+        console.log(`User ${email} added thumbnail for model ${uid} in the database. Path: ${dbUrl}`)
         return routeHandlerTypicalResponse('Thumbnail Added', update)
     }
     // Typical catch

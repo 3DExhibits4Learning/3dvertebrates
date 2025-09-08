@@ -33,11 +33,8 @@ export default async function Page() {
         const authorizedUsers = await prisma.authorized.findMany()
 
         // Authorized user redirect
-        const email = session?.user?.email as string
+        const email = session?.user?.email
         if (!authorizedUsers.find(user => user.email === email && user.role === 'admin')) return <h1>NOT AUTHORIZED</h1>
-
-        // Log access
-        console.log(`User ${session?.user?.email} accessed the management client`)
 
         // Get all 3D models
         const models = await prisma.model.findMany({ include: { software: true, tags: true } }) as fullModel[]
@@ -62,7 +59,8 @@ export default async function Page() {
                     modelsNeedingThumbnails={modelsNeedingThumbnails}
                     admin={true}
                     authorizedUsers={authorizedUsers}
-                    assignments={assignments} />
+                    assignments={assignments} 
+                    email={email}/>
             </main>
             <Foot />
         </>

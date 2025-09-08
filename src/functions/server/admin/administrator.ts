@@ -23,8 +23,12 @@ import prisma from "@/functions/utils/prisma"
  * @param email 
  * @returns 
  */
-export const deActivateStudent = async (email: string) => await prisma.authorized.update({ where: { email: email }, data: { active: false } }).then(() => 'Student deactivated')
-    .catch(e => serverActionErrorHandler(path, e.message, 'deActivateStudent()', "Couldn't deactivate student"))
+export const deActivateStudent = async (email: string, admin: string) => {
+    await prisma.authorized.update({ where: { email: email }, data: { active: false } }).then(() => 'Student deactivated')
+        .catch(e => serverActionErrorHandler(path, e.message, 'deActivateStudent()', "Couldn't deactivate student"))
+
+    console.log(`Admin ${admin} deactivated student with email ${email}`)
+}
 
 /**
  * 
@@ -127,18 +131,22 @@ export const getActiveStudents = async () => await prisma.authorized.findMany({ 
 /**
  * 
  * @param email 
- * @returns 
+ * @param adminEmail 
  */
-export const unassignAndDeactivate = async (email: string) => {
+export const unassignAndDeactivate = async (email: string, adminEmail: string) => {
+    // Get all assignments for student, add deactivation to transaction array
     const assignments = await prisma.model.findMany({ where: { assignedEmail: email } })
     const txArr: any = [prisma.authorized.update({ where: { email: email }, data: { active: false } })]
 
+    // For each assignment, update model data and delete annotations
     for (let assignment of assignments) {
         txArr.push(prisma.model.update({ where: { uid: assignment.uid }, data: { assignedEmail: null, annotator: null } }))
         txArr.push(prisma.annotations.deleteMany({ where: { uid: assignment.uid } }))
-
-        await prisma.$transaction(txArr).catch(e => serverActionErrorHandler(path, e.message, 'unassignAndDeactivate()', "Couldn't unassign model"))
     }
+
+    // Await transaction
+    await prisma.$transaction(txArr).catch(e => serverActionErrorHandler(path, e.message, 'unassignAndDeactivate()', "Couldn't unassign model"))
+    console.log(`Admin ${adminEmail} unassigned and deactivated student with email ${email}`)
 }
 
 /**
@@ -202,9 +210,10 @@ export const markModelAsIncomplete = async (uid: string) => {
  * @param uid 
  * @returns 
  */
-export const approveModel = async (uid: string) => {
+export const approveModel = async (uid: string, adminEmail: string) => {
     try {
         await prisma.model.update({ where: { uid: uid }, data: { modelApproved: true } }).catch(e => serverActionErrorHandler(path, e.message, 'approveModel()', "Coulnd't mark model as approved"))
+        console.log(`Admin ${adminEmail} approved model with uid ${uid}`)
         return 'Model approved'
     }
     catch (e: any) { return `Error: ${e.message}` }
@@ -215,7 +224,7 @@ export const approveModel = async (uid: string) => {
  * @param uid 
  * @returns 
  */
-export const deleteModel = async (uid: string) => {
+export const deleteModel = async (uid: string, adminEmail: string) => {
     try {
 
         // Sketchfab request header
@@ -238,7 +247,8 @@ export const deleteModel = async (uid: string) => {
             if (!res.ok) nonFatalError(path, res.statusText, '`fetch(https://api.sketchfab.com/v3/orgs/) - **MODEL ${uid} NEEDS TO BE DELETED FROM SKETCHFAB**`')
         }).catch(e => nonFatalError(path, e.message, '`fetch(https://api.sketchfab.com/v3/orgs/) - **MODEL ${uid} NEEDS TO BE DELETED FROM SKETCHFAB**`'))
 
-        // Typical success response
+        // Log and return
+        console.log(`Admin ${adminEmail} deleted model with uid ${uid}`)
         return "Model deleted"
     }
     // Typical fail response
@@ -251,18 +261,19 @@ export const deleteModel = async (uid: string) => {
  * @param name 
  * @returns 
  */
-export const addStudent = async (email: string, name: string) => {
+export const addStudent = async (email: string, name: string, adminEmail: string) => {
     try {
         if (!email || !name) throw Error('Name or email is missing')
-        
+
         // Get authorized users and check if user already exists
         const authorized = await prisma.authorized.findMany()
         const user = authorized.find(user => user.email === email)
 
         // Reactivate student if they already exist and are not active, else return they already exist
-        if(user){
-            if(!user.active) {
+        if (user) {
+            if (!user.active) {
                 await prisma.authorized.update({ where: { email: email }, data: { active: true } })
+                console.log(`Admin ${adminEmail} reactivated student with email ${email}`)
                 return 'Student reactivated'
             }
             else return 'Student already active'
@@ -274,7 +285,8 @@ export const addStudent = async (email: string, name: string) => {
         // Email student, informing them of their addition to the project
         await emailNewlyAddedStudent(process.env.NODE_ENV === 'production' ? email : "ab632@humboldt.edu", 'beta.3dvertebrates.org').catch((e) => nonFatalError(path, e.message, 'emailNewlyAddedStudent()'))
 
-        // Success response
+        // Log and success response
+        console.log(`Admin ${adminEmail} added student with email ${email}`)
         return 'Student added'
     }
     // Typical fail response
