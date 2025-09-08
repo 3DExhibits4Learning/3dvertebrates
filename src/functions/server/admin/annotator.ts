@@ -71,6 +71,7 @@ export const markModelAsAnnotated = async (uid: string) => {
         const updateAnnotator = prisma.model.update({ where: { uid: uid }, data: { annotator: name } })
         await prisma.$transaction([updateMark, updateAnnotator]).catch(e => serverActionErrorHandler(path, e.message, 'getServerSession(authOptions)', "Coulnd't get server session"))
 
+        console.log(`Model ${uid} marked as annotated by ${name} (${email})`)
         return 'Model marked as annotated'
     }
     catch (e: any) { return `Error: ${e.message}` }
@@ -731,6 +732,8 @@ export async function createNewAnnotationEntry(annotationEntryData: annotationDa
                 await autoWriteFile(file, dir, path)
                 await createNewPhotoAnnotation(annotationEntryData, newAnnotationData, email)
 
+                console.log(`User ${email} created new ${annotationEntryData.annotationType} annotation. It's annotation #${annotationEntryData.annotationNo} for model ${annotationEntryData.uid}`)
+
                 // Typical response
                 return 'Photo Annotation created'
         }
@@ -822,6 +825,10 @@ export const updateAnnotationEntry = async (updateObject: annotationDataEntryUpd
                 break
         }
 
+        // Log and return
+        console.log(`User ${email} updated annotation ${updateObject.annotationId} annotation. 
+            It's previous type was ${updateObject.previousMedia} and it's new type is ${updateObject.annotationType}. It's annotation #${updateObject.annotationNo} for model ${updateObject.uid}`)
+
         return 'Annotation Updated'
     }
     catch (e: any) { return `Error: ${e.message}` }
@@ -834,11 +841,16 @@ export const updateAnnotationEntry = async (updateObject: annotationDataEntryUpd
  * @param oldUrl 
  * @returns 
  */
-export const deleteAnnotationEntry = async (annotationId: string, modelUid: string, oldUrl?: string) => {
+export const deleteAnnotationEntry = async (annotationId: string, modelUid: string, email: string, oldUrl?: string) => {
     try {
         // Eliminate previous photo uploaded to data storage container if it exists, delete annotation, return
         if (oldUrl) await unlink(`public${oldUrl}`).catch((e) => nonFatalError(path, e.message, 'unlink'))
+        
+        // Delete annotation
         await deleteAnnotation(annotationId, modelUid)
+
+        // Log and return
+        console.log(`User ${email} deleted annotation ${annotationId} for model ${modelUid}`)
         return 'Annotation deleted'
     }
     catch (e: any) { return `Error: ${e.message}` }

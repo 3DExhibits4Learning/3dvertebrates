@@ -22,7 +22,8 @@ export const initialAnnotationsAndPositions: annotationsAndPositions = {
     newAnnotationEnabled: false,
     annotationSavedOrDeleted: false,
     repositionEnabled: false,
-    viewerLoaded: false
+    viewerLoaded: false,
+    userEmail: ''
 }
 
 // Specimen data object for context

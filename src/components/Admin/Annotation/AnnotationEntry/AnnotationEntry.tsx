@@ -77,7 +77,7 @@ export default function AnnotationEntry(props: { index: number, new: boolean }) 
     // Annotation CUD handlers
     const createAnnotation = () => dataTransferWrapper(createNewAnnotationEntry, [annotationCreationArg], 'Creating Annotation')
     const updateAnnotation = () => dataTransferWrapper(updateAnnotationEntry, [annotationUpdateArg], 'Updating Annotation')
-    const deleteAnnotation = () => dataTransferWrapper(deleteAnnotationEntry, [apData.activeAnnotation?.annotation_id as string, specimen.uid as string, getAnnotationDeletionUrl()], 'Deleting Annotation')
+    const deleteAnnotation = () => dataTransferWrapper(deleteAnnotationEntry, [apData.activeAnnotation?.annotation_id as string, specimen.uid as string, apData.userEmail, getAnnotationDeletionUrl()], 'Deleting Annotation')
 
     // Image visibility effect dependencies
     const imageVisibilityDependencies = [props.new, annotationEntryData.annotationType, props.index, annotationEntryData.file, apData.activeAnnotation]

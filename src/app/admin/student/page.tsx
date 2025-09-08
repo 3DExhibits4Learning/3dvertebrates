@@ -37,10 +37,12 @@ export default async function Page() {
  
         // Get email
         const email = session?.user?.email as string
-        // var email = 'jaa209@humboldt.edu' // Test email
 
-        // Authorized user
+        // Check authorization
         if (!(email || authorizedUsers.some(user => user.email === email))) return <h1>NOT AUTHORIZED</h1>
+
+        // Log access
+        console.log(`User ${email} accessed the student client`)
 
         // Get models to annotate, annotation models (models used as annotations themselves), and assignments
         const modelsToAnnotate = await getModelsToAnnotate().catch(e => serverErrorHandler(path, e.message, "Couldn't get models to annotate", 'getModelsToAnnotate()', false)) as fullModel[]

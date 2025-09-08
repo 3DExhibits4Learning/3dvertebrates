@@ -47,7 +47,6 @@ export const authOptions = {
 
         // If the user is in the database (has signed in before), and logged in with an oauth provider (not email), update their account data upon sign-in
         try {
-
           // Find user
           const userFromDatabase = await prisma.user.findUnique({ where: { id: user.id } }).catch(e => routeHandlerErrorHandler(route, e.message, 'prisma.user.findUnique', "Error finding user"))
 
@@ -84,5 +83,5 @@ export const authOptions = {
 }
 
 // Export handler as GET and POST
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+const handler = NextAuth(authOptions)
+export { handler as GET, handler as POST }

@@ -53,7 +53,6 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], adm
 
     // Data transfer state (for 'Are you sure' modal)
     const [modalOpen, setModalOpen] = useState(false)
-    //const [viewerLoaded, setViewerLoaded] = useState(false)
 
     // Annotation reorder open state, admin assigned state
     const [isOpen, setIsOpen] = useState(false)
@@ -64,7 +63,7 @@ export default function AnnotationClient(props: { modelsToAnnotate: model[], adm
     const newAnnotationEnabled = useRef(false)
 
     // Reducers
-    const [annotationsAndPositions, annotationsAndPositionsDispatch] = useReducer(annotationsAndPositionsReducer, initialAnnotationsAndPositions)
+    const [annotationsAndPositions, annotationsAndPositionsDispatch] = useReducer(annotationsAndPositionsReducer, { ...initialAnnotationsAndPositions, userEmail: userEmail ?? '' })
     const [specimenData, specimenDataDispatch] = useReducer(annotationClientSpecimenReducer, initialSpecimenData)
 
     // Set name and email states fn

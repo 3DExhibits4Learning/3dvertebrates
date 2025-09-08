@@ -64,6 +64,7 @@ export interface annotationsAndPositions {
   annotationSavedOrDeleted: boolean
   repositionEnabled: boolean
   viewerLoaded: boolean
+  userEmail: string
 }
 
 export interface annotationClientSpecimen {
