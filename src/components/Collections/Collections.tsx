@@ -61,11 +61,12 @@ export const CollectionsContext = createContext<collectionsContext | null>(null)
 // Main JSX
 export default function SFAPI(props: CollectionsProps) {
 
-  // Get path, router
+  // Get path, router, params
   const path = usePathname()
   const router = useRouter()
-
   const params = useSearchParams()
+
+  // Get and validate annotation url param
   const annotationParam = params.get('annotation')
   const annotationNumberParam = annotationParam && isAnnotationParamValid(annotationParam, props.numberOfAnnotations) ? annotationParam : undefined
 
