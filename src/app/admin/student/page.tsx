@@ -45,16 +45,15 @@ export default async function Page() {
         const modelsToAnnotate = await getModelsToAnnotate().catch(e => serverErrorHandler(path, e.message, "Couldn't get models to annotate", 'getModelsToAnnotate()', false)) as fullModel[]
         const annotationModels = await getAllAnnotationModels().catch(e => serverErrorHandler(path, e.message, "Couldn't get annotation models", 'getModelsToAnnotate()', false)) as model[]
         const assignments = modelsToAnnotate.filter(model => model.assignedEmail === email)
-        console.log('log0')
+
         // Get modelAnnotations and filter for unused annotations
         const modelAnnotations = await getModelAnnotations().catch(e => serverErrorHandler(path, e.message, "Couldn't get assignments", 'getAssignments()', false)) as annotationWithModel[]
-        console.log('log1')
         const unusedModelAnnotations = annotationModels.filter(model => isAnnotationModel(model) && !isUsedAnnotationModel(model, modelAnnotations))
-        console.log('log2')
+
         // Filter assigned models
         const studentAssignmentUids = assignments.filter(assignment => assignment.email === email).map(assignment => assignment.uid)
-        const assignedModels = email === 'ab632@humboldt.edu' ? modelsToAnnotate.filter(model => model.uid === 'ee451c036e3d45398f8a1f2ad78367c3') : modelsToAnnotate.filter(model => studentAssignmentUids.includes(model.uid))
-        console.log('log3')
+        const assignedModels = email === process.env.IT_EMAIL ? modelsToAnnotate.filter(model => model.uid === 'ee451c036e3d45398f8a1f2ad78367c3') : modelsToAnnotate.filter(model => studentAssignmentUids.includes(model.uid))
+
         // Typical client
         return <>
             <Header pageRoute="collections" headerTitle="Botany Admin" />
