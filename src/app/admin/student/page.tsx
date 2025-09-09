@@ -28,35 +28,32 @@ const path = 'src/app/admin/student/page.tsx'
 // Main JSX
 export default async function Page() {
     try {
+        console.log('log0')
         // Get server session
         const session = await getServerSession(authOptions).catch(e => serverErrorHandler(path, e.message, "Couldn't get session", 'getServerSession()', false))
-
+        console.log('log1')
         // Get authorized users
         const authorizedUsers = await getAuthorizedUsers().catch(e => serverErrorHandler(path, e.message, "Couldn't get authorized users", 'getAuthorizedUsers()', false)) as authorized[]
-
+        console.log('log2')
         // Get email
         const email = session?.user?.email as string
-
+        console.log('log3')
         // Check authorization
         if (!(email || authorizedUsers.some(user => user.email === email))) return <h1>NOT AUTHORIZED</h1>
-
+        console.log('log4')
         // Get models to annotate, annotation models (models used as annotations themselves), and assignments
         const modelsToAnnotate = await getModelsToAnnotate().catch(e => serverErrorHandler(path, e.message, "Couldn't get models to annotate", 'getModelsToAnnotate()', false)) as fullModel[]
         const annotationModels = await getAllAnnotationModels().catch(e => serverErrorHandler(path, e.message, "Couldn't get annotation models", 'getModelsToAnnotate()', false)) as model[]
         const assignments = modelsToAnnotate.filter(model => model.assignedEmail === email)
-
+        console.log('log5')
         // Get modelAnnotations and filter for unused annotations
         const modelAnnotations = await getModelAnnotations().catch(e => serverErrorHandler(path, e.message, "Couldn't get assignments", 'getAssignments()', false)) as annotationWithModel[]
         const unusedModelAnnotations = annotationModels.filter(model => isAnnotationModel(model) && !isUsedAnnotationModel(model, modelAnnotations))
-
+        console.log('log6')
         // Filter assigned models
-        console.log('Student Assignment Uids')
-        console.log(assignments)
         const studentAssignmentUids = assignments.filter(assignment => assignment.email === email).map(assignment => assignment.uid)
-        console.log('log0')
         const assignedModels = email === 'ab632@humboldt.edu' ? modelsToAnnotate.filter(model => model.uid === 'ee451c036e3d45398f8a1f2ad78367c3') : modelsToAnnotate.filter(model => studentAssignmentUids.includes(model.uid))
-        console.log('log1')
-
+        console.log('log7')
         // Typical client
         return <>
             <Header pageRoute="collections" headerTitle="Botany Admin" />
