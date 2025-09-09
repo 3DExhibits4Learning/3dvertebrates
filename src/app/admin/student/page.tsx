@@ -34,7 +34,7 @@ export default async function Page() {
 
         // Get authorized users
         const authorizedUsers = await getAuthorizedUsers().catch(e => serverErrorHandler(path, e.message, "Couldn't get authorized users", 'getAuthorizedUsers()', false)) as authorized[]
- 
+
         // Get email
         const email = session?.user?.email as string
 
@@ -52,8 +52,10 @@ export default async function Page() {
 
         // Filter assigned models
         const studentAssignmentUids = assignments.filter(assignment => assignment.email === email).map(assignment => assignment.uid)
+        console.log('log0')
         const assignedModels = email === 'ab632@humboldt.edu' ? modelsToAnnotate.filter(model => model.uid === 'ee451c036e3d45398f8a1f2ad78367c3') : modelsToAnnotate.filter(model => studentAssignmentUids.includes(model.uid))
-        
+        console.log('log1')
+
         // Typical client
         return <>
             <Header pageRoute="collections" headerTitle="Botany Admin" />
@@ -63,6 +65,6 @@ export default async function Page() {
             <Foot />
         </>
     }
-    //Typical catch
+    // Typical catch
     catch (e: any) { return <FullPageError clientErrorMessage={e.message} /> }
 }
