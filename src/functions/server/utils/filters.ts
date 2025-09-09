@@ -6,7 +6,7 @@ import { annotationWithModel } from "@/interface/interface"
  * @param model 3d model
  * @returns boolean value indicating if the model is an approved, site ready base model with a thumbnail
  */
-export const isAnnotationModel = (model: model) => model.site_ready && !model.base_model && model.modelApproved && model.thumbnail
+export const isAnnotationModel = (model: model) => model.site_ready && !model.base_model && model.modelApproved
 
 /**
  * 

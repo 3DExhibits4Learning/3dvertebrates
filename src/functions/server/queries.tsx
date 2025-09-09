@@ -184,7 +184,7 @@ export const getAllModels = async () => { return await prisma.model.findMany({ o
  * 
  * @returns {Promise<model[]>}
  */
-export const getModelAnnotations = async () => { return await prisma.annotations.findMany({ where: { annotation_type: 'model' }, include: { model_annotation: true } }) }
+export const getModelAnnotations = async () => await prisma.annotations.findMany({ where: { annotation_type: 'model' }, include: { model_annotation: true } }) 
 
 /**
  * @function getModelsWithoutThumbnails
