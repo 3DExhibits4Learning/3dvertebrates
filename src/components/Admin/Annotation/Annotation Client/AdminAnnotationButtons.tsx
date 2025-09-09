@@ -6,9 +6,6 @@
  * @todo remove 'mark as annotated button' after model has been marked as annotated
  */
 
-// Default imports
-import Link from "next/link"
-
 // Typical imports
 import { Button } from "@heroui/react"
 import { AnnotationClientData } from "./AnnotationClient"
@@ -19,6 +16,7 @@ import { annotationClientData } from "@/interface/interface"
 import UnassignmentModal from "@/components/Admin/Annotation/Annotation Client/UnassignModal"
 import MarkAsIncompleteModal from "@/components/Admin/Annotation/Annotation Client/MarkAsIncompleteModal"
 import PublishModal from "@/components/Admin/Annotation/Annotation Client/PublishModal"
+import Link from "next/link"
 
 // Main JSX
 const AdminAnnotationButtons = forwardRef((props: { setModalOpen: Dispatch<SetStateAction<boolean>>, setReorderOpen: Dispatch<SetStateAction<boolean>> }, ref) => {

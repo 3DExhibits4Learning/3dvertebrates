@@ -82,12 +82,14 @@ export const markModelAsAnnotated = async (uid: string) => {
  * @param annotationNumbers 
  * @returns 
  */
-export const renumberAnnotationsServer = async (annotationNumbers: AnnotationNumbers[]) => {
+export const renumberAnnotationsServer = async (annotationNumbers: AnnotationNumbers[], userEmail: string) => {
     try {
+        // Temp annotation number and tx arrays
         var tempAnnotationNumber = 100
         const temporaryAnnotationNumberTransactionArr = []
         const newAnnotationNumberTransactionArr = []
 
+        // Iterate through annotation numbers, push to tx arrays
         for (let i in annotationNumbers) {
             temporaryAnnotationNumberTransactionArr.push(prisma.annotations.update({
                 where: { annotation_id: annotationNumbers[i].id },
@@ -98,13 +100,16 @@ export const renumberAnnotationsServer = async (annotationNumbers: AnnotationNum
                 where: { annotation_id: annotationNumbers[i].id },
                 data: { annotation_no: parseInt(annotationNumbers[i].no) }
             }))
+
             tempAnnotationNumber++
         }
 
+        // Await transactions
         const transactionArr = [...temporaryAnnotationNumberTransactionArr, ...newAnnotationNumberTransactionArr]
-        await prisma.$transaction(transactionArr)
-            .catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction(temporaryAnnotationNumberTransactionArr)', "Couldn't complete annotation number temporary transaction"))
+        await prisma.$transaction(transactionArr).catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction(temporaryAnnotationNumberTransactionArr)', "Couldn't complete annotation number temporary transaction"))
 
+        // Log and return
+        console.log(`User ${userEmail} renumbered annotations`)
         return 'Annotation numbers updated'
     }
     catch (e: any) { return `Error: ${e.message}` }

@@ -19,20 +19,21 @@ const ModelViewer = dynamic(() => import("@/components/Shared/ModelViewer"), { s
 // Main JSX
 export default function FindModel(props: { models: model[] }) {
     // Transfer context
-    const dataTransferContext = useContext(DataTransferContext)
-    const initializeDataTransfer = dataTransferContext.initializeDataTransferHandler
-    const terminateDataTransfer = dataTransferContext.terminateDataTransferHandler
+    const context = useContext(DataTransferContext)
+    const initializeDataTransfer = context.initializeDataTransferHandler
+    const terminateDataTransfer = context.terminateDataTransferHandler
+    const adminEmail = context.adminEmail
 
     // States
     const [uid, setUid] = useState<string>('')
     const [model, setModel] = useState<model>()
     const [isPublished, setIsPublished] = useState<boolean>(false)
 
+    // Memoized sorted models
     const models = useMemo(() => props.models.sort((a, b) => a.spec_name.localeCompare(b.spec_name)), [props.models])
-    console.log('wtf')
 
     // Unpublish model handler
-    const unpublishModelHandler = async (uid: string) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unpublishModel, [uid], 'Unpublishing model...')
+    const unpublishModelHandler = async (uid: string) => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, unpublishModel, [uid, adminEmail], 'Unpublishing model...')
 
     // Set Model Handler and effect
     const setModelHandler = () => setModel(props.models.find(model => model.uid === uid))

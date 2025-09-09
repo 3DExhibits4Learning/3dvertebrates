@@ -155,7 +155,7 @@ export const unassignAndDeactivate = async (email: string, adminEmail: string) =
  * @param uid 
  * @returns 
  */
-export const unassignAnnotation = async (uid: string, dev?: boolean) => {
+export const unassignAnnotation = async (uid: string, adminEmail: string, dev?: boolean) => {
     try {
         // Throw error if any data is missing
         if (!uid) throw Error('Uid missing')
@@ -167,8 +167,9 @@ export const unassignAnnotation = async (uid: string, dev?: boolean) => {
 
         // Await transaction and inform student of assignment
         await prisma.$transaction(tx).catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction([updateAnnotator, unassignModelForAnnotation])', "Couldn't unassign model"))
-
-        // Success message
+        
+        // Log and return
+        console.log(`Admin ${adminEmail} unassigned model with uid ${uid}`)
         return `Model unassigned`
     }
     catch (e: any) { return e.message }
@@ -178,14 +179,16 @@ export const unassignAnnotation = async (uid: string, dev?: boolean) => {
  * @param uid 
  * @returns 
  */
-export const publishModel = async (uid: string, adminAssigned?: boolean) => {
+export const publishModel = async (uid: string, adminEmail: string) => {
     try {
         // Approve model annotations
         await prisma.model.update({ where: { uid: uid }, data: { published: true } }).catch(e => serverActionErrorHandler(path, e.message, 'publishModel()', "Unable to approve model"))
+        const adminAssigned = await getAssignmentEmail(uid) == adminEmail
 
         if (adminAssigned) await prisma.model.update({ where: { uid: uid }, data: { annotated: true } }).catch(e => serverActionErrorHandler(path, e.message, 'publishModel()', "Unable to approve model"))
 
-        // Return
+        // Log and return
+        console.log(`Admin ${adminEmail} approved model with uid ${uid}`)
         return "Annotations approved"
     }
     catch (e: any) { return e.message }
@@ -196,10 +199,11 @@ export const publishModel = async (uid: string, adminAssigned?: boolean) => {
  * @param uid 
  * @returns 
  */
-export const markModelAsIncomplete = async (uid: string) => {
+export const markModelAsIncomplete = async (uid: string, adminEmail: string) => {
     try {
         // Mark model as incomplete (or unannotated) and return success
         await prisma.model.update({ where: { uid: uid }, data: { annotated: false } }).catch(e => serverActionErrorHandler(path, e.message, 'unapproveAnnotations()', "Error marking model as incomplete"))
+        console.log(`Admin ${adminEmail} marked model with uid ${uid} as incomplete`)
         return "Annotations unapproved"
     }
     catch (e: any) { return e.message }
@@ -314,10 +318,11 @@ export const updatePhotoAnnotation = async (annotation_id: string, annotation: s
  * @param uid 
  * @returns 
  */
-export const unpublishModel = async (uid: string) => {
+export const unpublishModel = async (uid: string, adminEmail: string) => {
     try {
         // Unpublish model annotations
         await prisma.model.update({ where: { uid: uid }, data: { published: false } }).catch(e => serverActionErrorHandler(path, e.message, 'unpublishModel()', "Unable to unpublish model"))
+        console.log(`Admin ${adminEmail} unpublished model with uid ${uid}`)
         return "Model unpublished"
     }
     catch (e: any) { return e.message }
