@@ -27,8 +27,6 @@ const path = 'src/app/admin/student/page.tsx'
 
 // Main JSX
 export default async function Page() {
-    console.log('Student Page Render')
-
     try {
         // Get server session
         const session = await getServerSession(authOptions).catch(e => serverErrorHandler(path, e.message, "Couldn't get session", 'getServerSession()', false))
@@ -52,6 +50,8 @@ export default async function Page() {
         const unusedModelAnnotations = annotationModels.filter(model => isAnnotationModel(model) && !isUsedAnnotationModel(model, modelAnnotations))
 
         // Filter assigned models
+        console.log('Student Assignment Uids')
+        console.log(assignments)
         const studentAssignmentUids = assignments.filter(assignment => assignment.email === email).map(assignment => assignment.uid)
         console.log('log0')
         const assignedModels = email === 'ab632@humboldt.edu' ? modelsToAnnotate.filter(model => model.uid === 'ee451c036e3d45398f8a1f2ad78367c3') : modelsToAnnotate.filter(model => studentAssignmentUids.includes(model.uid))
