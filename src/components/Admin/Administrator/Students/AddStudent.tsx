@@ -29,8 +29,10 @@ export default function AddStudent() {
     const [name, setName] = useState<string>('')
     const [buttonDisabled, setButtonDiabled] = useState<boolean>(true)
 
+    // Add student handler
     const addStudentHandler = async () => await dataTransferHandler(initializeDataTransfer, terminateDataTransfer, addStudent, [email, name, adminEmail], 'Adding student')
 
+    // Effect to enable button if email is a humboldt email and name is not empty
     useEffect(() => {
         if (email.includes("@humboldt.edu") && name) setButtonDiabled(false)
         else setButtonDiabled(true)
