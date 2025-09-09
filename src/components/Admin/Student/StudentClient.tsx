@@ -26,6 +26,7 @@ import initializeDataTransfer from "@/functions/client/dataTransfer/initializeDa
 import terminateDataTransfer from "@/functions/client/dataTransfer/terminateDataTransfer"
 import DataTransferModal from '@/components/Shared/Modals/DataTransferModal'
 
+// Context for data transfer modals
 export const StudentTransferContext = createContext<any>('')
 
 // Main JSX

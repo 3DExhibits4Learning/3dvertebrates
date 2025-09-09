@@ -27,6 +27,7 @@ const path = 'src/app/admin/student/page.tsx'
 
 // Main JSX
 export default async function Page() {
+    console.log('Student Page Render')
 
     try {
         // Get server session
