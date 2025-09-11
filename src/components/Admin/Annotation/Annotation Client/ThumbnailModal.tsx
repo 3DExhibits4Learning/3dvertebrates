@@ -2,14 +2,13 @@
 
 // Typical imports
 import { isLocalDevEnvClient } from "@/functions/client/utils"
-import { convertDbPathToLocalPath } from "@/functions/server/utils/utils"
+import { convertDbPathToCloudPath, convertDbPathToLocalPath } from "@/functions/server/utils/utils"
 import { Modal, ModalContent, ModalBody, ModalFooter, Button } from "@heroui/react"
 import { Dispatch, SetStateAction } from "react"
 
 // Main JSX
 export default function ThumbnailPreviewModal(props: { path: string | null | undefined, isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>, species: string }) {
-    const path = props.path ? isLocalDevEnvClient() ? convertDbPathToLocalPath(props.path) : `public/${props.path.replaceAll("\\", "/")}` : null
-    console.log(path)
+    const path = props.path ? isLocalDevEnvClient() ? convertDbPathToLocalPath(props.path) : convertDbPathToCloudPath(props.path) : null
 
     return <Modal isOpen={props.isOpen} isDismissable={false} hideCloseButton isKeyboardDismissDisabled={true}>
         <ModalContent>
