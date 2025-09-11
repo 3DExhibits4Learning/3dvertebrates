@@ -28,7 +28,6 @@ const path = 'src/app/admin/student/page.tsx'
 // Main JSX
 export default async function Page() {
     try {
-
         // Get server session
         const session = await getServerSession(authOptions).catch(e => serverErrorHandler(path, e.message, "Couldn't get session", 'getServerSession()', false))
 

@@ -702,6 +702,9 @@ export async function createNewAnnotationEntry(annotationEntryData: annotationDa
 
                 // Create new text annotation and return success
                 await createNewTextAnnotation(newAnnotationData, annotationEntryData.annotation)
+
+                // Log and return
+                console.log(`User ${email} created new text annotation. It's annotation #${annotationEntryData.annotationNo} for model ${annotationEntryData.uid}`)
                 return 'Text annotation created'
 
             case 'video':
@@ -710,6 +713,9 @@ export async function createNewAnnotationEntry(annotationEntryData: annotationDa
 
                 // Create new video annotation and return success
                 await createNewVideoAnnotation(newAnnotationData, annotationEntryData.length as string, annotationEntryData.annotation)
+
+                // Log and return
+                console.log(`User ${email} created new video annotation. It's annotation #${annotationEntryData.annotationNo} for model ${annotationEntryData.uid}`)
                 return 'Video annotation created'
 
             case 'model':
@@ -718,7 +724,10 @@ export async function createNewAnnotationEntry(annotationEntryData: annotationDa
 
                 // Create new model annotation and return success
                 await createNewModelAnnotation(newAnnotationData, email, annotationEntryData.modelAnnotationUid as string, annotationEntryData.annotation)
-                return 'Model nnotation created'
+
+                // Log and return
+                console.log(`User ${email} created new model annotation. It's annotation #${annotationEntryData.annotationNo} for model ${annotationEntryData.uid}`)
+                return 'Model annotation created'
 
             case 'photo':
                 // Get and check relevant variables
@@ -737,9 +746,8 @@ export async function createNewAnnotationEntry(annotationEntryData: annotationDa
                 await autoWriteFile(file, dir, path)
                 await createNewPhotoAnnotation(annotationEntryData, newAnnotationData, email)
 
-                console.log(`User ${email} created new ${annotationEntryData.annotationType} annotation. It's annotation #${annotationEntryData.annotationNo} for model ${annotationEntryData.uid}`)
-
-                // Typical response
+                // Log and return
+                console.log(`User ${email} created new photo annotation. It's annotation #${annotationEntryData.annotationNo} for model ${annotationEntryData.uid}`)
                 return 'Photo Annotation created'
         }
     }
@@ -765,6 +773,7 @@ export const updateAnnotationEntry = async (updateObject: annotationDataEntryUpd
         if (updateObject.index === '1') {
             // Update position and return success
             await prisma.model.update({ where: { uid: updateObject.uid }, data: { annotationPosition: updateObject.position } }).catch((e) => serverActionErrorHandler(path, e.message, 'prisma.model.update()', "Couldn't insert first annotation position"))
+            console.log(`User ${email} updated first annotation position for model ${updateObject.uid}`)
             return 'Annotation Updated'
         }
 
@@ -825,6 +834,7 @@ export const updateAnnotationEntry = async (updateObject: annotationDataEntryUpd
                     transitionToPhotoAnnotation(updateObject, email)
                     break
                 }
+                
                 // Else update annotation and return
                 updatePhotoAnnotationEntry(updateObject, email)
                 break
@@ -850,7 +860,7 @@ export const deleteAnnotationEntry = async (annotationId: string, modelUid: stri
     try {
         // Eliminate previous photo uploaded to data storage container if it exists, delete annotation, return
         if (oldUrl) await unlink(`public${oldUrl}`).catch((e) => nonFatalError(path, e.message, 'unlink'))
-        
+
         // Delete annotation
         await deleteAnnotation(annotationId, modelUid)
 
