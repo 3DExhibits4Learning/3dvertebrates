@@ -27,7 +27,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   // Get parameters
   const parameters = await params
   const searchParameters = await searchParams
-  const isPreview = !(Object.keys(searchParameters).length === 0)
+  const isPreview = Object.keys(searchParameters).includes('preview')
 
   // Ensure there is a session if this is a preview
   if (isPreview) {
