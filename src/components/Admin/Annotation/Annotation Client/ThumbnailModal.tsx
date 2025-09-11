@@ -8,7 +8,7 @@ import { Dispatch, SetStateAction } from "react"
 
 // Main JSX
 export default function ThumbnailPreviewModal(props: { path: string | null | undefined, isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>, species: string }) {
-    const path = props.path ? isLocalDevEnvClient() ? convertDbPathToLocalPath(props.path) : `public/data/Vertebrates/Thumbnails/ee451c036e3d45398f8a1f2ad78367c3/Screenshot 2025-06-26 105040.png` : null
+    const path = props.path ? isLocalDevEnvClient() ? convertDbPathToLocalPath(props.path) : `public/${props.path.replaceAll("\\", "/")}` : null
     console.log(path)
 
     return <Modal isOpen={props.isOpen} isDismissable={false} hideCloseButton isKeyboardDismissDisabled={true}>
