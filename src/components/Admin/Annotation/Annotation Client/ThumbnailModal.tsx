@@ -8,7 +8,7 @@ import { Dispatch, SetStateAction } from "react"
 
 // Main JSX
 export default function ThumbnailPreviewModal(props: { path: string | null | undefined, isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>, species: string }) {
-    const path = props.path ? isLocalDevEnvClient() ? convertDbPathToLocalPath(props.path) : `\\${props.path}` : null
+    const path = props.path ? isLocalDevEnvClient() ? convertDbPathToLocalPath(props.path) : `public\\${props.path}` : null
 
     return <Modal isOpen={props.isOpen} isDismissable={false} hideCloseButton isKeyboardDismissDisabled={true}>
         <ModalContent>
