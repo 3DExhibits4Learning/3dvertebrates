@@ -61,7 +61,7 @@ export default function UpdateThumbnailContainer(props: { modelsWithThumbnails: 
                                     <ModelViewer uid={uid} minHeight="100%" />
                                 </div>
                             </div>
-                            <UpdateThumbnail uid={uid} file={file} setFile={setFile as Dispatch<SetStateAction<File>>} updateThumbnail={updateThumbnailHandler} />
+                            <UpdateThumbnail uid={uid} file={file} setFile={setFile as Dispatch<SetStateAction<File>>} updateThumbnail={updateThumbnailHandler} modelsWithThumbnails={props.modelsWithThumbnails} />
                         </div>
                     }
                 </>

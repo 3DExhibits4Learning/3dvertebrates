@@ -10,12 +10,12 @@ import { Button } from "@heroui/react"
 import { useContext, useState } from "react"
 import { AnnotationClientData } from "./AnnotationClient"
 import { authorized } from "@prisma/client"
+import { useSession } from "next-auth/react"
 
 // Default imports
 import StudentSelect from "../../Administrator/Students/SelectStudents"
 import ThumbnailPreviewModal from "@/components/Admin/Annotation/Annotation Client/ThumbnailModal"
 import AssignModal from "@/components/Admin/Annotation/Annotation Client/AssignModal"
-import { useSession } from "next-auth/react"
 
 // Main JSX
 export default function AdminAnnotation(props: { admin: boolean, authorizedUsers: authorized[] }) {
