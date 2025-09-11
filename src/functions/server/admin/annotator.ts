@@ -864,7 +864,7 @@ export const deleteAnnotationEntry = async (annotationId: string, modelUid: stri
         await deleteAnnotation(annotationId, modelUid)
 
         // Log and return
-        console.log(`User ${email} deleted annotation ${annotationId} for model ${modelUid}`)
+        serverLog(`User ${email} deleted annotation ${annotationId} for model ${modelUid}`)
         return 'Annotation deleted'
     }
     catch (e: any) { return `Error: ${e.message}` }
