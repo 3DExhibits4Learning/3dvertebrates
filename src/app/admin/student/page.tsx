@@ -21,6 +21,7 @@ import StudentClient from "@/components/Admin/Student/StudentClient"
 import Header from "@/components/Header/Header"
 import Foot from "@/components/Shared/Foot"
 import FullPageError from "@/components/Error/FullPageError"
+import { serverLog } from "@/functions/server/utils/utils"
 
 // Path
 const path = 'src/app/admin/student/page.tsx'

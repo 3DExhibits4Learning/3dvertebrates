@@ -17,6 +17,7 @@ import routeHandlerTypicalResponse from '@/functions/server/typicalSuccessRespon
 // SINGLETON
 import prisma from '@/functions/utils/prisma'
 import { getServerSession } from 'next-auth'
+import { serverLog } from '@/functions/server/utils/utils'
 
 // PATH
 const path = 'src/app/api/thumbnail/update/route.tsx'
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
         await unlink(process.env.LOCAL_ENV === 'development' ? `X:${oldThumbnailObject?.thumbnail?.slice(4)}` : 'public/' + oldThumbnailObject?.thumbnail).catch(e => console.log(routeHandlerError(path, e.message, 'unlink', 'POST', true)))
 
         // Log and return
-        console.log(`User ${email} updated thumbnail for model ${uid} in the database. Path: ${dbUrl}`)
+        serverLog(`User ${email} updated thumbnail for model ${uid} in the database. Path: ${dbUrl}`)
         return routeHandlerTypicalResponse('Thumbnail Updated', update)
     }
     // Typical catch

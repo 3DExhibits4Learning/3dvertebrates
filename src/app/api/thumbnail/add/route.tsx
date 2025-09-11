@@ -15,6 +15,7 @@ import { getServerSession } from 'next-auth'
 // Default imports
 import routeHandlerTypicalResponse from '@/functions/server/typicalSuccessResponse'
 import prisma from '@/functions/utils/prisma'
+import { serverLog } from '@/functions/server/utils/utils'
 
 // PATH
 const path = 'src/app/api/thumbnail/add/route.tsx'
@@ -60,7 +61,7 @@ export async function POST(request: Request) {
         const update = await prisma.model.update({ where: { uid: uid }, data: { thumbnail: dbUrl.replaceAll('/', '\\') } }).catch(e => routeHandlerErrorHandler(e.message, path, 'prisma.model.update()', "Couldn't update thumbnail in database"))
 
         // Log and return
-        console.log(`User ${email} added thumbnail for model ${uid} in the database. Path: ${dbUrl}`)
+        serverLog(`User ${email} added thumbnail for model ${uid} in the database. Path: ${dbUrl}`)
         return routeHandlerTypicalResponse('Thumbnail Added', update)
     }
     // Typical catch

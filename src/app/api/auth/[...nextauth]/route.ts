@@ -9,6 +9,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import { Adapter } from "next-auth/adapters"
 import { SessionStrategy } from "next-auth"
 import { routeHandlerErrorHandler, routeHandlerTypicalCatch } from "@/functions/server/error"
+import { serverLog } from "@/functions/server/utils/utils"
 
 // Default imports
 import NextAuth from "next-auth"
@@ -42,7 +43,7 @@ export const authOptions = {
         token.id = user.id
         token.provider = account.provider
         token.accessToken = account.access_token
-        console.log(`User ${user.email} signed in with provider ${account.provider}`)
+        serverLog(`User ${user.email} signed in with provider ${account.provider}`)
 
         // If the user is in the database (has signed in before), and logged in with an oauth provider (not email), update their account data upon sign-in
         try {

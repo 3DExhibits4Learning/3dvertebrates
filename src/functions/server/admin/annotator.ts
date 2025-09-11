@@ -15,7 +15,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { fullAnnotation } from "@/interface/interface"
 import { model, model_annotation, photo_annotation, PrismaPromise, text_annotation, video_annotation } from "@prisma/client"
 import { unlink } from "fs/promises"
-import { checkEssentialValues, convertCloudPathToLocalPath, convertDbPathToLocalPath, getPathToUnlink, isLocalDevEnv } from "@/functions/server/utils/utils"
+import { checkEssentialValues, convertCloudPathToLocalPath, convertDbPathToLocalPath, getPathToUnlink, isLocalDevEnv, serverLog } from "@/functions/server/utils/utils"
 import { autoWriteFile } from "@/functions/server/utils/file"
 import { deleteAnnotation } from "@/functions/server/queries"
 
@@ -71,7 +71,7 @@ export const markModelAsAnnotated = async (uid: string) => {
         const updateAnnotator = prisma.model.update({ where: { uid: uid }, data: { annotator: name } })
         await prisma.$transaction([updateMark, updateAnnotator]).catch(e => serverActionErrorHandler(path, e.message, 'getServerSession(authOptions)', "Coulnd't get server session"))
 
-        console.log(`Model ${uid} marked as annotated by ${name} (${email})`)
+        serverLog(`Model ${uid} marked as annotated by ${name} (${email})`)
         return 'Model marked as annotated'
     }
     catch (e: any) { return `Error: ${e.message}` }
@@ -109,7 +109,7 @@ export const renumberAnnotationsServer = async (annotationNumbers: AnnotationNum
         await prisma.$transaction(transactionArr).catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction(temporaryAnnotationNumberTransactionArr)', "Couldn't complete annotation number temporary transaction"))
 
         // Log and return
-        console.log(`User ${userEmail} renumbered annotations`)
+        serverLog(`User ${userEmail} renumbered annotations`)
         return 'Annotation numbers updated'
     }
     catch (e: any) { return `Error: ${e.message}` }
@@ -704,7 +704,7 @@ export async function createNewAnnotationEntry(annotationEntryData: annotationDa
                 await createNewTextAnnotation(newAnnotationData, annotationEntryData.annotation)
 
                 // Log and return
-                console.log(`User ${email} created new text annotation. It's annotation #${annotationEntryData.annotationNo} for model ${annotationEntryData.uid}`)
+                serverLog(`User ${email} created new text annotation. It's annotation #${annotationEntryData.annotationNo} for model ${annotationEntryData.uid}`)
                 return 'Text annotation created'
 
             case 'video':
@@ -715,7 +715,7 @@ export async function createNewAnnotationEntry(annotationEntryData: annotationDa
                 await createNewVideoAnnotation(newAnnotationData, annotationEntryData.length as string, annotationEntryData.annotation)
 
                 // Log and return
-                console.log(`User ${email} created new video annotation. It's annotation #${annotationEntryData.annotationNo} for model ${annotationEntryData.uid}`)
+                serverLog(`User ${email} created new video annotation. It's annotation #${annotationEntryData.annotationNo} for model ${annotationEntryData.uid}`)
                 return 'Video annotation created'
 
             case 'model':
@@ -726,7 +726,7 @@ export async function createNewAnnotationEntry(annotationEntryData: annotationDa
                 await createNewModelAnnotation(newAnnotationData, email, annotationEntryData.modelAnnotationUid as string, annotationEntryData.annotation)
 
                 // Log and return
-                console.log(`User ${email} created new model annotation. It's annotation #${annotationEntryData.annotationNo} for model ${annotationEntryData.uid}`)
+                serverLog(`User ${email} created new model annotation. It's annotation #${annotationEntryData.annotationNo} for model ${annotationEntryData.uid}`)
                 return 'Model annotation created'
 
             case 'photo':
@@ -747,7 +747,7 @@ export async function createNewAnnotationEntry(annotationEntryData: annotationDa
                 await createNewPhotoAnnotation(annotationEntryData, newAnnotationData, email)
 
                 // Log and return
-                console.log(`User ${email} created new photo annotation. It's annotation #${annotationEntryData.annotationNo} for model ${annotationEntryData.uid}`)
+                serverLog(`User ${email} created new photo annotation. It's annotation #${annotationEntryData.annotationNo} for model ${annotationEntryData.uid}`)
                 return 'Photo Annotation created'
         }
     }
@@ -773,7 +773,7 @@ export const updateAnnotationEntry = async (updateObject: annotationDataEntryUpd
         if (updateObject.index === '1') {
             // Update position and return success
             await prisma.model.update({ where: { uid: updateObject.uid }, data: { annotationPosition: updateObject.position } }).catch((e) => serverActionErrorHandler(path, e.message, 'prisma.model.update()', "Couldn't insert first annotation position"))
-            console.log(`User ${email} updated first annotation position for model ${updateObject.uid}`)
+            serverLog(`User ${email} updated first annotation position for model ${updateObject.uid}`)
             return 'Annotation Updated'
         }
 
@@ -834,16 +834,15 @@ export const updateAnnotationEntry = async (updateObject: annotationDataEntryUpd
                     transitionToPhotoAnnotation(updateObject, email)
                     break
                 }
-                
+
                 // Else update annotation and return
                 updatePhotoAnnotationEntry(updateObject, email)
                 break
         }
 
         // Log and return
-        console.log(`User ${email} updated annotation ${updateObject.annotationId} annotation. 
+        serverLog(`User ${email} updated annotation ${updateObject.annotationId} annotation. 
             It's previous type was ${updateObject.previousMedia} and it's new type is ${updateObject.annotationType}. It's annotation #${updateObject.annotationNo} for model ${updateObject.uid}`)
-
         return 'Annotation Updated'
     }
     catch (e: any) { return `Error: ${e.message}` }

@@ -19,6 +19,7 @@ import { getTmpPath } from "@/functions/server/admin/modelSubmit"
 
 // Defualt imports
 import routeHandlerTypicalResponse from "@/functions/server/typicalSuccessResponse"
+import { serverLog } from "@/functions/server/utils/utils"
 
 // SINGLETON
 const prisma = prismaClient()
@@ -238,7 +239,7 @@ export async function PATCH(request: Request) {
         const update = await prisma.$transaction(transaction).catch(e => routeHandlerErrorHandler(route, e.message, "prisma.$transaction(transaction)", "Couldn't update model data"))
 
         // Log and return
-        console.log(`User ${email} updated model ${uid} in the database. Data: ${JSON.stringify(updateObject)}`)
+        serverLog(`User ${email} updated model ${uid} in the database. Data: ${JSON.stringify(updateObject)}`)
         return routeHandlerTypicalResponse('Model updated.', update)
     }
     // Typical catch

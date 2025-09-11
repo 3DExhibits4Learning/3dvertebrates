@@ -23,9 +23,10 @@ export async function GET(request: Request) {
         
         // Get file buffer
         const fileBuffer = await readFile(searchParams.get('path') as string).catch((e) => routeHandlerErrorHandler(route, e.message, 'readFile()', "Can't read photo")) as Buffer
+        const typedArray = new Uint8Array(fileBuffer)
 
         // Return filebuffer
-        return new Response(fileBuffer)
+        return new Response(typedArray)
     }
     // Typical catch
     catch (e: any) {return routeHandlerTypicalCatch(e.message)}

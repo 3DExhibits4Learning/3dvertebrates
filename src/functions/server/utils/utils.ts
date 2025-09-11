@@ -49,3 +49,13 @@ export const getPathToUnlink = (path?: string) => path ? isLocalDevEnv() ? conve
  * @returns 
  */
 export const isIT = (email: string | undefined | null) => email === process.env.IT_EMAIL
+
+/**
+ * 
+ * @param message 
+ */
+export const serverLog = (message: string) => {
+    const date = new Date()
+    const log = `[${date.toDateString()} ${date.toLocaleTimeString()}]\n${message}\n`
+    console.log(log)
+}

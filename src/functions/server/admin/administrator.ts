@@ -13,7 +13,7 @@ const path = 'src/functions/server/admin/administrator.ts'
 // Typical imports
 import { serverActionErrorHandler, catchMessage, nonFatalError } from "../error"
 import { informStudentOfAssignment, emailNewlyAddedStudent } from "../email"
-import { authorized } from "@prisma/client"
+import { serverLog } from "@/functions/server/utils/utils"
 
 // Default imports
 import prisma from "@/functions/utils/prisma"
@@ -27,7 +27,7 @@ export const deActivateStudent = async (email: string, admin: string) => {
     await prisma.authorized.update({ where: { email: email }, data: { active: false } }).then(() => 'Student deactivated')
         .catch(e => serverActionErrorHandler(path, e.message, 'deActivateStudent()', "Couldn't deactivate student"))
 
-    console.log(`Admin ${admin} deactivated student with email ${email}`)
+    serverLog(`Admin ${admin} deactivated student with email ${email}`)
 }
 
 /**
@@ -94,7 +94,7 @@ export const assignAnnotation = async (student: string, email: string, uid: stri
     try {
         // Throw error if any data is missing
         if (!(email && uid && student)) throw Error('Input data missing')
-        console.log(`Assigning model ${uid} to student ${student} with email ${email}`)
+        serverLog(`Assigning model ${uid} to student ${student} with email ${email}`)
 
         // Get annotator name
         const annotatorName = await prisma.authorized.findUnique({ where: { email: email } }).then(user => user?.name)
@@ -146,7 +146,7 @@ export const unassignAndDeactivate = async (email: string, adminEmail: string) =
 
     // Await transaction
     await prisma.$transaction(txArr).catch(e => serverActionErrorHandler(path, e.message, 'unassignAndDeactivate()', "Couldn't unassign model"))
-    console.log(`Admin ${adminEmail} unassigned and deactivated student with email ${email}`)
+    serverLog(`Admin ${adminEmail} unassigned and deactivated student with email ${email}`)
 }
 
 /**
@@ -169,7 +169,7 @@ export const unassignAnnotation = async (uid: string, adminEmail: string, dev?: 
         await prisma.$transaction(tx).catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction([updateAnnotator, unassignModelForAnnotation])', "Couldn't unassign model"))
         
         // Log and return
-        console.log(`Admin ${adminEmail} unassigned model with uid ${uid}`)
+        serverLog(`Admin ${adminEmail} unassigned model with uid ${uid}`)
         return `Model unassigned`
     }
     catch (e: any) { return e.message }
@@ -188,7 +188,7 @@ export const publishModel = async (uid: string, adminEmail: string) => {
         if (adminAssigned) await prisma.model.update({ where: { uid: uid }, data: { annotated: true } }).catch(e => serverActionErrorHandler(path, e.message, 'publishModel()', "Unable to approve model"))
 
         // Log and return
-        console.log(`Admin ${adminEmail} approved model with uid ${uid}`)
+        serverLog(`Admin ${adminEmail} approved model with uid ${uid}`)
         return "Annotations approved"
     }
     catch (e: any) { return e.message }
@@ -203,7 +203,7 @@ export const markModelAsIncomplete = async (uid: string, adminEmail: string) => 
     try {
         // Mark model as incomplete (or unannotated) and return success
         await prisma.model.update({ where: { uid: uid }, data: { annotated: false } }).catch(e => serverActionErrorHandler(path, e.message, 'unapproveAnnotations()', "Error marking model as incomplete"))
-        console.log(`Admin ${adminEmail} marked model with uid ${uid} as incomplete`)
+        serverLog(`Admin ${adminEmail} marked model with uid ${uid} as incomplete`)
         return "Annotations unapproved"
     }
     catch (e: any) { return e.message }
@@ -217,7 +217,7 @@ export const markModelAsIncomplete = async (uid: string, adminEmail: string) => 
 export const approveModel = async (uid: string, adminEmail: string) => {
     try {
         await prisma.model.update({ where: { uid: uid }, data: { modelApproved: true } }).catch(e => serverActionErrorHandler(path, e.message, 'approveModel()', "Coulnd't mark model as approved"))
-        console.log(`Admin ${adminEmail} approved model with uid ${uid}`)
+        serverLog(`Admin ${adminEmail} approved model with uid ${uid}`)
         return 'Model approved'
     }
     catch (e: any) { return `Error: ${e.message}` }
@@ -252,7 +252,7 @@ export const deleteModel = async (uid: string, adminEmail: string) => {
         }).catch(e => nonFatalError(path, e.message, '`fetch(https://api.sketchfab.com/v3/orgs/) - **MODEL ${uid} NEEDS TO BE DELETED FROM SKETCHFAB**`'))
 
         // Log and return
-        console.log(`Admin ${adminEmail} deleted model with uid ${uid}`)
+        serverLog(`Admin ${adminEmail} deleted model with uid ${uid}`)
         return "Model deleted"
     }
     // Typical fail response
@@ -277,7 +277,7 @@ export const addStudent = async (email: string, name: string, adminEmail: string
         if (user) {
             if (!user.active) {
                 await prisma.authorized.update({ where: { email: email }, data: { active: true } })
-                console.log(`Admin ${adminEmail} reactivated student with email ${email}`)
+                serverLog(`Admin ${adminEmail} reactivated student with email ${email}`)
                 return 'Student reactivated'
             }
             else return 'Student already active'
@@ -290,7 +290,7 @@ export const addStudent = async (email: string, name: string, adminEmail: string
         await emailNewlyAddedStudent(process.env.NODE_ENV === 'production' ? email : "ab632@humboldt.edu", 'beta.3dvertebrates.org').catch((e) => nonFatalError(path, e.message, 'emailNewlyAddedStudent()'))
 
         // Log and success response
-        console.log(`Admin ${adminEmail} added student with email ${email}`)
+        serverLog(`Admin ${adminEmail} added student with email ${email}`)
         return 'Student added'
     }
     // Typical fail response
@@ -322,7 +322,7 @@ export const unpublishModel = async (uid: string, adminEmail: string) => {
     try {
         // Unpublish model annotations
         await prisma.model.update({ where: { uid: uid }, data: { published: false } }).catch(e => serverActionErrorHandler(path, e.message, 'unpublishModel()', "Unable to unpublish model"))
-        console.log(`Admin ${adminEmail} unpublished model with uid ${uid}`)
+        serverLog(`Admin ${adminEmail} unpublished model with uid ${uid}`)
         return "Model unpublished"
     }
     catch (e: any) { return e.message }
