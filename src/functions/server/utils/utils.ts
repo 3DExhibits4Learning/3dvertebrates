@@ -41,7 +41,7 @@ export const convertDbPathToLocalPath = (path: string) => 'X:' + path.slice(5)
  * @param path 
  * @returns 
  */
-export const convertDbPathToCloudPath = (path: string) => `/${path.replaceAll("\\", "/")}`
+export const convertDbPathToCloudPath = (path: string) => `public/${path.replaceAll("\\", "/")}`
 
 /**
  * 
