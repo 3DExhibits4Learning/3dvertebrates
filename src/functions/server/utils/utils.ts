@@ -63,6 +63,6 @@ export const isIT = (email: string | undefined | null) => email === process.env.
  */
 export const serverLog = (message: string) => {
     const date = new Date()
-    const log = `[${date.toDateString()} ${date.toLocaleTimeString()}]\n${message}\n`
+    const log = `[${date.toUTCString()}]\n${message}\n`
     console.log(log)
 }
