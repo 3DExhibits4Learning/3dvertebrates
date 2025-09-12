@@ -17,6 +17,7 @@ import { getAuthorizedUsers } from "@/functions/server/queries"
 // Default imports
 import SessionProvider from '@/components/Shared/SessionProvider'
 import './globals.css'
+import Script from "next/script"
 
 // Main JSX
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -38,6 +39,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return <html id='layoutHTML' className={`${theme?.value} max-w-[100vw] bg-[#F5F3E7] dark:bg-[#181818] overflow-x-hidden`} lang="en">
     <body className="overflow-hidden min-h-[100vh] dark:bg-[#181818] text-[#004C46] dark:text-[#F5F3E7]">
+      <Script defer data-domain="3dvertebrates.org" src="https://plausible.io/js/script.js" />
       <SessionProvider session={session}>
         <Providers>
           {children}

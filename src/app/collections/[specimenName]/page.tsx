@@ -36,7 +36,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     // Ensure the user is authorized if there is a session, else return error page
     if (session) {
       const userEmail = session.user?.email
-      const authedUserEmails = await prisma?.authorized.findMany({ select: { email: true } }).then(authorizedEmails => authorizedEmails.map(emailObj => emailObj.email))
+      const authedUserEmails = await prisma.authorized.findMany({ select: { email: true } }).then(authorizedEmails => authorizedEmails.map(emailObj => emailObj.email))
 
       if (!authedUserEmails.some(authedEmail => authedEmail === userEmail)) return <CollectionsError specimenName={parameters.specimenName} preview />
     }
