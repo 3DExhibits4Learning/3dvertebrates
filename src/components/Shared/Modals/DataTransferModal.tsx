@@ -14,18 +14,12 @@ export default function AnnotationEntryDataTransfer(props: {
     modelUpload?: boolean,
     success?: boolean | undefined
 }) {
+
     return <Modal isOpen={props.open} isDismissable={false} hideCloseButton isKeyboardDismissDisabled={true}>
         <ModalContent>
             <ModalBody className="text-center">
-                {
-                    props.transferring &&
-                    <Spinner label={props.loadingLabel} />
-
-                }
-                {
-                    !props.transferring &&
-                    <p>{props.result}</p>
-                }
+                {props.transferring && <Spinner label={props.loadingLabel} />}
+                {!props.transferring && <p>{props.result}</p>}
                 {
                     !props.transferring && props.modelUpload && props.success &&
                     <>

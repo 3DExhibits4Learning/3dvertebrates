@@ -4,4 +4,5 @@ export default async function dataTransferHandler(initializeDataTransfer: Functi
     initializeDataTransfer(loadingLabel)
     const result = await dataTransferFn(...dataTransferFnArgs)
     terminateDataTransfer(result)
+    console.log('Data transfer complete')
 }
