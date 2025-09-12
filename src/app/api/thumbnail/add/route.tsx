@@ -58,11 +58,11 @@ export async function POST(request: Request) {
         
         // Update the thumbnail column for the model in the database (remove 'public' and follwing slash, then escape remaining forward slashes in path before DB entry)
         const dbUrl = `data/Vertebrates/Thumbnails/${uid}/${file.name}`
-        const update = await prisma.model.update({ where: { uid: uid }, data: { thumbnail: dbUrl.replaceAll('/', '\\') } }).catch(e => routeHandlerErrorHandler(e.message, path, 'prisma.model.update()', "Couldn't update thumbnail in database"))
+        await prisma.model.update({ where: { uid: uid }, data: { thumbnail: dbUrl.replaceAll('/', '\\') } }).catch(e => routeHandlerErrorHandler(e.message, path, 'prisma.model.update()', "Couldn't update thumbnail in database"))
 
         // Log and return
         serverLog(`User ${email} added thumbnail for model ${uid} in the database. Path: ${dbUrl}`)
-        return routeHandlerTypicalResponse('Thumbnail Added', update)
+        return new Response('Thunmbnail added')
     }
     // Typical catch
     catch (e: any) {return routeHandlerTypicalCatch(e.message)}
