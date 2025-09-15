@@ -2,10 +2,13 @@
 
 // Typical imports
 import { Modal, ModalContent, ModalBody, ModalFooter, Button, Spinner, Progress } from "@heroui/react"
+import { useRouter } from "next/navigation"
 import { Dispatch, SetStateAction } from "react"
 
 // Main JSX
 export default function UploadModal(props: { isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>, writingToDisk: boolean, exportingToSketchfab: boolean, progress: number, result: string }) {
+    const router = useRouter()
+
     return <Modal isOpen={props.isOpen} isDismissable={false} hideCloseButton isKeyboardDismissDisabled={true}>
         <ModalContent>
             <ModalBody className="text-center">
@@ -27,7 +30,7 @@ export default function UploadModal(props: { isOpen: boolean, setIsOpen: Dispatc
             <ModalFooter className="flex justify-center">
                 {
                     !props.writingToDisk && !props.exportingToSketchfab && props.result &&
-                    <Button color="primary" className="mb-4" onPress={() => props.setIsOpen(false)}>Close</Button>
+                    <Button color="primary" className="mb-4" onPress={() => router.refresh()}>Close</Button>
                 }
             </ModalFooter>
         </ModalContent>
