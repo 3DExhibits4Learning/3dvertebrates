@@ -46,7 +46,6 @@ export default function ModelSubmitForm() {
     const [uploadDisabled, setUploadDisabled] = useState<boolean>(true)
     const [open, setOpen] = useState<boolean>(false)
     const [result, setResult] = useState<string>('')
-    const [success, setSuccess] = useState<boolean>()
     const [uploadProgress, setUploadProgress] = useState<number>(0)
     const [writingToDisk, setWritingToDisk] = useState<boolean>(false)
     const [exportingToSketchfab, setExportingToSketchfab] = useState<boolean>(false)
@@ -96,7 +95,6 @@ export default function ModelSubmitForm() {
             setResult(e.message)
             setWritingToDisk(false)
             setExportingToSketchfab(false)
-            setSuccess(false)
         }
     }
 
@@ -109,7 +107,6 @@ export default function ModelSubmitForm() {
     }, [species, artist, buildMethod, software.length, file, baseOrAnnotation])
 
     return <>
-        {/* <DataTransferModal open={open} transferring={transferring} result={result} loadingLabel='Uploading 3D Model' href='/admin' modelUpload success={success} /> */}
         <UploadModal isOpen={open} setIsOpen={setOpen} writingToDisk={writingToDisk} exportingToSketchfab={exportingToSketchfab} progress={uploadProgress} result={result} />
 
         <form className='w-full lg:w-3/5 lg:border-2 m-auto lg:border-[#004C46] lg:rounded-md bg-[#D5CB9F] dark:bg-[#212121] lg:mb-16 text-[#004C46] dark:text-white'>
