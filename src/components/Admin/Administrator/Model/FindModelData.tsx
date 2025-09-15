@@ -6,11 +6,10 @@ import { isAnnotationModelUsed } from "@/functions/server/admin/administrator"
 import { useEffect, useState } from "react"
 
 export default function ModelDataTable(props: { model: model }) {
+    // Declare model and see if it's been used if it's an annotation model
     const m = props.model
     const isUsed = async() => await isAnnotationModelUsed(m.uid)
     const [used, setUsed] = useState<boolean | undefined>(undefined)
-    console.log(used)
-
     useEffect(() => {if(!m.base_model) isUsed().then(res => setUsed(res)) }, [])
 
     return <section className="flex flex-col w-[30%] min-w-[285px] items-center ml-8">
