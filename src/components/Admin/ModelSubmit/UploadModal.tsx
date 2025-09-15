@@ -25,7 +25,7 @@ export default function UploadModal(props: { isOpen: boolean, setIsOpen: Dispatc
                         <Spinner label='Exporting model to host...' size='lg' />
                     </section>
                 }
-                {props.result && <p className="my-6">{props.result}</p>}
+                {props.result && <p className="my-6 text-lg">{props.result}</p>}
             </ModalBody>
             <ModalFooter className="flex justify-center">
                 {
