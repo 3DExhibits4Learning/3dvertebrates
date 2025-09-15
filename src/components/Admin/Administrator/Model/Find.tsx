@@ -46,6 +46,6 @@ export default function FindModel(props: { models: model[] }) {
             {uid && <div className="w-full h-full"><ModelViewer uid={uid} minHeight="100%" /></div>}
             {model && <ModelDataTable model={model} />}
         </div>
-        {isPublished && <section><button className="text-red-600 mt-6" onClick={() => unpublishModelHandler(uid)}>Unpublish 3D Vertebrate</button></section>}
+        {isPublished && model?.base_model && <section><button className="text-red-600 mt-6" onClick={() => unpublishModelHandler(uid)}>Unpublish 3D Vertebrate</button></section>}
     </AdminItemContainer>
 }
