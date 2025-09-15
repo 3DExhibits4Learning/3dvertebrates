@@ -17,7 +17,7 @@ export async function emailNewlyAddedStudent(email: string, domain: string) {
         html: `You have been authorized to contribute to ${domain}!
         Remember that you must login with your humboldt.edu email address.
         <br><br>
-        You can find the admin portal for login on the contributions page of ${domain}, or click <u><a href="${domain}" target='_blank'>here</a></u>`
+        You can find the admin portal for login on the contributions page of ${domain}, or click <u><a href="${domain}/contribute" target='_blank'>here</a></u>`
     }).catch(e => {throw Error(e.message)})
 }
 

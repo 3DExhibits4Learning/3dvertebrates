@@ -107,7 +107,7 @@ export const assignAnnotation = async (student: string, email: string, uid: stri
 
         // Await transaction and inform student of assignment
         await prisma.$transaction(tx).catch(e => serverActionErrorHandler(path, e.message, 'prisma.$transaction([updateAnnotator, assignModelForAnnotation])', "Couldn't assign model to student"))
-        await informStudentOfAssignment(process.env.NODE_ENV === 'production' ? email : "ab632@humboldt.edu", "beta.3dvertebrates.org")
+        await informStudentOfAssignment(process.env.NODE_ENV === 'production' ? email : "ab632@humboldt.edu", "3dvertebrates.org")
 
         // Success message
         return `Model assigned to ${student} for annotation`
@@ -189,7 +189,7 @@ export const publishModel = async (uid: string, adminEmail: string) => {
 
         // Log and return
         serverLog(`Admin ${adminEmail} approved model with uid ${uid}`)
-        return "Annotations approved"
+        return "Model Published"
     }
     catch (e: any) { return e.message }
 }
@@ -287,7 +287,7 @@ export const addStudent = async (email: string, name: string, adminEmail: string
         await prisma.authorized.create({ data: { email: email, name: name } }).catch((e) => serverActionErrorHandler(path, e.message, 'addStudent()', "Couldn't add student"))
 
         // Email student, informing them of their addition to the project
-        await emailNewlyAddedStudent(process.env.NODE_ENV === 'production' ? email : "ab632@humboldt.edu", 'beta.3dvertebrates.org').catch((e) => nonFatalError(path, e.message, 'emailNewlyAddedStudent()'))
+        await emailNewlyAddedStudent(process.env.NODE_ENV === 'production' ? email : "ab632@humboldt.edu", '3dvertebrates.org').catch((e) => nonFatalError(path, e.message, 'emailNewlyAddedStudent()'))
 
         // Log and success response
         serverLog(`Admin ${adminEmail} added student with email ${email}`)
@@ -328,3 +328,12 @@ export const unpublishModel = async (uid: string, adminEmail: string) => {
     catch (e: any) { return e.message }
 }
 
+/**
+ * 
+ * @param uid 
+ * @returns 
+ */
+export const isAnnotationModelUsed = async (uid: string) => {
+    const modelAnnotations = await prisma.model_annotation.findMany({ where: { uid: uid} })
+    return modelAnnotations.length > 0
+}

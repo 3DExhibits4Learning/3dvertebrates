@@ -2,9 +2,16 @@
 
 import { model } from "@prisma/client"
 import { toUpperFirstLetter } from "@/functions/utils/toUpperFirstLetter"
+import { isAnnotationModelUsed } from "@/functions/server/admin/administrator"
+import { useEffect, useState } from "react"
 
 export default function ModelDataTable(props: { model: model }) {
     const m = props.model
+    const isUsed = async() => await isAnnotationModelUsed(m.uid)
+    const [used, setUsed] = useState<boolean | undefined>(undefined)
+    console.log(used)
+
+    useEffect(() => {if(!m.base_model) isUsed().then(res => setUsed(res)) }, [])
 
     return <section className="flex flex-col w-[30%] min-w-[285px] items-center ml-8">
         <p className="font-medium text-center">Species Name</p>
@@ -12,7 +19,8 @@ export default function ModelDataTable(props: { model: model }) {
         <p className="font-medium">UID</p>
         <p className="mb-1">{m.uid}</p>
         <p className="font-medium">Status</p>
-        <p className="mb-1">{m.published ? 'Published' : m.assignedEmail ? 'Assigned' : 'Unassigned'}</p>
+        {m.base_model && <p className="mb-1">{m.published ? 'Published' : m.assignedEmail ? 'Assigned' : 'Unassigned'}</p>}
+        {!m.base_model && used !== undefined && <p className="mb-1">{used ? 'Published as annotation model' : 'Unpublished'}</p>}
         <p className="font-medium">Modeler</p>
         <p className="mb-1">{m.modeled_by}</p>
         <p className="font-medium">Base Model</p>
